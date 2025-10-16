@@ -2,7 +2,7 @@
   "apps": [
     {
       "name": "cuidemjunts",
-      "script": "dist/main.js",
+      "script": "npm run start:dev",
       "instances": 1,
       "exec_mode": "fork",
       "watch": false,

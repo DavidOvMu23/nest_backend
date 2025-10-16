@@ -11,7 +11,7 @@ import {
   SUPERVISOR = 'supervisor',
 }*/
 
-
+export type TipoTrabajador = "admin" | "editor" | "ghost";
 
 @Entity('trabajador')
 @TableInheritance({ column: { type: 'varchar', name: 'tipo' } })

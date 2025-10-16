@@ -6,10 +6,12 @@ import {
   BaseEntity,
 } from 'typeorm';
 
-export enum TipoTrabajador {
+/*export enum TipoTrabajador {
   TELEOPERADOR = 'teleoperador',
   SUPERVISOR = 'supervisor',
-}
+}*/
+
+export type TipoTrabajador = "admin" | "editor" | "ghost";
 
 @Entity('trabajador')
 @TableInheritance({ column: { type: 'varchar', name: 'tipo' } })
@@ -31,7 +33,7 @@ export class Trabajador extends BaseEntity {
 
   @Column({
     type: 'enum',
-    enum: TipoTrabajador,
+    enum: ["admin", "editor", "ghost"],
   })
   tipo: TipoTrabajador;
 }

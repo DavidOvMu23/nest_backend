@@ -9,21 +9,29 @@ import { NotificacionModule } from './notificacion/notificacion.module';
 import { ComunicacionModule } from './comunicacion/comunicacion.module';
 import { UsuarioModule } from './usuario/usuario.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [TrabajadorModule, TeleoperadorModule, SupervisorModule, GrupoModule, NotificacionModule, ComunicacionModule, UsuarioModule,
+  imports: [
+    // 👇 Cargar las variables de entorno
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env', // asegúrate de que tu .env esté en nest_backend/
+    }),
+
     TypeOrmModule.forRoot({
       type: 'mariadb',
       host: process.env.DB_HOST,
-      port: 3306,
+      port: Number(process.env.DB_PORT) || 3306,
       username: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [__dirname + '/**/*.entity.ts'],
-      synchronize: true,
+      entities: [__dirname + '/**/*.entity.{ts,js}'],
+      synchronize: false,
+      autoLoadEntities: true,
     }),
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

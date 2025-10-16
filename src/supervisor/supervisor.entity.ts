@@ -1,5 +1,5 @@
 import { ChildEntity, Column } from 'typeorm';
-import { Trabajador } from '../trabajador/trabajdor.entity';
+import { Trabajador } from '../trabajador/trabajador.entity';
 
 @ChildEntity()
 export class Supervisor extends Trabajador {

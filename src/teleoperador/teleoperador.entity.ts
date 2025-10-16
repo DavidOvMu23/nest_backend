@@ -4,7 +4,7 @@ import {
     ManyToOne,
     OneToMany,
 } from 'typeorm';
-import { Trabajador } from '../trabajador/trabajdor.entity';
+import { Trabajador } from '../trabajador/trabajador.entity';
 import { Grupo } from '../grupo/grupo.entity';
 import { Notificacion } from '../notificacion/notificacion.entity';
 

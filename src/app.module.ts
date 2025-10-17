@@ -13,10 +13,9 @@ import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    // 👇 Cargar las variables de entorno
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env', // asegúrate de que tu .env esté en nest_backend/
+      envFilePath: '.env',
     }),
 
     TypeOrmModule.forRoot({
@@ -27,8 +26,11 @@ import { ConfigModule } from '@nestjs/config';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       entities: [__dirname + '/**/*.entity.{ts,js}'],
-      synchronize: false,
-      autoLoadEntities: true,
+      autoLoadEntities: false,
+      synchronize: false, //se usa solo para desarrollo y probar los datos de prueba del script,
+      // Habrá que declararlo en true cuando ya metamos los datos reales de la app y que typeORM
+      // gestione la estructura sin el script de SQL manual, habrá que borrar el script de sql y
+      // declarar el syncronize en tru
     }),
   ],
   controllers: [AppController],

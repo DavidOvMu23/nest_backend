@@ -1,5 +1,14 @@
-import { Entity, PrimaryColumn, Column, OneToMany, ManyToOne } from 'typeorm';
+import {
+    Entity,
+    PrimaryColumn,
+    Column,
+    OneToMany,
+    ManyToOne,
+    ManyToMany,
+    JoinTable,
+} from 'typeorm';
 import { Comunicacion } from '../comunicacion/comunicacion.entity';
+import { ContactoEmergencia } from '../contacto_emergencia/contacto_emergencia.entity';
 
 @Entity('usuario')
 export class Usuario {
@@ -24,15 +33,29 @@ export class Usuario {
     @Column()
     nivel_dependencia: string;
 
-    @Column()
+    @Column({ nullable: true })
     datos_medicos_dolencias: string;
 
-    @Column()
+    @Column({ nullable: true })
     medicacion: string;
+
+    @Column({ nullable: true })
+    telefono: string;
+
+    @Column({ nullable: true })
+    direccion: string;
 
     @OneToMany(() => Comunicacion, com => com.usuario)
     comunicaciones: Comunicacion[];
 
-    @ManyToOne(() => Usuario)
-    contactoEmergencia: Usuario; // Relación por DNI_cont
+    @ManyToOne(() => Usuario, { nullable: true })
+    contactoEmergencia: Usuario;
+
+    @ManyToMany(() => ContactoEmergencia, contacto => contacto.usuarios, { cascade: true })
+    @JoinTable({
+        name: 'usuario_contacto', // nombre de tabla intermedia igual que en SQL
+        joinColumn: { name: 'dni_usuario', referencedColumnName: 'dni' },
+        inverseJoinColumn: { name: 'id_contacto', referencedColumnName: 'id_cont' },
+    })
+    contactosEmergencia: ContactoEmergencia[];
 }

@@ -6,16 +6,15 @@ import {
   BaseEntity,
 } from 'typeorm';
 
-/*export enum TipoTrabajador {
-  TELEOPERADOR = 'teleoperador',
+export enum TipoTrabajador {
+  ADMIN = 'admin',
   SUPERVISOR = 'supervisor',
-}*/
-
-export type TipoTrabajador = "admin" | "editor" | "ghost";
+  TELEOPERADOR = 'teleoperador',
+}
 
 @Entity('trabajador')
 @TableInheritance({ column: { type: 'varchar', name: 'tipo' } })
-export class Trabajador {
+export class Trabajador extends BaseEntity {
   @PrimaryGeneratedColumn()
   id_trab: number;
 
@@ -31,6 +30,9 @@ export class Trabajador {
   @Column()
   contrasena: string;
 
-  @Column()
-  tipo: number;
+  @Column({
+    type: 'enum',
+    enum: TipoTrabajador,
+  })
+  tipo: TipoTrabajador;
 }

@@ -10,6 +10,8 @@ import { ComunicacionModule } from './comunicacion/comunicacion.module';
 import { UsuarioModule } from './usuario/usuario.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { ContactoEmergenciaModule } from './contacto_emergencia/contacto_emergencia.module';
+import { UsuarioContactoModule } from './usuario_contacto/usuario_contacto.module';
 
 @Module({
   imports: [
@@ -32,6 +34,10 @@ import { ConfigModule } from '@nestjs/config';
       // gestione la estructura sin el script de SQL manual, habrá que borrar el script de sql y
       // declarar el syncronize en tru
     }),
+
+    ContactoEmergenciaModule,
+
+    UsuarioContactoModule,
   ],
   controllers: [AppController],
   providers: [AppService],

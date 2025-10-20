@@ -12,6 +12,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { ContactoEmergenciaModule } from './contacto_emergencia/contacto_emergencia.module';
 import { UsuarioContactoModule } from './usuario_contacto/usuario_contacto.module';
+import { UsuarioContactoModule } from './usuario_contacto/usuario_contacto.module';
 
 @Module({
   imports: [

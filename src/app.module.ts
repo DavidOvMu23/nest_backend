@@ -26,8 +26,8 @@ import { ConfigModule } from '@nestjs/config';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       entities: [__dirname + '/**/*.entity.{ts,js}'],
-      autoLoadEntities: false,
-      synchronize: false, //se usa solo para desarrollo y probar los datos de prueba del script,
+      autoLoadEntities: true,
+      synchronize: true, //se usa solo para desarrollo y probar los datos de prueba del script,
       // Habrá que declararlo en true cuando ya metamos los datos reales de la app y que typeORM
       // gestione la estructura sin el script de SQL manual, habrá que borrar el script de sql y
       // declarar el syncronize en tru

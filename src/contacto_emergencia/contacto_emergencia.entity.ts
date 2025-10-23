@@ -28,4 +28,5 @@ export class ContactoEmergencia extends BaseEntity {
     // En tu SQL, algunos contactos están vinculados a usuarios, otros son genéricos
     @ManyToMany(() => Usuario, usuario => usuario.contactosEmergencia, { nullable: true })
     usuarios?: Usuario[];
+    dni_usuario_ref: Usuario | null;
 }

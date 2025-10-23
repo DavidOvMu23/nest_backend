@@ -25,9 +25,9 @@ async function runSeeds() {
         await seedComunicaciones();
         await seedNotificaciones();
 
-        console.log('✅ Carga de datos completada correctamente.');
+        console.log('Carga de datos completada correctamente.');
     } catch (error) {
-        console.error('❌ Error ejecutando seeds:', error);
+        console.error('Error ejecutando seeds:', error);
     } finally {
         if (AppDataSource.isInitialized) {
             await AppDataSource.destroy();

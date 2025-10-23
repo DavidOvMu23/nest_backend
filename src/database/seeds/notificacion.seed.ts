@@ -1,33 +1,28 @@
-import { AppDataSource } from '../../../data-source';
+import { DataSource } from 'typeorm';
+import { Seeder } from 'typeorm-extension';
+import notificacionData from '../../data/notificacion';
 import { Notificacion } from '../../notificacion/notificacion.entity';
 import { Teleoperador } from '../../teleoperador/teleoperador.entity';
 
-export async function seedNotificaciones() {
-    await AppDataSource.initialize();
-    const repo = AppDataSource.getRepository(Notificacion);
-    const telRepo = AppDataSource.getRepository(Teleoperador);
+export class NotificacionSeed implements Seeder {
+    public async run(dataSource: DataSource) {
+        const notificacionRepository = dataSource.getRepository(Notificacion);
+        const teleoperadorRepository = dataSource.getRepository(Teleoperador);
 
-    const teleops = await telRepo.find();
-    const count = await repo.count();
-
-    if (count === 0 && teleops.length) {
-        const map = (correo: string) => teleops.find(t => t.correo === correo);
-
-        const notificaciones = [
-            { teleoperador: map('laura.gomez@cuidem.local'), contenido: 'Tienes 3 llamadas programadas para hoy a partir de las 10:00.', estado: 'sin_leer' },
-            { teleoperador: map('laura.gomez@cuidem.local'), contenido: 'La incidencia de centralita quedó resuelta.', estado: 'leida' },
-            { teleoperador: map('carlos.navas@cuidem.local'), contenido: 'Recuerda registrar la comunicación con José Martínez.', estado: 'sin_leer' },
-            { teleoperador: map('noa.benitez@cuidem.local'), contenido: 'Nueva pauta de comunicación empática — viernes 12:00.', estado: 'leida' },
-            { teleoperador: map('pablo.rey@cuidem.local'), contenido: 'Caso escalado a psicología comunitaria.', estado: 'archivada' },
-            { teleoperador: map('ines.campos@cuidem.local'), contenido: 'Se cancela la formación de esta tarde.', estado: 'cancelada' },
-            { teleoperador: map('hugo.santos@cuidem.local'), contenido: 'Actualiza el resumen de la llamada de Eduardo.', estado: 'sin_leer' },
-        ];
-
-        await repo.save(notificaciones);
-        console.log('Notificaciones creadas');
-    } else {
-        console.log('Notificaciones ya existen o faltan teleoperadores');
+        const notificacionEntries = await Promise.all(
+            notificacionData.map(async (notificacion) => {
+                const notificacionEntry = new Notificacion();
+                notificacionEntry.contenido = notificacion.contenido;
+                notificacionEntry.estado = notificacion.estado;
+                /*Esto lo que hace es comprobar que el teleoperador exita para evitar errores, puesto que el findOneBy puede darte valor null si no lo encuentra entonces no se puede almacenar la notificacion puesto que si o si tiene que haber un teleoperador asociado, por es que se hace ese if y luego lanzo la excepcion en caso de que no se encuentre*/
+                const tele = await teleoperadorRepository.findOneBy({ correo: notificacion.teleoperador });
+                if (!tele) {
+                    throw new Error(`Teleoperador no encontrado: ${notificacion.teleoperador}`);
+                }
+                notificacionEntry.teleoperador = tele;
+                return notificacionEntry;
+            })
+        );
+        await notificacionRepository.save(notificacionEntries);
     }
-
-    await AppDataSource.destroy();
 }

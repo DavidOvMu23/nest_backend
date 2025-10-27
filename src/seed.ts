@@ -69,6 +69,6 @@ dataSource
     .then(async () => {
         await dataSource.synchronize(true);
         await runSeeders(dataSource)
-        process.exit();
+        console.log('Seeders ejecutados correctamente');
     })
     .catch((error) => console.log('Error inicializando los datos', error))

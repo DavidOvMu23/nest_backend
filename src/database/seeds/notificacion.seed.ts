@@ -15,8 +15,8 @@ export class NotificacionSeed implements Seeder {
                 notificacionEntry.contenido = notificacion.contenido;
                 notificacionEntry.estado = notificacion.estado;
                 /*Esto lo que hace es comprobar que el teleoperador exita para evitar errores, puesto que el findOneBy puede darte valor null si no lo encuentra entonces no se puede almacenar la notificacion puesto que si o si tiene que haber un teleoperador asociado, por es que se hace ese if y luego lanzo la excepcion en caso de que no se encuentre*/
-                const tele = await teleoperadorRepository.findOneBy({ correo: notificacion.teleoperador });
-                if (!tele) {
+                const tele = await teleoperadorRepository.findOneBy({ correo: notificacion.teleoperador }); //Aquí almaceno en una constante el valor que me va a dar el findOneBy.
+                if (!tele) { // Aquí compruebo que dicha constante tenga valor es decir sea true, en caso de que no tenga algo entonces lanzará una excepción
                     throw new Error(`Teleoperador no encontrado: ${notificacion.teleoperador}`);
                 }
                 notificacionEntry.teleoperador = tele;

@@ -27,7 +27,6 @@ import { UsuarioContactoModule } from './usuario_contacto/usuario_contacto.modul
       username: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [__dirname + '/**/*.entity.{ts,js}'],
       autoLoadEntities: true,
       synchronize: true, //se usa solo para desarrollo y probar los datos de prueba del script,
       // Habrá que declararlo en true cuando ya metamos los datos reales de la app y que typeORM
@@ -38,8 +37,9 @@ import { UsuarioContactoModule } from './usuario_contacto/usuario_contacto.modul
     ContactoEmergenciaModule,
 
     UsuarioContactoModule,
+
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

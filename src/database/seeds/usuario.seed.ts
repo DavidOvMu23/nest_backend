@@ -3,7 +3,7 @@ import usuarioData from '../../data/usuario';
 import { Seeder } from 'typeorm-extension';
 import { Usuario } from '../../usuario/usuario.entity';
 
-export default class UsuarioSeed implements Seeder {
+export class UsuarioSeed implements Seeder {
     public async run(dataSource: DataSource): Promise<void> {
         const usuarioRepository = dataSource.getRepository(Usuario);
         const usuarioEntries = await Promise.all(

@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Comunicacion } from '../comunicacion/comunicacion.entity';
 import { ContactoEmergencia } from '../contacto_emergencia/contacto_emergencia.entity';
+import { UsuarioContactoUsuario } from 'src/usuario_contacto/usuario_contacto.entity';
 
 @Entity('usuario')
 export class Usuario {
@@ -51,6 +52,7 @@ export class Usuario {
     @ManyToOne(() => Usuario, { nullable: true })
     contactoEmergencia: Usuario;
 
+
     @ManyToMany(() => ContactoEmergencia, contacto => contacto.usuarios, { cascade: true })
     @JoinTable({
         name: 'usuario_contacto', // nombre de tabla intermedia igual que en SQL
@@ -58,4 +60,11 @@ export class Usuario {
         inverseJoinColumn: { name: 'id_contacto', referencedColumnName: 'id_cont' },
     })
     contactosEmergencia: ContactoEmergencia[];
+
+    @OneToMany(() => UsuarioContactoUsuario, uc => uc.usuario)
+    contactosAsignados: UsuarioContactoUsuario[];
+
+    @OneToMany(() => UsuarioContactoUsuario, uc => uc.contacto)
+    esContactoDe: UsuarioContactoUsuario[];
+
 }

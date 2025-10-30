@@ -11,8 +11,8 @@ import {
     HttpStatus,
     NotFoundException,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { CreateSupervisorDTO, UpdateSupervisorDTO } from './supervisor.dto';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { CreateSupervisorDTO, UpdateSupervisorDTO, SupervisorResponseDTO } from './supervisor.dto';
 import { SupervisorService } from './supervisor.service';
 
 /**
@@ -32,7 +32,8 @@ export class SupervisorController {
     // ====== CREAR ======
     @Post()
     @ApiOperation({ summary: 'Crear un supervisor' })
-    @ApiResponse({ status: 201, description: 'Supervisor creado' })
+    @ApiBody({ type: CreateSupervisorDTO })
+    @ApiResponse({ status: 201, description: 'Supervisor creado', type: SupervisorResponseDTO })
     async create(@Body() createDto: CreateSupervisorDTO) {
         // @Body(): toma el JSON que envía el cliente y lo convierte en createDto
         // La validación del DTO (regex de DNI, tipo string, etc.) debe ocurrir
@@ -47,7 +48,7 @@ export class SupervisorController {
     // ====== LISTAR TODOS ======
     @Get()
     @ApiOperation({ summary: 'Listar todos los supervisores' })
-    @ApiResponse({ status: 200, description: 'Lista de supervisores' })
+    @ApiResponse({ status: 200, description: 'Lista de supervisores', type: SupervisorResponseDTO, isArray: true })
     async findAll() {
         // Llamamos al servicio que obtiene todos los supervisores.
         // Aquí no hay body ni params; sólo devolvemos lo que venga del servicio.
@@ -57,7 +58,7 @@ export class SupervisorController {
     // ====== OBTENER UNO ======
     @Get(':id')
     @ApiOperation({ summary: 'Obtener supervisor por id' })
-    @ApiResponse({ status: 200, description: 'Supervisor encontrado' })
+    @ApiResponse({ status: 200, description: 'Supervisor encontrado', type: SupervisorResponseDTO })
     @ApiResponse({ status: 404, description: 'No encontrado' })
     async findOne(@Param('id', ParseIntPipe) id: number) {
         // @Param('id', ParseIntPipe): toma el parametro de la ruta y lo convierte a number.
@@ -74,7 +75,8 @@ export class SupervisorController {
     // ====== ACTUALIZAR PARCIAL (PATCH) ======
     @Patch(':id')
     @ApiOperation({ summary: 'Actualizar supervisor (parcial)' })
-    @ApiResponse({ status: 200, description: 'Supervisor actualizado' })
+    @ApiBody({ type: UpdateSupervisorDTO })
+    @ApiResponse({ status: 200, description: 'Supervisor actualizado', type: SupervisorResponseDTO })
     @ApiResponse({ status: 404, description: 'No encontrado' })
     async update(
         @Param('id', ParseIntPipe) id: number,

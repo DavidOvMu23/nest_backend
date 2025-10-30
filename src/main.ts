@@ -1,18 +1,25 @@
 import { NestFactory } from '@nestjs/core';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const config = new DocumentBuilder()
+    .setTitle('Cats example')
+    .setDescription('The cats API description')
+    .setVersion('1.0')
+    .addTag('cats')
+    .build();
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, documentFactory);
 
-  console.log('Usuario:', process.env.DB_USER);
-  console.log('Contraseña:', process.env.DB_PASSWORD);
+  await app.listen(process.env.PORT ?? 3000);
 
 
   // Permite conexiones desde fuera del contenedor (Docker)
   const port = process.env.PORT ?? 3000;
   await app.listen(port, '0.0.0.0');
 
-  console.log(`🚀 Server running on http://0.0.0.0:${port}`);
 }
 
 bootstrap();

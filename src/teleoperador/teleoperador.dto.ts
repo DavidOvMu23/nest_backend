@@ -1,4 +1,4 @@
-import { IsEmail, IsOptional, IsString, Matches, Length } from 'class-validator';
+import { IsEmail, IsOptional, IsString, Matches, Length, IsNumber } from 'class-validator';
 import { ApiPropertyOptional, ApiProperty } from '@nestjs/swagger';
 
 
@@ -19,6 +19,11 @@ export class CreateTeleoperadorDTO {
     correo: string;
 
     @IsString()
+    @Length(6, 128)
+    @ApiProperty({ description: 'Contraseña temporal o definitiva', example: 'temporal123' })
+    contrasena: string;
+
+    @IsNumber()
     @Matches(/^[0-9]{8}$/, { message: 'Formato de NIA incorrecto' })
     @ApiProperty({ description: 'NIA del teleoperador(8 dígitos)', example: '12345678A' })
     nia: string;
@@ -44,6 +49,12 @@ export class UpdateTeleoperadorDTO {
     @ApiPropertyOptional({ description: 'Correo del teleoperador', example: 'Juan.martin@cuidem.local' })
     correo?: string;
 
+
+    @IsOptional()
+    @IsString()
+    @Length(6, 128)
+    @ApiPropertyOptional({ description: 'Contraseña temporal o definitiva', example: 'temporal123' })
+    contrasena?: string;
 
 
     @IsOptional()

@@ -7,7 +7,6 @@ import {
 } from 'typeorm';
 
 export enum TipoTrabajador {
-  ADMIN = 'admin',
   SUPERVISOR = 'supervisor',
   TELEOPERADOR = 'teleoperador',
 }

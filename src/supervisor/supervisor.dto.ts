@@ -32,7 +32,6 @@ export class CreateSupervisorDTO {
     @Length(6, 128)
     @ApiProperty({ description: 'Contraseña temporal o definitiva', example: 'temporal123' })
     contrasena: string;
-
     // El DNI es obligator al crear, debe cumplir el patrón 8 números + letra.
     @IsString()
     @Matches(/^[0-9]{8}[A-Z]$/, { message: 'Format of DNI incorrect' })

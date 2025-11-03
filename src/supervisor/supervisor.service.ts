@@ -28,7 +28,7 @@ export class SupervisorService {
             apellidos: dto.apellidos,
             correo: dto.correo,
             contrasena: dto.contrasena,
-            dni: dto.dni ? dto.dni.toUpperCase() : undefined, // normalizamos el DNI a mayúsculas
+            dni: dto.dni.toUpperCase(), // normalizamos el DNI a mayúsculas
             tipo: TipoTrabajador.SUPERVISOR, // aseguramos que el tipo coincide con la subclase
         });
 

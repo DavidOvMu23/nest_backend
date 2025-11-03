@@ -31,84 +31,84 @@ export class SupervisorController {
     constructor(private readonly supervisorService: SupervisorService) { }
 
     // ====== CREAR ======
-    @Post()
-    @ApiOperation({ summary: 'Crear un supervisor' })
-    @ApiBody({ type: CreateSupervisorDTO })
-    @ApiResponse({ status: 201, description: 'Supervisor creado', type: SupervisorResponseDTO })
-    async create(@Body() createDto: CreateSupervisorDTO) {
-        // @Body convierte el JSON del cliente en una instancia del DTO ya validada.
-        const created = await this.supervisorService.create(createDto);
-        // Convertimos la entidad a un DTO de salida para controlar qué campos mostramos.
-        return this.toResponse(created);
-    }
+    @Post() if(dto.f_nac !== undefined) usuario.f_nac = dto.f_nac;
+@ApiOperation({ summary: 'Crear un supervisor' })
+@ApiBody({ type: CreateSupervisorDTO })
+@ApiResponse({ status: 201, description: 'Supervisor creado', type: SupervisorResponseDTO })
+async create(@Body() createDto: CreateSupervisorDTO) {
+    // @Body convierte el JSON del cliente en una instancia del DTO ya validada.
+    const created = await this.supervisorService.create(createDto);
+    // Convertimos la entidad a un DTO de salida para controlar qué campos mostramos.
+    return this.toResponse(created);
+}
 
-    // ====== LISTAR TODOS ======
-    @Get()
-    @ApiOperation({ summary: 'Listar todos los supervisores' })
-    @ApiResponse({ status: 200, description: 'Lista de supervisores', type: SupervisorResponseDTO, isArray: true })
-    async findAll() {
-        const supervisors = await this.supervisorService.findAll();
-        return supervisors.map((item) => this.toResponse(item));
-    }
+// ====== LISTAR TODOS ======
+@Get()
+@ApiOperation({ summary: 'Listar todos los supervisores' })
+@ApiResponse({ status: 200, description: 'Lista de supervisores', type: SupervisorResponseDTO, isArray: true })
+async findAll() {
+    const supervisors = await this.supervisorService.findAll();
+    return supervisors.map((item) => this.toResponse(item));
+}
 
-    // ====== OBTENER UNO ======
-    @Get(':id')
-    @ApiOperation({ summary: 'Obtener supervisor por id' })
-    @ApiResponse({ status: 200, description: 'Supervisor encontrado', type: SupervisorResponseDTO })
-    @ApiResponse({ status: 404, description: 'No encontrado' })
-    async findOne(@Param('id', ParseIntPipe) id: number) {
-        // ParseIntPipe convierte el parámetro a number y lanza 400 si no puede.
-        const found = await this.supervisorService.findOne(id);
-        if (!found) {
-            // Lanzamos 404 si el registro no existe.
-            throw new NotFoundException(`Supervisor con id ${id} no encontrado`);
-        }
-        return this.toResponse(found);
+// ====== OBTENER UNO ======
+@Get(':id')
+@ApiOperation({ summary: 'Obtener supervisor por id' })
+@ApiResponse({ status: 200, description: 'Supervisor encontrado', type: SupervisorResponseDTO })
+@ApiResponse({ status: 404, description: 'No encontrado' })
+async findOne(@Param('id', ParseIntPipe) id: number) {
+    // ParseIntPipe convierte el parámetro a number y lanza 400 si no puede.
+    const found = await this.supervisorService.findOne(id);
+    if (!found) {
+        // Lanzamos 404 si el registro no existe.
+        throw new NotFoundException(`Supervisor con id ${id} no encontrado`);
     }
+    return this.toResponse(found);
+}
 
-    // ====== ACTUALIZAR PARCIAL (PATCH) ======
-    @Patch(':id')
-    @ApiOperation({ summary: 'Actualizar supervisor (parcial)' })
-    @ApiBody({ type: UpdateSupervisorDTO })
-    @ApiResponse({ status: 200, description: 'Supervisor actualizado', type: SupervisorResponseDTO })
-    @ApiResponse({ status: 404, description: 'No encontrado' })
-    async update(
-        @Param('id', ParseIntPipe) id: number,
-        @Body() updateDto: UpdateSupervisorDTO,
-    ) {
-        const updated = await this.supervisorService.update(id, updateDto);
-        if (!updated) {
-            throw new NotFoundException(`Supervisor con id ${id} no encontrado`);
-        }
-        return this.toResponse(updated);
+// ====== ACTUALIZAR PARCIAL (PATCH) ======
+@Patch(':id')
+@ApiOperation({ summary: 'Actualizar supervisor (parcial)' })
+@ApiBody({ type: UpdateSupervisorDTO })
+@ApiResponse({ status: 200, description: 'Supervisor actualizado', type: SupervisorResponseDTO })
+@ApiResponse({ status: 404, description: 'No encontrado' })
+async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateDto: UpdateSupervisorDTO,
+) {
+    const updated = await this.supervisorService.update(id, updateDto);
+    if (!updated) {
+        throw new NotFoundException(`Supervisor con id ${id} no encontrado`);
     }
+    return this.toResponse(updated);
+}
 
-    // ====== ELIMINAR ======
-    @Delete(':id')
-    @HttpCode(HttpStatus.NO_CONTENT) // HTTP 204 = se borró, no hace falta cuerpo de respuesta.
-    @ApiOperation({ summary: 'Eliminar supervisor' })
-    @ApiResponse({ status: 204, description: 'Eliminado correctamente' })
-    @ApiResponse({ status: 404, description: 'No encontrado' })
-    async remove(@Param('id', ParseIntPipe) id: number) {
-        const removed = await this.supervisorService.remove(id);
-        if (!removed) {
-            throw new NotFoundException(`Supervisor con id ${id} no encontrado`);
-        }
-        // No devolvemos nada porque el 204 indica “todo bien, sin contenido”.
+// ====== ELIMINAR ======
+@Delete(':id')
+@HttpCode(HttpStatus.NO_CONTENT) // HTTP 204 = se borró, no hace falta cuerpo de respuesta.
+@ApiOperation({ summary: 'Eliminar supervisor' })
+@ApiResponse({ status: 204, description: 'Eliminado correctamente' })
+@ApiResponse({ status: 404, description: 'No encontrado' })
+async remove(@Param('id', ParseIntPipe) id: number) {
+    const removed = await this.supervisorService.remove(id);
+    if (!removed) {
+        throw new NotFoundException(`Supervisor con id ${id} no encontrado`);
     }
+    // No devolvemos nada porque el 204 indica “todo bien, sin contenido”.
+}
 
     /**
      * Función privada para centralizar cómo transformamos la entidad a DTO.
      * Así evitamos repetir lógica en cada método.
      */
     private toResponse(supervisor: Supervisor): SupervisorResponseDTO {
-        const { id_trab, nombre, apellidos, correo, dni } = supervisor;
-        return {
-            id_trab,
-            nombre,
-            apellidos,
-            correo,
-            dni: dni ?? undefined,
-        };
-    }
+    const { id_trab, nombre, apellidos, correo, dni } = supervisor;
+    return {
+        id_trab,
+        nombre,
+        apellidos,
+        correo,
+        dni
+    };
+}
 }

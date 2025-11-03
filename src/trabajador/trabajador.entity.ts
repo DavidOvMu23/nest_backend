@@ -32,6 +32,7 @@ export class Trabajador extends BaseEntity {
   @Column({
     type: 'enum',
     enum: TipoTrabajador,
+    name: 'rol',
   })
-  tipo: TipoTrabajador;
+  rol: TipoTrabajador;
 }

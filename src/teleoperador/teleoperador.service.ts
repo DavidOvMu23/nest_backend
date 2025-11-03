@@ -21,7 +21,7 @@ export class TeleoperadorService {
             correo: dto.correo,
             contrasena: dto.contrasena,
             nia: dto.nia,
-            tipo: TipoTrabajador.TELEOPERADOR,
+            rol: TipoTrabajador.TELEOPERADOR,
         })
 
         return this.teleoperadorRepository.save(teleoperador);

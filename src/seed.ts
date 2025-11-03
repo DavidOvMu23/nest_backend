@@ -20,7 +20,6 @@ import { Teleoperador } from "./teleoperador/teleoperador.entity";
 import { TeleoperadorSeed } from "./database/seeds/teleoperador.seed";
 //Trabajador
 import { Trabajador } from "./trabajador/trabajador.entity";
-import { TrabajadorSeed } from "./database/seeds/trabajador.seed";
 //Usuario
 import { Usuario } from "./usuario/usuario.entity";
 import { UsuarioSeed } from "./database/seeds/usuario.seed";
@@ -47,26 +46,40 @@ const options: DataSourceOptions & SeederOptions = {
         Usuario,
     ],
     seeds: [
-        ComunicacionSeed,
-        ContactoEmergenciaSeeder,
         GrupoSeed,
-        NotificacionSeed,
         SupervisorSeed,
         TeleoperadorSeed,
-        TrabajadorSeed,
+        ContactoEmergenciaSeeder,
         UsuarioSeed,
-        UsuarioContactoSeed
-    ]
+        UsuarioContactoSeed,
+        ComunicacionSeed,
+        NotificacionSeed,
+    ],
 };
 
 
 const dataSource = new DataSource(options);
 
-dataSource
-    .initialize()
+async function initializeWithRetry(maxRetries = 10, delayMs = 3000) {
+    for (let attempt = 1; attempt <= maxRetries; attempt += 1) {
+        try {
+            await dataSource.initialize();
+            return;
+        } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            console.log(`Error conectando a la base de datos (intento ${attempt}/${maxRetries}): ${message}`);
+            if (attempt === maxRetries) {
+                throw error;
+            }
+            await new Promise((resolve) => setTimeout(resolve, delayMs));
+        }
+    }
+}
+
+initializeWithRetry()
     .then(async () => {
         await dataSource.synchronize(true);
-        await runSeeders(dataSource)
+        await runSeeders(dataSource);
         console.log('Seeders ejecutados correctamente');
     })
-    .catch((error) => console.log('Error inicializando los datos', error))
+    .catch((error) => console.log('Error inicializando los datos', error));

@@ -1,7 +1,7 @@
 import { DataSource } from 'typeorm';
 import { Seeder } from 'typeorm-extension';
 import trabajadorData from '../../data/trabajador';
-import { Trabajador, TipoTrabajador } from '../../trabajador/trabajador.entity';
+import { Trabajador } from '../../trabajador/trabajador.entity';
 
 export class TrabajadorSeed implements Seeder {
     public async run(dataSource: DataSource) {
@@ -14,7 +14,7 @@ export class TrabajadorSeed implements Seeder {
                 trabajadorEntry.apellidos = trabajador.apellidos;
                 trabajadorEntry.correo = trabajador.correo;
                 trabajadorEntry.contrasena = trabajador.contrasena;
-                trabajadorEntry.tipo = trabajador.tipo;
+                trabajadorEntry.rol = trabajador.rol;
                 return trabajadorEntry;
             })
         );

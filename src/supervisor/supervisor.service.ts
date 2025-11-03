@@ -29,7 +29,7 @@ export class SupervisorService {
             correo: dto.correo,
             contrasena: dto.contrasena,
             dni: dto.dni ? dto.dni.toUpperCase() : undefined, // normalizamos el DNI a mayúsculas
-            tipo: TipoTrabajador.SUPERVISOR, // aseguramos que el tipo coincide con la subclase
+            rol: TipoTrabajador.SUPERVISOR, // aseguramos que el rol coincide con la subclase
         });
 
         return this.supervisorRepository.save(supervisor);

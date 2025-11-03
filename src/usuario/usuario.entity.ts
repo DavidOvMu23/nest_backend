@@ -3,13 +3,11 @@ import {
     PrimaryColumn,
     Column,
     OneToMany,
-    ManyToOne,
     ManyToMany,
     JoinTable,
 } from 'typeorm';
 import { Comunicacion } from '../comunicacion/comunicacion.entity';
 import { ContactoEmergencia } from '../contacto_emergencia/contacto_emergencia.entity';
-import { UsuarioContactoUsuario } from 'src/usuario_contacto/usuario_contacto.entity';
 
 @Entity('usuario')
 export class Usuario {
@@ -49,10 +47,6 @@ export class Usuario {
     @OneToMany(() => Comunicacion, com => com.usuario)
     comunicaciones: Comunicacion[];
 
-    @ManyToOne(() => Usuario, { nullable: true })
-    contactoEmergencia: Usuario;
-
-
     @ManyToMany(() => ContactoEmergencia, contacto => contacto.usuarios, { cascade: true })
     @JoinTable({
         name: 'usuario_contacto', // nombre de tabla intermedia igual que en SQL
@@ -61,10 +55,7 @@ export class Usuario {
     })
     contactosEmergencia: ContactoEmergencia[];
 
-    @OneToMany(() => UsuarioContactoUsuario, uc => uc.usuario)
-    contactosAsignados: UsuarioContactoUsuario[];
-
-    @OneToMany(() => UsuarioContactoUsuario, uc => uc.contacto)
-    esContactoDe: UsuarioContactoUsuario[];
+    @OneToMany(() => ContactoEmergencia, contacto => contacto.usuarioReferenciado)
+    contactosPropios?: ContactoEmergencia[];
 
 }

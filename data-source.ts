@@ -1,7 +1,14 @@
-
-import 'dotenv/config';
+import { config } from 'dotenv';
 import { DataSource } from 'typeorm';
 import { join } from 'path';
+
+const envCandidates = ['.env', '../env', '../../env'];
+for (const candidate of envCandidates) {
+    const result = config({ path: candidate, override: false });
+    if (!result.error) {
+        break;
+    }
+}
 
 export const AppDataSource = new DataSource({
     type: 'mariadb',

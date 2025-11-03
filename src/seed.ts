@@ -21,12 +21,11 @@ import { TeleoperadorSeed } from "./database/seeds/teleoperador.seed";
 //Trabajador
 import { Trabajador } from "./trabajador/trabajador.entity";
 import { TrabajadorSeed } from "./database/seeds/trabajador.seed";
-//Usuario de contacto
-import { UsuarioContactoSeed } from "./database/seeds/usuario_contacto.seed";
-import { UsuarioContactoUsuario } from "./usuario_contacto/usuario_contacto.entity";
 //Usuario
 import { Usuario } from "./usuario/usuario.entity";
 import { UsuarioSeed } from "./database/seeds/usuario.seed";
+//Usuario-Contacto relación
+import { UsuarioContactoSeed } from "./database/seeds/usuario_contacto.seed";
 
 
 const options: DataSourceOptions & SeederOptions = {
@@ -46,7 +45,6 @@ const options: DataSourceOptions & SeederOptions = {
         Teleoperador,
         Trabajador,
         Usuario,
-        UsuarioContactoUsuario
     ],
     seeds: [
         ComunicacionSeed,

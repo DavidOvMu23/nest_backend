@@ -1,83 +1,81 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateSupervisorDTO, UpdateSupervisorDTO } from './supervisor.dto';
+import { Supervisor } from './supervisor.entity';
+import { TipoTrabajador } from '../trabajador/trabajador.entity';
 
 /**
- * Servicio de Supervisores (STUB en memoria)
- *
- * Atención: esto es una implementación simple en memoria pensada para desarrollo
- * y pruebas. No la uses en producción (no persiste nada al reiniciar la app).
- *
- * Está escrita con comentarios sencillos para que entiendas qué hace cada cosa.
+ * Servicio = “la zona que habla con la base de datos”.
+ * Aquí no hay magia: inyectamos el Repository de TypeORM y usamos sus métodos
+ * para crear, buscar, actualizar o borrar supervisores.
  */
-
-export type Supervisor = {
-    id: number; // identificador numérico automático
-    dni?: string; // el dni (8 dígitos + letra). Usamos string para conservar la letra
-    createdAt: string; // fecha ISO de creación
-    updatedAt?: string; // fecha ISO de última actualización
-};
-
 @Injectable()
 export class SupervisorService {
-    // Aquí almacenaremos los supervisores en memoria (array). Fácil y directo.
-    private items: Supervisor[] = [];
-    // Contador para asignar id incremental
-    private nextId = 1;
+    constructor(
+        @InjectRepository(Supervisor)
+        private readonly supervisorRepository: Repository<Supervisor>,
+    ) { }
 
-    // Crear un nuevo supervisor
-    // Recibe el DTO validado por el controlador
+    /**
+     * CREATE = recibir el DTO y convertirlo en una entidad lista para guardar.
+     * - repository.create() construye el objeto (pero no lo guarda).
+     * - repository.save() lo mete en la base de datos.
+     */
     async create(dto: CreateSupervisorDTO): Promise<Supervisor> {
-        // Normalizamos el DNI a mayúsculas por si el cliente envió minúscula
-        const dni = dto.dni ? dto.dni.toUpperCase() : undefined;
+        const supervisor = this.supervisorRepository.create({
+            nombre: dto.nombre,
+            apellidos: dto.apellidos,
+            correo: dto.correo,
+            contrasena: dto.contrasena,
+            dni: dto.dni ? dto.dni.toUpperCase() : undefined, // normalizamos el DNI a mayúsculas
+            tipo: TipoTrabajador.SUPERVISOR, // aseguramos que el tipo coincide con la subclase
+        });
 
-        const supervisor: Supervisor = {
-            id: this.nextId++,
-            dni,
-            createdAt: new Date().toISOString(),
-        };
-
-        // Lo metemos en la lista
-        this.items.push(supervisor);
-        // Devolvemos el objeto creado (simula lo que haría una BD)
-        return supervisor;
+        return this.supervisorRepository.save(supervisor);
     }
 
-    // Devolver todos los supervisores
+    /**
+     * READ ALL = devuelve el listado completo.
+     * find() sin parámetros = SELECT * FROM supervisor;
+     */
     async findAll(): Promise<Supervisor[]> {
-        // Devolvemos la referencia directa (en un servicio real clonarías o usarías un repositorio)
-        return this.items;
+        return this.supervisorRepository.find();
     }
 
-    // Buscar uno por id
+    /**
+     * READ ONE = buscamos por el id (en la tabla heredada se llama id_trab).
+     * Si no existe devolvemos null y el controller decidirá qué hacer.
+     */
     async findOne(id: number): Promise<Supervisor | null> {
-        const found = this.items.find((s) => s.id === id);
-        return found ?? null; // si no existe, devolvemos null
+        return this.supervisorRepository.findOne({ where: { id_trab: id } });
     }
 
-    // Actualizar parcialmente (PATCH)
+    /**
+     * UPDATE = primero buscamos, luego tocamos solo los campos que llegaron en el DTO
+     * y finalmente persistimos el resultado con save().
+     */
     async update(id: number, dto: UpdateSupervisorDTO): Promise<Supervisor | null> {
-        const idx = this.items.findIndex((s) => s.id === id);
-        if (idx === -1) return null; // no existe
-
-        const existing = this.items[idx];
-        // Si el DTO trae dni, lo actualizamos (normalizamos a mayúsculas)
-        if (dto.dni !== undefined) {
-            existing.dni = dto.dni ? dto.dni.toUpperCase() : undefined;
+        const supervisor = await this.supervisorRepository.findOne({ where: { id_trab: id } });
+        if (!supervisor) {
+            return null;
         }
-        existing.updatedAt = new Date().toISOString();
 
-        // Guardamos el cambio en el array
-        this.items[idx] = existing;
-        return existing;
+        if (dto.nombre !== undefined) supervisor.nombre = dto.nombre;
+        if (dto.apellidos !== undefined) supervisor.apellidos = dto.apellidos;
+        if (dto.correo !== undefined) supervisor.correo = dto.correo;
+        if (dto.contrasena !== undefined) supervisor.contrasena = dto.contrasena;
+        if (dto.dni !== undefined) supervisor.dni = dto.dni ? dto.dni.toUpperCase() : undefined;
+
+        return this.supervisorRepository.save(supervisor);
     }
 
-    // Eliminar por id
+    /**
+     * DELETE = usamos delete({ id }) y devolvemos true/false según si borró algo.
+     * result.affected nos dice cuántas filas fueron eliminadas.
+     */
     async remove(id: number): Promise<boolean> {
-        const idx = this.items.findIndex((s) => s.id === id);
-        if (idx === -1) return false; // no existía
-        // Eliminamos del array
-        this.items.splice(idx, 1);
-        return true; // eliminado correctamente
+        const result = await this.supervisorRepository.delete({ id_trab: id });
+        return result.affected !== undefined && result.affected > 0;
     }
 }
-

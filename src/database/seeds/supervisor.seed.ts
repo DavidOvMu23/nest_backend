@@ -3,7 +3,6 @@ import { Seeder } from 'typeorm-extension';
 import supervisorData from '../../data/supervisor';
 import { Supervisor } from '../../supervisor/supervisor.entity';
 import { Trabajador, TipoTrabajador } from '../../trabajador/trabajador.entity';
-import { find } from 'rxjs';
 
 
 export class SupervisorSeed implements Seeder {
@@ -13,11 +12,19 @@ export class SupervisorSeed implements Seeder {
 
         const supervisorEntries = await Promise.all(
             supervisorData.map(async (supervisor) => {
-                trabajadorRepository.findOneBy({
+                const trabajadorBase = await trabajadorRepository.findOneBy({ correo: supervisor.correo });
+                if (!trabajadorBase) {
+                    throw new Error(`Trabajador no encontrado para el correo ${supervisor.correo}`);
+                }
+                if (trabajadorBase.tipo !== TipoTrabajador.SUPERVISOR) {
+                    throw new Error(`El trabajador ${supervisor.correo} no es supervisor`);
+                }
+
+                const supervisorEntry = supervisorRepository.create({
+                    ...trabajadorBase,
+                    dni: supervisor.dni,
                     tipo: TipoTrabajador.SUPERVISOR,
                 });
-                const supervisorEntry = new Supervisor();
-                supervisorEntry.dni = supervisor.dni;
                 return supervisorEntry;
             })
         );

@@ -3,7 +3,8 @@ import {
     PrimaryGeneratedColumn,
     Column,
     ManyToMany,
-    JoinTable,
+    ManyToOne,
+    JoinColumn,
     BaseEntity,
 } from 'typeorm';
 import { Usuario } from '../usuario/usuario.entity';
@@ -28,5 +29,11 @@ export class ContactoEmergencia extends BaseEntity {
     // En tu SQL, algunos contactos están vinculados a usuarios, otros son genéricos
     @ManyToMany(() => Usuario, usuario => usuario.contactosEmergencia, { nullable: true })
     usuarios?: Usuario[];
-    dni_usuario_ref: Usuario | null;
+
+    @ManyToOne(() => Usuario, usuario => usuario.contactosPropios, {
+        nullable: true,
+        onDelete: 'SET NULL',
+    })
+    @JoinColumn({ name: 'dni_usuario_ref', referencedColumnName: 'dni' })
+    usuarioReferenciado?: Usuario | null;
 }

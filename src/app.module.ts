@@ -1,23 +1,22 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { TrabajadorModule } from './trabajador/trabajador.module';
-import { TeleoperadorModule } from './teleoperador/teleoperador.module';
-import { SupervisorModule } from './supervisor/supervisor.module';
-import { GrupoModule } from './grupo/grupo.module';
-import { NotificacionModule } from './notificacion/notificacion.module';
-import { ComunicacionModule } from './comunicacion/comunicacion.module';
-import { UsuarioModule } from './usuario/usuario.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { ContactoEmergenciaModule } from './contacto_emergencia/contacto_emergencia.module';
-import { UsuarioContactoModule } from './usuario_contacto/usuario_contacto.module';
+import { UsuarioModule } from './usuario/usuario.module';
+import { ComunicacionModule } from './comunicacion/comunicacion.module';
+import { GrupoModule } from './grupo/grupo.module';
+import { NotificacionModule } from './notificacion/notificacion.module';
+import { SupervisorModule } from './supervisor/supervisor.module';
+import { TeleoperadorModule } from './teleoperador/teleoperador.module';
+import { TrabajadorModule } from './trabajador/trabajador.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: ['.env', '../env', '../../env'],
     }),
 
     TypeOrmModule.forRoot({
@@ -33,11 +32,14 @@ import { UsuarioContactoModule } from './usuario_contacto/usuario_contacto.modul
       // gestione la estructura sin el script de SQL manual, habrá que borrar el script de sql y
       // declarar el syncronize en tru
     }),
-
+    UsuarioModule,
+    ComunicacionModule,
     ContactoEmergenciaModule,
-
-    UsuarioContactoModule,
-
+    GrupoModule,
+    NotificacionModule,
+    SupervisorModule,
+    TeleoperadorModule,
+    TrabajadorModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -14,19 +14,20 @@ import {
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { CreateSupervisorDTO, UpdateSupervisorDTO, SupervisorResponseDTO } from './supervisor.dto';
 import { SupervisorService } from './supervisor.service';
+import { Supervisor } from './supervisor.entity';
 
 /**
- * CONTROLADOR DE SUPERVISOR
- *
- * Abajo tienes un controlador con métodos CRUD básicos. Cada método tiene
- * comentarios "como si fueras nuevo" explicando paso a paso qué hace y por qué.
+ * PIENSA EN EL CONTROLADOR COMO EN “la puerta de entrada”.
+ * - Recibe la petición HTTP (POST/GET/…)
+ * - Invoca al servicio adecuado
+ * - Devuelve una respuesta amigable al cliente
+ * Aquí solo hay orquestación, la lógica “pesada” vive en el servicio.
  */
 
-@ApiTags('supervisors') // Esto sólo es para documentación (Swagger)
-@Controller('supervisors') // Todas las rutas tendrán prefijo /supervisors
+@ApiTags('supervisors') // Etiqueta bonita para Swagger.
+@Controller('supervisors') // Todas las rutas empiezan por /supervisors.
 export class SupervisorController {
-    // El servicio es donde realmente vive la lógica de negocio (BD, validaciones extra, etc).
-    // Aquí sólo lo llamamos. Nest lo inyecta automáticamente.
+    // Nest crea el servicio y nos lo entrega por el constructor.
     constructor(private readonly supervisorService: SupervisorService) { }
 
     // ====== CREAR ======
@@ -35,14 +36,10 @@ export class SupervisorController {
     @ApiBody({ type: CreateSupervisorDTO })
     @ApiResponse({ status: 201, description: 'Supervisor creado', type: SupervisorResponseDTO })
     async create(@Body() createDto: CreateSupervisorDTO) {
-        // @Body(): toma el JSON que envía el cliente y lo convierte en createDto
-        // La validación del DTO (regex de DNI, tipo string, etc.) debe ocurrir
-        // antes de entrar aquí si tienes ValidationPipe activo.
-
-        // Llamamos al servicio para crear el supervisor en la base de datos.
-        // El servicio debería devolver el objeto creado.
+        // @Body convierte el JSON del cliente en una instancia del DTO ya validada.
         const created = await this.supervisorService.create(createDto);
-        return created; // Se devuelve al cliente el supervisor creado
+        // Convertimos la entidad a un DTO de salida para controlar qué campos mostramos.
+        return this.toResponse(created);
     }
 
     // ====== LISTAR TODOS ======
@@ -50,9 +47,8 @@ export class SupervisorController {
     @ApiOperation({ summary: 'Listar todos los supervisores' })
     @ApiResponse({ status: 200, description: 'Lista de supervisores', type: SupervisorResponseDTO, isArray: true })
     async findAll() {
-        // Llamamos al servicio que obtiene todos los supervisores.
-        // Aquí no hay body ni params; sólo devolvemos lo que venga del servicio.
-        return this.supervisorService.findAll();
+        const supervisors = await this.supervisorService.findAll();
+        return supervisors.map((item) => this.toResponse(item));
     }
 
     // ====== OBTENER UNO ======
@@ -61,15 +57,13 @@ export class SupervisorController {
     @ApiResponse({ status: 200, description: 'Supervisor encontrado', type: SupervisorResponseDTO })
     @ApiResponse({ status: 404, description: 'No encontrado' })
     async findOne(@Param('id', ParseIntPipe) id: number) {
-        // @Param('id', ParseIntPipe): toma el parametro de la ruta y lo convierte a number.
-        // Si el cliente envía /supervisors/abc, ParseIntPipe lanza 400 (no es número).
-
+        // ParseIntPipe convierte el parámetro a number y lanza 400 si no puede.
         const found = await this.supervisorService.findOne(id);
         if (!found) {
-            // Si no existe, lanzamos una excepción que Nest convierte a 404.
+            // Lanzamos 404 si el registro no existe.
             throw new NotFoundException(`Supervisor con id ${id} no encontrado`);
         }
-        return found; // Devolvemos el supervisor encontrado
+        return this.toResponse(found);
     }
 
     // ====== ACTUALIZAR PARCIAL (PATCH) ======
@@ -82,28 +76,39 @@ export class SupervisorController {
         @Param('id', ParseIntPipe) id: number,
         @Body() updateDto: UpdateSupervisorDTO,
     ) {
-        // Se llama al servicio para actualizar. El servicio debe devolver el objeto
-        // actualizado o null/undefined si no existe.
         const updated = await this.supervisorService.update(id, updateDto);
         if (!updated) {
             throw new NotFoundException(`Supervisor con id ${id} no encontrado`);
         }
-        return updated; // Devolvemos el objeto actualizado
+        return this.toResponse(updated);
     }
 
     // ====== ELIMINAR ======
     @Delete(':id')
-    @HttpCode(HttpStatus.NO_CONTENT) // Si todo va bien, devolvemos 204 (sin cuerpo)
+    @HttpCode(HttpStatus.NO_CONTENT) // HTTP 204 = se borró, no hace falta cuerpo de respuesta.
     @ApiOperation({ summary: 'Eliminar supervisor' })
     @ApiResponse({ status: 204, description: 'Eliminado correctamente' })
     @ApiResponse({ status: 404, description: 'No encontrado' })
     async remove(@Param('id', ParseIntPipe) id: number) {
-        // El servicio debe intentar borrar y devolver true/false o lanzar excepción.
         const removed = await this.supervisorService.remove(id);
         if (!removed) {
-            // Si no se borró porque no existía, lanzamos 404
             throw new NotFoundException(`Supervisor con id ${id} no encontrado`);
         }
-        // Como usamos HttpCode NO_CONTENT, aquí no devolvemos nada (204)
+        // No devolvemos nada porque el 204 indica “todo bien, sin contenido”.
+    }
+
+    /**
+     * Función privada para centralizar cómo transformamos la entidad a DTO.
+     * Así evitamos repetir lógica en cada método.
+     */
+    private toResponse(supervisor: Supervisor): SupervisorResponseDTO {
+        const { id_trab, nombre, apellidos, correo, dni } = supervisor;
+        return {
+            id_trab,
+            nombre,
+            apellidos,
+            correo,
+            dni: dni ?? undefined,
+        };
     }
 }

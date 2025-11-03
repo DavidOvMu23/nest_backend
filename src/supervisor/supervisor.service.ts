@@ -28,7 +28,7 @@ export class SupervisorService {
             apellidos: dto.apellidos,
             correo: dto.correo,
             contrasena: dto.contrasena,
-            dni: dto.dni.toUpperCase(), // normalizamos el DNI a mayúsculas
+            dni: dto.dni ? dto.dni.toUpperCase() : undefined, // normalizamos el DNI a mayúsculas
             tipo: TipoTrabajador.SUPERVISOR, // aseguramos que el tipo coincide con la subclase
         });
 
@@ -55,8 +55,13 @@ export class SupervisorService {
      * UPDATE = primero buscamos, luego tocamos solo los campos que llegaron en el DTO
      * y finalmente persistimos el resultado con save().
      */
-    async update(id: number, dto: UpdateSupervisorDTO): Promise<Supervisor | null> {
-        const supervisor = await this.supervisorRepository.findOne({ where: { id_trab: id } });
+    async update(
+        id: number,
+        dto: UpdateSupervisorDTO,
+    ): Promise<Supervisor | null> {
+        const supervisor = await this.supervisorRepository.findOne({
+            where: { id_trab: id },
+        });
         if (!supervisor) {
             return null;
         }
@@ -65,7 +70,8 @@ export class SupervisorService {
         if (dto.apellidos !== undefined) supervisor.apellidos = dto.apellidos;
         if (dto.correo !== undefined) supervisor.correo = dto.correo;
         if (dto.contrasena !== undefined) supervisor.contrasena = dto.contrasena;
-        if (dto.dni !== undefined) supervisor.dni = dto.dni ? dto.dni.toUpperCase() : supervisor.dni;
+        if (dto.dni !== undefined)
+            supervisor.dni = dto.dni ? dto.dni.toUpperCase() : supervisor.dni;
 
         return this.supervisorRepository.save(supervisor);
     }

@@ -65,7 +65,7 @@ export class SupervisorService {
         if (dto.apellidos !== undefined) supervisor.apellidos = dto.apellidos;
         if (dto.correo !== undefined) supervisor.correo = dto.correo;
         if (dto.contrasena !== undefined) supervisor.contrasena = dto.contrasena;
-        if (dto.dni !== undefined) supervisor.dni = dto.dni ? dto.dni.toUpperCase() : undefined;
+        if (dto.dni !== undefined) supervisor.dni = dto.dni ? dto.dni.toUpperCase() : supervisor.dni;
 
         return this.supervisorRepository.save(supervisor);
     }
@@ -76,6 +76,7 @@ export class SupervisorService {
      */
     async remove(id: number): Promise<boolean> {
         const result = await this.supervisorRepository.delete({ id_trab: id });
-        return result.affected !== undefined && result.affected > 0;
+        const affected = result.affected ?? 0;
+        return affected > 0;
     }
 }

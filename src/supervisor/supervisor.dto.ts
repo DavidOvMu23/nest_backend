@@ -20,7 +20,7 @@ export class CreateSupervisorDTO {
     @IsString()
     @Length(1, 150)
     @ApiProperty({ description: 'Apellidos del supervisor', example: 'Martín Prado' })
-   apellidos: string;
+    apellidos: string;
 
     // Un correo válido y único. Si no tiene formato de email, salta error antes de llegar al controller.
     @IsEmail()
@@ -33,12 +33,11 @@ export class CreateSupervisorDTO {
     @ApiProperty({ description: 'Contraseña temporal o definitiva', example: 'temporal123' })
     contrasena: string;
 
-    // El DNI es opcional al crear, pero si lo envían debe cumplir el patrón 8 números + letra.
-    @IsOptional()
+    // El DNI es obligator al crear, debe cumplir el patrón 8 números + letra.
     @IsString()
     @Matches(/^[0-9]{8}[A-Z]$/, { message: 'Format of DNI incorrect' })
-    @ApiPropertyOptional({ description: 'DNI del supervisor (8 dígitos + letra)', example: '12345678A' })
-    dni?: string;
+    @ApiProperty({ description: 'DNI del supervisor (8 dígitos + letra)', example: '12345678A' })
+    dni: string;
 }
 
 export class UpdateSupervisorDTO {
@@ -92,6 +91,6 @@ export class SupervisorResponseDTO {
     @ApiProperty({ description: 'Correo corporativo', example: 'sofia.martin@cuidem.local' })
     correo: string;
 
-    @ApiPropertyOptional({ description: 'DNI (8 dígitos + letra)', example: '12345678A' })
-    dni?: string;
+    @ApiProperty({ description: 'DNI (8 dígitos + letra)', example: '12345678A' })
+    dni: string;
 }

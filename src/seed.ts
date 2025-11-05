@@ -78,8 +78,20 @@ async function initializeWithRetry(maxRetries = 10, delayMs = 3000) {
 
 initializeWithRetry()
     .then(async () => {
-        await dataSource.synchronize(true);
-        await runSeeders(dataSource);
-        console.log('Seeders ejecutados correctamente');
+        try {
+            await dataSource.synchronize(true);
+            await runSeeders(dataSource);
+            console.log('Seeders ejecutados correctamente');
+            await dataSource.destroy();
+            process.exit(0);
+        } catch (error) {
+            console.error('Error ejecutando los seeders', error);
+            await dataSource.destroy();
+            process.exit(1);
+        }
     })
-    .catch((error) => console.log('Error inicializando los datos', error));
+    .catch(async (error) => {
+        console.log('Error inicializando los datos', error);
+        await dataSource.destroy();
+        process.exit(1);
+    });

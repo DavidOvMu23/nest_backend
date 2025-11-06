@@ -1,5 +1,15 @@
-import { IsEmail, IsOptional, IsString, Matches, Length, IsNumber } from 'class-validator';
+import {
+    IsEmail,
+    IsEnum,
+    IsOptional,
+    IsString,
+    Length,
+    Matches,
+    ValidateIf,
+} from 'class-validator';
 import { ApiPropertyOptional, ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
+import { TipoTrabajador } from './trabajador.entity';
 
 
 export class CreateTrabajadorDTO {
@@ -22,6 +32,35 @@ export class CreateTrabajadorDTO {
     @ApiProperty({ description: 'Contraseña temporal o definitiva', example: 'temporal123' })
     contrasena: string;
 
+    @IsEnum(TipoTrabajador)
+    @Transform(({ value }) => typeof value === 'string' ? value.toLowerCase() : value)
+    @ApiProperty({
+        description: 'Rol del trabajador',
+        enum: TipoTrabajador,
+        example: TipoTrabajador.TELEOPERADOR,
+    })
+    rol: TipoTrabajador;
+
+    @ValidateIf((dto) => dto.rol === TipoTrabajador.TELEOPERADOR)
+    @IsString()
+    @Matches(/^[0-9]{8}$/, { message: 'Formato de NIA incorrecto' })
+    @ApiPropertyOptional({
+        description: 'NIA obligatorio para teleoperadores (8 dígitos)',
+        example: '12345678',
+    })
+    nia?: string;
+
+    @ValidateIf((dto) => dto.rol === TipoTrabajador.SUPERVISOR)
+    @IsString()
+    @Matches(/^[0-9]{8}[A-Z]$/, { message: 'Formato de DNI incorrecto' })
+    @Transform(({ value }) =>
+        typeof value === 'string' ? value.toUpperCase() : value,
+    )
+    @ApiPropertyOptional({
+        description: 'DNI obligatorio para supervisores (8 dígitos + letra)',
+        example: '12345678A',
+    })
+    dni?: string;
 }
 
 
@@ -49,6 +88,36 @@ export class UpdateTrabajadorDTO {
     @ApiPropertyOptional({ description: 'Contraseña temporal o definitiva', example: 'temporal123' })
     contrasena?: string;
 
+    @IsOptional()
+    @IsEnum(TipoTrabajador)
+    @Transform(({ value }) => typeof value === 'string' ? value.toLowerCase() : value)
+    @ApiPropertyOptional({
+        description: 'Rol del trabajador',
+        enum: TipoTrabajador,
+        example: TipoTrabajador.SUPERVISOR,
+    })
+    rol?: TipoTrabajador;
+
+    @IsOptional()
+    @IsString()
+    @Matches(/^[0-9]{8}$/, { message: 'Formato de NIA incorrecto' })
+    @ApiPropertyOptional({
+        description: 'NIA del teleoperador (8 dígitos)',
+        example: '12345678',
+    })
+    nia?: string;
+
+    @IsOptional()
+    @IsString()
+    @Matches(/^[0-9]{8}[A-Z]$/, { message: 'Formato de DNI incorrecto' })
+    @Transform(({ value }) =>
+        typeof value === 'string' ? value.toUpperCase() : value,
+    )
+    @ApiPropertyOptional({
+        description: 'DNI del supervisor (8 dígitos + letra)',
+        example: '12345678A',
+    })
+    dni?: string;
 }
 
 export class TrabajadorReponseDTO {
@@ -64,4 +133,22 @@ export class TrabajadorReponseDTO {
     @ApiPropertyOptional({ description: 'Correo electronico del trabajador', example: 'julen.garcia@cuidem.local' })
     correo?: string;
 
+    @ApiProperty({
+        description: 'Rol del trabajador',
+        enum: TipoTrabajador,
+        example: TipoTrabajador.SUPERVISOR,
+    })
+    rol: TipoTrabajador;
+
+    @ApiPropertyOptional({
+        description: 'NIA del teleoperador (8 dígitos)',
+        example: '12345678',
+    })
+    nia?: string;
+
+    @ApiPropertyOptional({
+        description: 'DNI del supervisor (8 dígitos + letra)',
+        example: '12345678A',
+    })
+    dni?: string;
 }

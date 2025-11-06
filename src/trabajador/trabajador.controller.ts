@@ -15,6 +15,8 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiResponseProperty } from
 import { CreateTrabajadorDTO, UpdateTrabajadorDTO, TrabajadorReponseDTO } from './trabajador.dto';
 import { TrabajadorService } from './trabajador.service';
 import { Trabajador } from './trabajador.entity';
+import { Teleoperador } from '../teleoperador/teleoperador.entity';
+import { Supervisor } from '../supervisor/supervisor.entity';
 
 @ApiTags('trabajador')
 @Controller('trabajador')
@@ -131,13 +133,21 @@ export class TrabajadorController {
         }
     }
     private toResponse(trabajador: Trabajador): TrabajadorReponseDTO {
-        const { id_trab, nombre, apellidos, correo } = trabajador;
-        return {
+        const { id_trab, nombre, apellidos, correo, rol } = trabajador;
+        const response: TrabajadorReponseDTO = {
             id_trab,
             nombre,
             apellidos,
             correo,
+            rol,
         };
+        if (trabajador instanceof Teleoperador) {
+            response.nia = trabajador.nia;
+        }
+        if (trabajador instanceof Supervisor) {
+            response.dni = trabajador.dni;
+        }
+        return response;
     }
 
 }

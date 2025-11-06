@@ -3,9 +3,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { TrabajadorService } from './trabajador.service';
 import { TrabajadorController } from './trabajador.controller';
 import { Trabajador } from './trabajador.entity';
+import { Teleoperador } from '../teleoperador/teleoperador.entity';
+import { Supervisor } from '../supervisor/supervisor.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Trabajador])],
+  imports: [TypeOrmModule.forFeature([Trabajador, Teleoperador, Supervisor])],
   providers: [TrabajadorService],
   controllers: [TrabajadorController]
 })

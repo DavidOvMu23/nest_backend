@@ -13,8 +13,11 @@ export class Teleoperador extends Trabajador {
     @Column({ unique: true })
     nia: string;
 
-    @ManyToOne(() => Grupo, grupo => grupo.teleoperadores, { nullable: true })
-    grupo: Grupo;
+    @ManyToOne(() => Grupo, (grupo) => grupo.teleoperadores, {
+        nullable: true,
+        onDelete: 'SET NULL',
+    })
+    grupo: Grupo | null;
 
     @OneToMany(() => Notificacion, noti => noti.teleoperador)
     notificaciones: Notificacion[];

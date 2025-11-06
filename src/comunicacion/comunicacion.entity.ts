@@ -30,9 +30,12 @@ export class Comunicacion {
     @Column()
     observaciones: string;
 
-    @ManyToOne(() => Grupo, grupo => grupo.comunicaciones)
-    grupo: Grupo;
+    @ManyToOne(() => Grupo, (grupo) => grupo.comunicaciones, {
+        nullable: true,
+        onDelete: 'SET NULL',
+    })
+    grupo: Grupo | null;
 
-    @ManyToOne(() => Usuario, usuario => usuario.comunicaciones)
+    @ManyToOne(() => Usuario, (usuario) => usuario.comunicaciones)
     usuario: Usuario;
 }

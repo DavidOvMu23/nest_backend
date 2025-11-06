@@ -20,11 +20,11 @@ import {
 import { ComunicacionService } from './comunicacion.service';
 import { Comunicacion } from './comunicacion.entity';
 
-@ApiTags('comunications') // Etiqueta bonita para Swagger.
-@Controller('comunications')
+@ApiTags('comunicacion') // Etiqueta bonita para Swagger.
+@Controller('comunicacion')
 export class ComunicacionController {
   // Nest crea el servicio y nos lo entrega por el constructor.
-  constructor(private readonly comunicationsService: ComunicacionService) {}
+  constructor(private readonly comunicationsService: ComunicacionService) { }
 
   // ====== CREAR ======
   @Post()
@@ -39,7 +39,24 @@ export class ComunicacionController {
     const created = await this.comunicationsService.create(createDto);
     return this.toResponse(created);
   }
-
+  // ====== OBTENER UNO ======
+  @Get('id')
+  @ApiOperation({ summary: 'Obtener comunicacion por id' })
+  @ApiResponse({
+    status: 200,
+    description: 'Comunicacion encontrada',
+    type: ComunicacionResponseDTO,
+  })
+  @ApiResponse({ status: 404, description: 'No encontrado' })
+  async findOne(@Body('id', ParseIntPipe) id: number): Promise<Comunicacion> {
+    // ParseIntPipe convierte el parámetro a number y lanza 400 si no puede.
+    const found = await this.comunicationsService.findOne(id);
+    if (!found) {
+      // Lanzamos 404 si el registro no existe.
+      throw new NotFoundException(`Comunicacion con id ${id} no encontrada`);
+    }
+    return found;
+  }
   // ====== LISTAR TODOS ======
   @Get()
   @ApiOperation({ summary: 'Listar todos las comunicaciones' })
@@ -54,24 +71,7 @@ export class ComunicacionController {
     return comunications.map((item) => this.toResponse(item));
   }
 
-  // ====== OBTENER UNO ======
-  @Get(':id')
-  @ApiOperation({ summary: 'Obtener comunicacion por id' })
-  @ApiResponse({
-    status: 200,
-    description: 'Comunicacion encontrada',
-    type: ComunicacionResponseDTO,
-  })
-  @ApiResponse({ status: 404, description: 'No encontrado' })
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    // ParseIntPipe convierte el parámetro a number y lanza 400 si no puede.
-    const found = await this.comunicationsService.findOne(id);
-    if (!found) {
-      // Lanzamos 404 si el registro no existe.
-      throw new NotFoundException(`Comunicacion con id ${id} no encontrada`);
-    }
-    return this.toResponse(found);
-  }
+
 
   // ====== ACTUALIZAR PARCIAL (PATCH) ======
   @Patch(':id')

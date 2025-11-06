@@ -9,6 +9,7 @@ import {
     Param,
     Patch,
     Post,
+    Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
@@ -22,7 +23,7 @@ import { Usuario } from './usuario.entity';
 @ApiTags('usuario')
 @Controller('usuario')
 export class UsuarioController {
-    constructor(private readonly usuarioService: UsuarioService) {}
+    constructor(private readonly usuarioService: UsuarioService) { }
 
     @Post()
     @ApiOperation({ summary: 'Crear un nuevo usuario' })
@@ -34,6 +35,18 @@ export class UsuarioController {
         };
         return this.usuarioService.create(payload);
     }
+    //! Saber que cojones hace esto por que no lo entiendo.
+    @Get('dni')
+    @ApiOperation({ summary: 'Obtener un usuario por DNI' })
+    @ApiResponse({ status: 200, type: UsuarioResponseDTO })
+    @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
+    async findOne(@Body('dni') dni: string): Promise<Usuario> {
+        const usuario = await this.usuarioService.findOne(dni);
+        if (!usuario) {
+            throw new NotFoundException('Usuario no encontrado');
+        }
+        return usuario;
+    }
 
     @Get()
     @ApiOperation({ summary: 'Listar usuarios' })
@@ -42,17 +55,7 @@ export class UsuarioController {
         return this.usuarioService.findAll();
     }
 
-    @Get(':dni')
-    @ApiOperation({ summary: 'Obtener un usuario por DNI' })
-    @ApiResponse({ status: 200, type: UsuarioResponseDTO })
-    @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
-    async findOne(@Param('dni') dni: string): Promise<Usuario> {
-        const usuario = await this.usuarioService.findOne(dni.toUpperCase());
-        if (!usuario) {
-            throw new NotFoundException('Usuario no encontrado');
-        }
-        return usuario;
-    }
+
 
     @Patch(':dni')
     @ApiOperation({ summary: 'Actualizar datos de un usuario' })

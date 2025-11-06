@@ -16,11 +16,11 @@ import { CreateGrupoDTO, UpdateGrupoDTO, GrupoResponseDTO } from './grupo.dto';
 import { GrupoService } from './grupo.service';
 import { Grupo } from './grupo.entity';
 
-@ApiTags('grupos') // Etiqueta bonita para Swagger.
-@Controller('grupos')
+@ApiTags('grupo') // Etiqueta bonita para Swagger.
+@Controller('grupo')
 export class GrupoController {
   // Nest crea el servicio y nos lo entrega por el constructor.
-  constructor(private readonly gruposService: GrupoService) {}
+  constructor(private readonly gruposService: GrupoService) { }
 
   // ====== CREAR ======
   @Post()
@@ -35,7 +35,24 @@ export class GrupoController {
     const created = await this.gruposService.create(createDto);
     return this.toResponse(created);
   }
-
+  // ====== OBTENER UNO ======
+  @Get('id')
+  @ApiOperation({ summary: 'Obtener grupo por id' })
+  @ApiResponse({
+    status: 200,
+    description: 'Grupo encontrado',
+    type: GrupoResponseDTO,
+  })
+  @ApiResponse({ status: 404, description: 'No encontrado' })
+  async findOne(@Body('id', ParseIntPipe) id: number): Promise<Grupo> {
+    // ParseIntPipe convierte el parámetro a number y lanza 400 si no puede.
+    const found = await this.gruposService.findOne(id);
+    if (!found) {
+      // Lanzamos 404 si el registro no existe.
+      throw new NotFoundException(`Grupo con id ${id} no encontrado`);
+    }
+    return found;
+  }
   // ====== LISTAR TODOS ======
   @Get()
   @ApiOperation({ summary: 'Listar todos los grupos' })
@@ -50,24 +67,7 @@ export class GrupoController {
     return grupos.map((item) => this.toResponse(item));
   }
 
-  // ====== OBTENER UNO ======
-  @Get(':id')
-  @ApiOperation({ summary: 'Obtener grupo por id' })
-  @ApiResponse({
-    status: 200,
-    description: 'Grupo encontrado',
-    type: GrupoResponseDTO,
-  })
-  @ApiResponse({ status: 404, description: 'No encontrado' })
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    // ParseIntPipe convierte el parámetro a number y lanza 400 si no puede.
-    const found = await this.gruposService.findOne(id);
-    if (!found) {
-      // Lanzamos 404 si el registro no existe.
-      throw new NotFoundException(`Grupo con id ${id} no encontrado`);
-    }
-    return this.toResponse(found);
-  }
+
 
   // ====== ACTUALIZAR PARCIAL (PATCH) ======
   @Patch(':id')

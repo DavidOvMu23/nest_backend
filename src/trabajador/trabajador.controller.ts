@@ -39,6 +39,28 @@ export class TrabajadorController {
         return this.toResponse(created);
     }
 
+    // ========== Obtener uno ==========
+    @Get('id')
+    @ApiOperation({
+        summary: 'Obtener trabajador por ID'
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Trabajador encontrado',
+        type: TrabajadorReponseDTO
+    })
+    @ApiResponse({
+        status: 404,
+        description: 'No encontrado'
+    })
+    async findOne(@Body('id', ParseIntPipe) id: number): Promise<Trabajador> {
+        const found = await this.trabajadorService.findOne(id);
+        if (!found) {
+            throw new NotFoundException(`Trabajador con id ${id} no encontrado`)
+        }
+        return found;
+    }
+
 
     // ======= Obtener todos ========
     @Get()
@@ -56,27 +78,7 @@ export class TrabajadorController {
         return trabajador.map((item) => this.toResponse(item));
     }
 
-    // ========== Obtener uno ==========
-    @Get(':id')
-    @ApiOperation({
-        summary: 'Obtener trabajador por ID'
-    })
-    @ApiResponse({
-        status: 200,
-        description: 'Trabajador encontrado',
-        type: TrabajadorReponseDTO
-    })
-    @ApiResponse({
-        status: 404,
-        description: 'No encontrado'
-    })
-    async findOne(@Param('id', ParseIntPipe) id: number) {
-        const found = await this.trabajadorService.findOne(id);
-        if (!found) {
-            throw new NotFoundException(`Trabajador con id ${id} no encontrado`)
-        }
-        return this.toResponse(found)
-    }
+
 
 
 

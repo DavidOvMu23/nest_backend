@@ -19,12 +19,13 @@ import {
 } from './notificacion.dto';
 import { NotificacionService } from './notificacion.service';
 import { Notificacion } from './notificacion.entity';
+import { Comunicacion } from 'src/comunicacion/comunicacion.entity';
 
-@ApiTags('comunications') // Etiqueta bonita para Swagger.
-@Controller('comunications')
+@ApiTags('notificacion') // Etiqueta bonita para Swagger.
+@Controller('notificacion')
 export class NotificacionController {
   // Nest crea el servicio y nos lo entrega por el constructor.
-  constructor(private readonly comunicationsService: NotificacionService) {}
+  constructor(private readonly notificacionService: NotificacionService) { }
 
   // ====== CREAR ======
   @Post()
@@ -36,8 +37,27 @@ export class NotificacionController {
     type: NotificacionResponseDTO,
   })
   async create(@Body() createDto: CreateNotificacionDTO) {
-    const created = await this.comunicationsService.create(createDto);
+    const created = await this.notificacionService.create(createDto);
     return this.toResponse(created);
+  }
+
+  // ====== OBTENER UNO ======
+  @Get('id')
+  @ApiOperation({ summary: 'Obtener notificacion por id' })
+  @ApiResponse({
+    status: 200,
+    description: 'Notificacion encontrada',
+    type: NotificacionResponseDTO,
+  })
+  @ApiResponse({ status: 404, description: 'No encontrada' })
+  async findOne(@Body('id', ParseIntPipe) id: number): Promise<Notificacion> {
+    // ParseIntPipe convierte el parámetro a number y lanza 400 si no puede.
+    const found = await this.notificacionService.findOne(id);
+    if (!found) {
+      // Lanzamos 404 si el registro no existe.
+      throw new NotFoundException(`Notificacion con id ${id} no encontrada`);
+    }
+    return found;
   }
 
   // ====== LISTAR TODOS ======
@@ -50,28 +70,11 @@ export class NotificacionController {
     isArray: true,
   })
   async findAll() {
-    const comunications = await this.comunicationsService.findAll();
-    return comunications.map((item) => this.toResponse(item));
+    return await this.notificacionService.findAll();
+
   }
 
-  // ====== OBTENER UNO ======
-  @Get(':id')
-  @ApiOperation({ summary: 'Obtener notificacion por id' })
-  @ApiResponse({
-    status: 200,
-    description: 'Notificacion encontrada',
-    type: NotificacionResponseDTO,
-  })
-  @ApiResponse({ status: 404, description: 'No encontrada' })
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    // ParseIntPipe convierte el parámetro a number y lanza 400 si no puede.
-    const found = await this.comunicationsService.findOne(id);
-    if (!found) {
-      // Lanzamos 404 si el registro no existe.
-      throw new NotFoundException(`Notificacion con id ${id} no encontrada`);
-    }
-    return this.toResponse(found);
-  }
+
 
   // ====== ACTUALIZAR PARCIAL (PATCH) ======
   @Patch(':id')
@@ -86,12 +89,12 @@ export class NotificacionController {
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateDto: UpdateNotificacionDTO,
-  ) {
-    const updated = await this.comunicationsService.update(id, updateDto);
+  ): Promise<Notificacion> {
+    const updated = await this.notificacionService.update(id, updateDto);
     if (!updated) {
       throw new NotFoundException(`Notificacion con id ${id} no encontrada`);
     }
-    return this.toResponse(updated);
+    return updated;
   }
 
   // ====== ELIMINAR ======
@@ -101,7 +104,7 @@ export class NotificacionController {
   @ApiResponse({ status: 204, description: 'Eliminada correctamente' })
   @ApiResponse({ status: 404, description: 'No encontrado' })
   async remove(@Param('id', ParseIntPipe) id: number) {
-    const removed = await this.comunicationsService.remove(id);
+    const removed = await this.notificacionService.remove(id);
     if (!removed) {
       throw new NotFoundException(`Notificacion con id ${id} no encontrada`);
     }

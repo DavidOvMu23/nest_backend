@@ -24,8 +24,8 @@ import { Supervisor } from './supervisor.entity';
  * Aquí solo hay orquestación, la lógica “pesada” vive en el servicio.
  */
 
-@ApiTags('supervisors') // Etiqueta bonita para Swagger.
-@Controller('supervisors') // Todas las rutas empiezan por /supervisors.
+@ApiTags('supervisor') // Etiqueta bonita para Swagger.
+@Controller('supervisor') // Todas las rutas empiezan por /supervisors.
 export class SupervisorController {
     // Nest crea el servicio y nos lo entrega por el constructor.
     constructor(private readonly supervisorService: SupervisorService) { }
@@ -41,6 +41,20 @@ export class SupervisorController {
         // Convertimos la entidad a un DTO de salida para controlar qué campos mostramos.
         return this.toResponse(created);
     }
+    // ====== OBTENER UNO ======
+    @Get('id')
+    @ApiOperation({ summary: 'Obtener supervisor por id' })
+    @ApiResponse({ status: 200, description: 'Supervisor encontrado', type: SupervisorResponseDTO })
+    @ApiResponse({ status: 404, description: 'No encontrado' })
+    async findOne(@Body('id', ParseIntPipe) id: number): Promise<Supervisor> {
+        // ParseIntPipe convierte el parámetro a number y lanza 400 si no puede.
+        const found = await this.supervisorService.findOne(id);
+        if (!found) {
+            // Lanzamos 404 si el registro no existe.
+            throw new NotFoundException(`Supervisor con id ${id} no encontrado`);
+        }
+        return found;
+    }
 
     // ====== LISTAR TODOS ======
     @Get()
@@ -51,20 +65,7 @@ export class SupervisorController {
         return supervisors.map((item) => this.toResponse(item));
     }
 
-    // ====== OBTENER UNO ======
-    @Get(':id')
-    @ApiOperation({ summary: 'Obtener supervisor por id' })
-    @ApiResponse({ status: 200, description: 'Supervisor encontrado', type: SupervisorResponseDTO })
-    @ApiResponse({ status: 404, description: 'No encontrado' })
-    async findOne(@Param('id', ParseIntPipe) id: number) {
-        // ParseIntPipe convierte el parámetro a number y lanza 400 si no puede.
-        const found = await this.supervisorService.findOne(id);
-        if (!found) {
-            // Lanzamos 404 si el registro no existe.
-            throw new NotFoundException(`Supervisor con id ${id} no encontrado`);
-        }
-        return this.toResponse(found);
-    }
+
 
     // ====== ACTUALIZAR PARCIAL (PATCH) ======
     @Patch(':id')

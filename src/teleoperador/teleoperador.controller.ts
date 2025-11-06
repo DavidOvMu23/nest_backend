@@ -30,6 +30,17 @@ export class TeleoperadorController {
         const created = await this.teleoperadorService.create(createDto);
         return this.toResponse(created);
     }
+    @Get('id')
+    @ApiOperation({ summary: 'Obtener teleoperador por id' })
+    @ApiResponse({ status: 200, description: 'Supervisor encontrado', type: TeleoperadorResponseDTO })
+    @ApiResponse({ status: 404, description: 'No encontrado' })
+    async findOne(@Body('id', ParseIntPipe) id: number): Promise<Teleoperador> {
+        const found = await this.teleoperadorService.findOne(id);
+        if (!found) {
+            throw new NotFoundException(`Teleoperador con id ${id} no encontrado`)
+        }
+        return found;
+    }
 
     @Get()
     @ApiOperation({ summary: 'Listar todos los Teleoperadores' })
@@ -39,17 +50,7 @@ export class TeleoperadorController {
         return teleoperador.map((item) => this.toResponse(item));
     }
 
-    @Get(':id')
-    @ApiOperation({ summary: 'Obtener teleoperador por id' })
-    @ApiResponse({ status: 200, description: 'Supervisor encontrado', type: TeleoperadorResponseDTO })
-    @ApiResponse({ status: 404, description: 'No encontrado' })
-    async findOne(@Param('id', ParseIntPipe) id: number) {
-        const found = await this.teleoperadorService.findOne(id);
-        if (!found) {
-            throw new NotFoundException(`Teleoperador con id ${id} no encontrado`)
-        }
-        return this.toResponse(found)
-    }
+
 
 
     @Patch(':id')

@@ -24,7 +24,7 @@ import { Comunicacion } from './comunicacion.entity';
 @Controller('comunicacion')
 export class ComunicacionController {
   // Nest crea el servicio y nos lo entrega por el constructor.
-  constructor(private readonly comunicationsService: ComunicacionService) { }
+  constructor(private readonly comunicationsService: ComunicacionService) {}
 
   // ====== CREAR ======
   @Post()
@@ -71,10 +71,8 @@ export class ComunicacionController {
     return comunications.map((item) => this.toResponse(item));
   }
 
-
-
   // ====== ACTUALIZAR PARCIAL (PATCH) ======
-  @Patch(':id')
+  @Patch('id')
   @ApiOperation({ summary: 'Actualizar comuncacion (parcial)' })
   @ApiBody({ type: UpdateComunicacionDTO })
   @ApiResponse({
@@ -84,7 +82,7 @@ export class ComunicacionController {
   })
   @ApiResponse({ status: 404, description: 'No encontrado' })
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Body('id', ParseIntPipe) id: number,
     @Body() updateDto: UpdateComunicacionDTO,
   ) {
     const updated = await this.comunicationsService.update(id, updateDto);
@@ -95,12 +93,12 @@ export class ComunicacionController {
   }
 
   // ====== ELIMINAR ======
-  @Delete(':id')
+  @Delete('id')
   @HttpCode(HttpStatus.NO_CONTENT) // HTTP 204 = se borró, no hace falta cuerpo de respuesta.
   @ApiOperation({ summary: 'Eliminar comunicacion' })
   @ApiResponse({ status: 204, description: 'Eliminado correctamente' })
   @ApiResponse({ status: 404, description: 'No encontrado' })
-  async remove(@Param('id', ParseIntPipe) id: number) {
+  async remove(@Body('id', ParseIntPipe) id: number): Promise<void> {
     const removed = await this.comunicationsService.remove(id);
     if (!removed) {
       throw new NotFoundException(`Comunicacion con id ${id} no encontrado`);

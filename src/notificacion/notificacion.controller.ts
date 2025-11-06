@@ -25,7 +25,7 @@ import { Comunicacion } from 'src/comunicacion/comunicacion.entity';
 @Controller('notificacion')
 export class NotificacionController {
   // Nest crea el servicio y nos lo entrega por el constructor.
-  constructor(private readonly notificacionService: NotificacionService) { }
+  constructor(private readonly notificacionService: NotificacionService) {}
 
   // ====== CREAR ======
   @Post()
@@ -71,13 +71,10 @@ export class NotificacionController {
   })
   async findAll() {
     return await this.notificacionService.findAll();
-
   }
 
-
-
   // ====== ACTUALIZAR PARCIAL (PATCH) ======
-  @Patch(':id')
+  @Patch('id')
   @ApiOperation({ summary: 'Actualizar notificacion (parcial)' })
   @ApiBody({ type: UpdateNotificacionDTO })
   @ApiResponse({
@@ -87,7 +84,7 @@ export class NotificacionController {
   })
   @ApiResponse({ status: 404, description: 'No encontrado' })
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Body('id', ParseIntPipe) id: number,
     @Body() updateDto: UpdateNotificacionDTO,
   ): Promise<Notificacion> {
     const updated = await this.notificacionService.update(id, updateDto);
@@ -98,12 +95,12 @@ export class NotificacionController {
   }
 
   // ====== ELIMINAR ======
-  @Delete(':id')
+  @Delete('id')
   @HttpCode(HttpStatus.NO_CONTENT) // HTTP 204 = se borró, no hace falta cuerpo de respuesta.
   @ApiOperation({ summary: 'Eliminar notificacion' })
   @ApiResponse({ status: 204, description: 'Eliminada correctamente' })
   @ApiResponse({ status: 404, description: 'No encontrado' })
-  async remove(@Param('id', ParseIntPipe) id: number) {
+  async remove(@Body('id', ParseIntPipe) id: number): Promise<void> {
     const removed = await this.notificacionService.remove(id);
     if (!removed) {
       throw new NotFoundException(`Notificacion con id ${id} no encontrada`);

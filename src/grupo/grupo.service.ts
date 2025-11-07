@@ -22,7 +22,7 @@ export class GrupoService {
   }
 
   async findAll(): Promise<Grupo[]> {
-    return this.grupoRepository.find();
+    return this.grupoRepository.find({ where: { activo: true } });
   }
 
   async findOne(id: number): Promise<Grupo | null> {
@@ -45,8 +45,16 @@ export class GrupoService {
   }
 
   async remove(id: number): Promise<boolean> {
-    const result = await this.grupoRepository.delete({ id_grup: id });
-    const affected = result.affected ?? 0;
-    return affected > 0;
+    const grupo = await this.grupoRepository.findOne({
+      where: { id_grup: id },
+    });
+    if (!grupo) {
+      return false;
+    }
+
+    // Soft delete: marcamos el registro como inactivo en lugar de borrarlo.
+    grupo.activo = false;
+    await this.grupoRepository.save(grupo);
+    return true;
   }
 }

@@ -20,7 +20,7 @@ import { Grupo } from './grupo.entity';
 @Controller('grupo')
 export class GrupoController {
   // Nest crea el servicio y nos lo entrega por el constructor.
-  constructor(private readonly gruposService: GrupoService) {}
+  constructor(private readonly gruposService: GrupoService) { }
 
   // ====== CREAR ======
   @Post()
@@ -66,7 +66,7 @@ export class GrupoController {
   })
   async findAll() {
     const grupos = await this.gruposService.findAll();
-    return grupos.map((item) => this.toResponse(item));
+    return grupos.map((grupo) => this.toResponse(grupo));
   }
 
   // ====== ACTUALIZAR PARCIAL (PATCH) ======

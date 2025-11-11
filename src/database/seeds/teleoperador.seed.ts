@@ -1,45 +1,42 @@
+// src/database/seeds/teleoperador.seed.ts
 import { DataSource } from 'typeorm';
-import teleoperadorData from 'src/data/teleoperador';
 import { Seeder } from 'typeorm-extension';
+import teleoperadorData from '../../data/teleoperador';
 import { Teleoperador } from '../../teleoperador/teleoperador.entity';
+import { Trabajador } from '../../trabajador/trabajador.entity';
 import { Grupo } from '../../grupo/grupo.entity';
-import { TipoTrabajador } from '../../trabajador/trabajador.entity';
-import trabajadorData from '../../data/trabajador';
 
-export class TeleoperadorSeed implements Seeder {
+export class TeleoperadorSeeder implements Seeder {
     public async run(dataSource: DataSource) {
-        const teleoperadorRepository = dataSource.getRepository(Teleoperador);
-        const grupoRepository = dataSource.getRepository(Grupo);
 
+        const teleRepo = dataSource.getRepository(Teleoperador);
+        const trabajadorRepo = dataSource.getRepository(Trabajador);
+        const grupoRepo = dataSource.getRepository(Grupo);
 
-        const teleoperadorEntries = await Promise.all(
-            teleoperadorData.map(async (teleoperador) => {
-                const trabajadorBase = trabajadorData.find((trabajador) => trabajador.correo === teleoperador.correo);
-                if (!trabajadorBase) {
-                    throw new Error(`Datos base de trabajador no encontrados para el correo ${teleoperador.correo}`);
+        const teleoperadores = await Promise.all(
+            teleoperadorData.map(async data => {
+                const teleoperador = new Teleoperador();
+
+                const trabajador = await trabajadorRepo.findOneBy({ correo: data.correo });
+                if (!trabajador) {
+                    console.error(`❌ Trabajador no encontrado para teleoperador: ${data.correo}`);
+                    return null;
                 }
-                if (trabajadorBase.rol !== TipoTrabajador.TELEOPERADOR) {
-                    throw new Error(`El trabajador ${teleoperador.correo} no está marcado como teleoperador en los datos base`);
-                }
-                const grupo = await grupoRepository.findOneBy({ id_grup: teleoperador.grupo });
+
+                const grupo = await grupoRepo.findOneBy({ id_grup: data.grupo });
                 if (!grupo) {
-                    throw new Error(`Grupo no encontrado con id ${teleoperador.grupo}`);
+                    console.error(`❌ Grupo no encontrado: ${data.grupo}`);
+                    return null;
                 }
 
-                const teleoperadorEntry = teleoperadorRepository.create({
-                    nombre: trabajadorBase.nombre,
-                    apellidos: trabajadorBase.apellidos,
-                    correo: trabajadorBase.correo,
-                    contrasena: trabajadorBase.contrasena,
-                    rol: TipoTrabajador.TELEOPERADOR,
-                    nia: teleoperador.nia,
-                    grupo,
-                });
+                teleoperador.nia = data.nia;
+                teleoperador.grupo = grupo;
 
-                return teleoperadorEntry;
+                return teleoperador;
             })
         );
 
-        await teleoperadorRepository.save(teleoperadorEntries);
+        await teleRepo.save(teleoperadores.filter(t => t !== null));
+        console.log('✅ Teleoperadores creados');
     }
 }

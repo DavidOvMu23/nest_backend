@@ -11,6 +11,7 @@ import { NotificacionModule } from './notificacion/notificacion.module';
 import { SupervisorModule } from './supervisor/supervisor.module';
 import { TeleoperadorModule } from './teleoperador/teleoperador.module';
 import { TrabajadorModule } from './trabajador/trabajador.module';
+import { LoginModule } from './login/login.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { TrabajadorModule } from './trabajador/trabajador.module';
     SupervisorModule,
     TeleoperadorModule,
     TrabajadorModule,
+    LoginModule,
   ],
   controllers: [AppController],
   providers: [AppService],

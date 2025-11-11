@@ -14,10 +14,10 @@ import { Notificacion } from "./notificacion/notificacion.entity";
 import { NotificacionSeed } from "./database/seeds/notificacion.seed";
 //Supervisor
 import { Supervisor } from "./supervisor/supervisor.entity";
-import { SupervisorSeed } from "./database/seeds/supervisor.seed";
+import { SupervisorSeeder } from "./database/seeds/supervisor.seed";
 //Teleoperador
 import { Teleoperador } from "./teleoperador/teleoperador.entity";
-import { TeleoperadorSeed } from "./database/seeds/teleoperador.seed";
+import { TrabajadorSeeder } from "./database/seeds/trabajador.seed";
 //Trabajador
 import { Trabajador } from "./trabajador/trabajador.entity";
 //Usuario
@@ -25,6 +25,7 @@ import { Usuario } from "./usuario/usuario.entity";
 import { UsuarioSeed } from "./database/seeds/usuario.seed";
 //Usuario-Contacto relación
 import { UsuarioContactoSeed } from "./database/seeds/usuario_contacto.seed";
+import { TeleoperadorSeeder } from "./database/seeds/teleoperador.seed";
 
 
 const options: DataSourceOptions & SeederOptions = {
@@ -40,15 +41,16 @@ const options: DataSourceOptions & SeederOptions = {
         ContactoEmergencia,
         Grupo,
         Notificacion,
+        Trabajador,
         Supervisor,
         Teleoperador,
-        Trabajador,
         Usuario,
     ],
     seeds: [
         GrupoSeed,
-        SupervisorSeed,
-        TeleoperadorSeed,
+        TrabajadorSeeder,
+        SupervisorSeeder,
+        TeleoperadorSeeder,
         ContactoEmergenciaSeeder,
         UsuarioSeed,
         UsuarioContactoSeed,

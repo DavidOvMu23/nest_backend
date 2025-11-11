@@ -9,6 +9,11 @@ import {
 import { Comunicacion } from '../comunicacion/comunicacion.entity';
 import { ContactoEmergencia } from '../contacto_emergencia/contacto_emergencia.entity';
 
+export enum EstadoCuenta {
+  ACTIVO = 'activo',
+  SUSPENDIDO = 'suspendido',
+}
+
 @Entity('usuario')
 export class Usuario {
   @PrimaryColumn()
@@ -23,8 +28,12 @@ export class Usuario {
   @Column()
   informacion: string;
 
-  @Column()
-  estado_cuenta: boolean;
+  @Column({
+    type: 'enum',
+    enum: EstadoCuenta,
+    default: EstadoCuenta.ACTIVO,
+  })
+  estado_cuenta: EstadoCuenta;
 
   @Column({ type: 'date' })
   f_nac: Date;
@@ -51,7 +60,7 @@ export class Usuario {
     cascade: true,
   })
   @JoinTable({
-    name: 'usuario_contacto', // nombre de tabla intermedia igual que en SQL
+    name: 'usuario_contacto',
     joinColumn: { name: 'dni_usuario', referencedColumnName: 'dni' },
     inverseJoinColumn: { name: 'id_contacto', referencedColumnName: 'id_cont' },
   })

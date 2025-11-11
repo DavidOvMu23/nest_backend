@@ -5,6 +5,7 @@ import { CreateTrabajadorDTO, UpdateTrabajadorDTO } from './trabajador.dto';
 import { Trabajador, TipoTrabajador } from './trabajador.entity';
 import { Teleoperador } from '../teleoperador/teleoperador.entity';
 import { Supervisor } from '../supervisor/supervisor.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class TrabajadorService {
@@ -23,6 +24,8 @@ export class TrabajadorService {
                 ? (dto.rol.toLowerCase() as TipoTrabajador)
                 : dto.rol;
 
+        const hashedPassword = await bcrypt.hash(dto.contrasena, 10);
+
         if (!rol) {
             throw new BadRequestException('Debe indicar un rol válido para el trabajador');
         }
@@ -36,7 +39,7 @@ export class TrabajadorService {
                 nombre: dto.nombre,
                 apellidos: dto.apellidos,
                 correo: dto.correo,
-                contrasena: dto.contrasena,
+                contrasena: hashedPassword,
                 rol: TipoTrabajador.TELEOPERADOR,
                 nia: dto.nia,
             });
@@ -53,7 +56,7 @@ export class TrabajadorService {
                 nombre: dto.nombre,
                 apellidos: dto.apellidos,
                 correo: dto.correo,
-                contrasena: dto.contrasena,
+                contrasena: hashedPassword,
                 rol: TipoTrabajador.SUPERVISOR,
                 dni: typeof dto.dni === 'string' ? dto.dni.toUpperCase() : dto.dni,
             });
@@ -65,7 +68,7 @@ export class TrabajadorService {
             nombre: dto.nombre,
             apellidos: dto.apellidos,
             correo: dto.correo,
-            contrasena: dto.contrasena,
+            contrasena: hashedPassword,
             rol,
         });
         return this.trabajadorRepository.save(trabajador);
@@ -135,4 +138,9 @@ export class TrabajadorService {
         const affected = result.affected ?? 0;
         return affected > 0;
     }
+
+    async findByEmail(correo: string) {
+        return this.trabajadorRepository.findOne({ where: { correo } });
+    }
+
 }

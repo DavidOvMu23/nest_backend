@@ -1,5 +1,6 @@
 import { IsEmail, IsOptional, IsString, Matches, Length, IsNotEmpty, IsDateString } from 'class-validator';
 import { ApiPropertyOptional, ApiProperty } from '@nestjs/swagger';
+import { EstadoCuenta } from './usuario.entity';
 
 
 export class CreateUsuarioDTO {
@@ -26,7 +27,7 @@ export class CreateUsuarioDTO {
     @IsString()
     @IsNotEmpty()
     @ApiProperty({ example: 'activo' })
-    estado_cuenta: string;
+    estado_cuenta: EstadoCuenta;
 
     @IsDateString()
     @ApiProperty({ example: '1945-11-30' })
@@ -83,7 +84,7 @@ export class UpdateUsuarioDTO {
     @IsOptional()
     @IsString()
     @ApiPropertyOptional({ example: 'activo' })
-    estado_cuenta?: string;
+    estado_cuenta?: EstadoCuenta;
 
     @IsOptional()
     @IsDateString()
@@ -130,7 +131,7 @@ export class UsuarioResponseDTO {
     informacion: string;
 
     @ApiProperty({ example: 'activo' })
-    estado_cuenta: string;
+    estado_cuenta: EstadoCuenta;
 
     @ApiProperty({ example: '1945-11-30' })
     f_nac: string;

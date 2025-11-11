@@ -1,23 +1,27 @@
+// src/database/seeds/trabajador.seed.ts
 import { DataSource } from 'typeorm';
 import { Seeder } from 'typeorm-extension';
 import trabajadorData from '../../data/trabajador';
 import { Trabajador } from '../../trabajador/trabajador.entity';
+import * as bcrypt from 'bcrypt';
 
-export class TrabajadorSeed implements Seeder {
+export class TrabajadorSeeder implements Seeder {
     public async run(dataSource: DataSource) {
-        const trabajadorRepository = dataSource.getRepository(Trabajador);
+        const trabajadorRepo = dataSource.getRepository(Trabajador);
 
-        const trabajadorEntries = await Promise.all(
-            trabajadorData.map(async (trabajador) => {
-                const trabajadorEntry = new Trabajador();
-                trabajadorEntry.nombre = trabajador.nombre;
-                trabajadorEntry.apellidos = trabajador.apellidos;
-                trabajadorEntry.correo = trabajador.correo;
-                trabajadorEntry.contrasena = trabajador.contrasena;
-                trabajadorEntry.rol = trabajador.rol;
-                return trabajadorEntry;
+        const trabajadores = await Promise.all(
+            trabajadorData.map(async data => {
+                const trabajador = new Trabajador();
+                trabajador.nombre = data.nombre;
+                trabajador.apellidos = data.apellidos;
+                trabajador.correo = data.correo;
+                trabajador.contrasena = await bcrypt.hash(data.contrasena, 10);
+                trabajador.rol = data.rol;
+                return trabajador;
             })
         );
-        await trabajadorRepository.save(trabajadorEntries);
+
+        await trabajadorRepo.save(trabajadores);
+        console.log('✅ Trabajadores creados');
     }
 }

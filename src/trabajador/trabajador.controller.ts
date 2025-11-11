@@ -149,5 +149,5 @@ export class TrabajadorController {
         }
         return response;
     }
-
+    private
 }

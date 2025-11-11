@@ -23,8 +23,8 @@ export class Usuario {
   @Column()
   informacion: string;
 
-  @Column()
-  estado_cuenta: boolean;
+  @Column({ type: 'varchar', length: 20 })
+  estado_cuenta: string;
 
   @Column({ type: 'date' })
   f_nac: Date;

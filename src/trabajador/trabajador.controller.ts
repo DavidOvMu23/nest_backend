@@ -10,6 +10,7 @@ import {
     HttpCode,
     HttpStatus,
     NotFoundException,
+    UnauthorizedException
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiResponseProperty } from '@nestjs/swagger';
 import { CreateTrabajadorDTO, UpdateTrabajadorDTO, TrabajadorReponseDTO } from './trabajador.dto';
@@ -17,6 +18,7 @@ import { TrabajadorService } from './trabajador.service';
 import { Trabajador } from './trabajador.entity';
 import { Teleoperador } from '../teleoperador/teleoperador.entity';
 import { Supervisor } from '../supervisor/supervisor.entity';
+import * as bcrypt from 'bcrypt';
 
 @ApiTags('trabajador')
 @Controller('trabajador')
@@ -132,6 +134,8 @@ export class TrabajadorController {
             throw new NotFoundException(`Trabajador con id ${id} no encontrado`)
         }
     }
+
+
     private toResponse(trabajador: Trabajador): TrabajadorReponseDTO {
         const { id_trab, nombre, apellidos, correo, rol } = trabajador;
         const response: TrabajadorReponseDTO = {
@@ -149,5 +153,32 @@ export class TrabajadorController {
         }
         return response;
     }
-    private
+
+
+    @Post('login')
+    @ApiOperation({
+        summary: 'Obtener el Usuario por su correo'
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Trabajador encontrado',
+        type: TrabajadorReponseDTO
+    })
+    @ApiResponse({
+        status: 404,
+        description: 'No encontrado'
+    })
+    async findOneEmail(
+        @Body('correo') correo: string,
+        @Body('contrasena') contrasena: string,
+    ): Promise<Trabajador> {
+        const user = await this.trabajadorService.findByEmail(correo);
+        if (!user) throw new UnauthorizedException('Usuario no encontrado');
+
+        // compara contraseñas
+        const isPasswordValid = await bcrypt.compare(contrasena, user.contrasena);
+        if (!isPasswordValid) throw new UnauthorizedException('Contraseña incorrecta');
+
+        return user;
+    }
 }

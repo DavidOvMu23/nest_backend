@@ -1,7 +1,11 @@
+// El archivo de configuración de la fuente de datos para TypeORM en una aplicación NestJS
+// Carga variables de entorno desde archivos .env en diferentes ubicaciones
+
 import { config } from 'dotenv';
 import { DataSource } from 'typeorm';
 import { join } from 'path';
 
+// Intentar cargar variables de entorno desde múltiples ubicaciones
 const envCandidates = ['.env', '../env', '../../env'];
 for (const candidate of envCandidates) {
     const result = config({ path: candidate, override: false });
@@ -10,6 +14,7 @@ for (const candidate of envCandidates) {
     }
 }
 
+// Configuración de la fuente de datos para TypeORM
 export const AppDataSource = new DataSource({
     type: 'postgres',
     host: process.env.DB_HOST,

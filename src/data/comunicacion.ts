@@ -1,6 +1,7 @@
 export default [
     {
-        grupo: 1, usuario: '33333333C',
+        grupo: 1,
+        usuario: '33333333C',
         fecha: new Date('2025-01-15'),
         hora: '11:05',
         duracion: '20',

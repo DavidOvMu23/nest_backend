@@ -36,7 +36,6 @@ export class UsuarioController {
         return this.usuarioService.create(payload);
     }
     //? No se que cojones hace pero funciona (Habrá que mirar si el resto tambien)
-    //! Saber que cojones hace esto por que no lo entiendo.
     @Get('dni')
     @ApiOperation({ summary: 'Obtener un usuario por DNI' })
     @ApiResponse({ status: 200, type: UsuarioResponseDTO })

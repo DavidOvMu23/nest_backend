@@ -151,4 +151,10 @@ export class TrabajadorReponseDTO {
         example: '12345678A',
     })
     dni?: string;
+
+    @ApiPropertyOptional({
+        description: 'Identificador del grupo al que pertenece el teleoperador',
+        example: 2,
+    })
+    grupoId?: number;
 }

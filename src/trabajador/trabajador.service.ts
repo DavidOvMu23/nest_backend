@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreateTrabajadorDTO, UpdateTrabajadorDTO } from './trabajador.dto';
 import { Trabajador, TipoTrabajador } from './trabajador.entity';
 import { Teleoperador } from '../teleoperador/teleoperador.entity';
@@ -75,15 +75,17 @@ export class TrabajadorService {
     }
 
     async findAll(): Promise<Trabajador[]> {
-        return this.trabajadorRepository.find();
+        const trabajadores = await this.trabajadorRepository.find();
+        return this.mergeTeleoperadoresConGrupo(trabajadores);
     }
 
     async findOne(id: number): Promise<Trabajador | null> {
-        return this.trabajadorRepository.findOne({
+        const trabajador = await this.trabajadorRepository.findOne({
             where: {
                 id_trab: id,
             },
         });
+        return this.cargarGrupoSiTeleoperador(trabajador);
     }
 
     async update(id: number, dto: UpdateTrabajadorDTO): Promise<Trabajador | null> {
@@ -117,7 +119,8 @@ export class TrabajadorService {
             if (dto.nia !== undefined) {
                 trabajador.nia = dto.nia;
             }
-            return this.teleoperadorRepository.save(trabajador);
+            await this.teleoperadorRepository.save(trabajador);
+            return this.cargarGrupoSiTeleoperador(trabajador);
         }
 
         if (trabajador instanceof Supervisor) {
@@ -140,7 +143,52 @@ export class TrabajadorService {
     }
 
     async findByEmail(correo: string) {
-        return this.trabajadorRepository.findOne({ where: { correo } });
+        const trabajador = await this.trabajadorRepository.findOne({
+            where: { correo },
+        });
+        return this.cargarGrupoSiTeleoperador(trabajador);
     }
 
+    private async mergeTeleoperadoresConGrupo(
+        trabajadores: Trabajador[],
+    ): Promise<Trabajador[]> {
+        const teleIds = trabajadores
+            .filter((trabajador) => trabajador.rol === TipoTrabajador.TELEOPERADOR)
+            .map((trabajador) => trabajador.id_trab);
+
+        if (teleIds.length === 0) {
+            return trabajadores;
+        }
+
+        const teleoperadores = await this.teleoperadorRepository.find({
+            where: { id_trab: In(teleIds) },
+            relations: {
+                grupo: true,
+            },
+        });
+
+        const teleoperadorMap = new Map<number, Teleoperador>();
+        teleoperadores.forEach((teleoperador) => {
+            teleoperadorMap.set(teleoperador.id_trab, teleoperador);
+        });
+
+        return trabajadores.map(
+            (trabajador) => teleoperadorMap.get(trabajador.id_trab) ?? trabajador,
+        );
+    }
+
+    private async cargarGrupoSiTeleoperador(
+        trabajador: Trabajador | null,
+    ): Promise<Trabajador | null> {
+        if (!trabajador || trabajador.rol !== TipoTrabajador.TELEOPERADOR) {
+            return trabajador;
+        }
+
+        return this.teleoperadorRepository.findOne({
+            where: { id_trab: trabajador.id_trab },
+            relations: {
+                grupo: true,
+            },
+        });
+    }
 }

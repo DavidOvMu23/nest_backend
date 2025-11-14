@@ -147,6 +147,7 @@ export class TrabajadorController {
         };
         if (trabajador instanceof Teleoperador) {
             response.nia = trabajador.nia;
+            response.grupoId = trabajador.grupo?.id_grup;
         }
         if (trabajador instanceof Supervisor) {
             response.dni = trabajador.dni;

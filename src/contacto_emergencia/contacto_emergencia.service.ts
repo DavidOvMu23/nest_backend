@@ -12,7 +12,7 @@ export class ContactoEmergenciaService {
   constructor(
     @InjectRepository(ContactoEmergencia)
     private readonly contacto_emergenciaRepository: Repository<ContactoEmergencia>,
-  ) {}
+  ) { }
 
   async create(dto: CreateContactoEmergenciaDTO): Promise<ContactoEmergencia> {
     const contacto_emergencia = this.contacto_emergenciaRepository.create({
@@ -27,6 +27,13 @@ export class ContactoEmergenciaService {
 
   async findAll(): Promise<ContactoEmergencia[]> {
     return this.contacto_emergenciaRepository.find();
+  }
+
+  async findByUsuarioDni(dni: string): Promise<ContactoEmergencia[]> {
+    return this.contacto_emergenciaRepository.find({
+      where: { usuarioReferenciado: { dni } },
+      relations: ['usuarioReferenciado'],
+    });
   }
 
   async findOne(id: number): Promise<ContactoEmergencia | null> {

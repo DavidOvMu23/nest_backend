@@ -27,7 +27,7 @@ export class ContactoEmergenciaController {
   // Nest crea el servicio y nos lo entrega por el constructor.
   constructor(
     private readonly contacto_emergenciaService: ContactoEmergenciaService,
-  ) {}
+  ) { }
 
   // ====== CREAR ======
   @Post()
@@ -78,6 +78,21 @@ export class ContactoEmergenciaController {
   async findAll() {
     const contacto_emergencia = await this.contacto_emergenciaService.findAll();
     return contacto_emergencia.map((item) => this.toResponse(item));
+  }
+
+  @Get('dni')
+  @ApiOperation({ summary: 'Listar contactos de emergencia por DNI de usuario' })
+  @ApiResponse({
+    status: 200,
+    description: 'Contactos de emergencia del usuario',
+    type: ContactoEmergenciaResponseDTO,
+    isArray: true,
+  })
+  async findByUsuario(@Body('dni') dni: string) {
+    const normalized = dni.toUpperCase();
+    const contactos =
+      await this.contacto_emergenciaService.findByUsuarioDni(normalized);
+    return contactos.map((item) => this.toResponse(item));
   }
 
   // ====== ACTUALIZAR PARCIAL (PATCH) ======

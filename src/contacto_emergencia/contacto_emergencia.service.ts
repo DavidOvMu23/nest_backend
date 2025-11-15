@@ -32,7 +32,6 @@ export class ContactoEmergenciaService {
   async findByUsuarioDni(dni: string): Promise<ContactoEmergencia[]> {
     return this.contacto_emergenciaRepository.find({
       where: { usuarioReferenciado: { dni } },
-      relations: ['usuarioReferenciado'],
     });
   }
 

@@ -12,6 +12,7 @@ import {
   IsDate,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { GrupoResponseDTO } from '../grupo/grupo.dto';
 import { match } from 'assert';
 
 export class CreateComunicacionDTO {
@@ -151,4 +152,7 @@ export class ComunicacionResponseDTO {
     example: 'Conversación fluida. Anima a continuar paseos.',
   })
   observaciones: string;
+
+  @ApiPropertyOptional({ description: 'Grupo que realizó la comunicación', type: () => GrupoResponseDTO })
+  grupo?: GrupoResponseDTO;
 }

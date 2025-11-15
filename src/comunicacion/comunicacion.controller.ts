@@ -24,7 +24,7 @@ import { Comunicacion } from './comunicacion.entity';
 @Controller('comunicacion')
 export class ComunicacionController {
   // Nest crea el servicio y nos lo entrega por el constructor.
-  constructor(private readonly comunicationsService: ComunicacionService) {}
+  constructor(private readonly comunicationsService: ComunicacionService) { }
 
   // ====== CREAR ======
   @Post()
@@ -111,8 +111,17 @@ export class ComunicacionController {
    * Así evitamos repetir lógica en cada método.
    */
   private toResponse(comunicacion: Comunicacion): ComunicacionResponseDTO {
-    const { id_com, fecha, hora, duracion, resumen, estado, observaciones } =
-      comunicacion;
+    const {
+      id_com,
+      fecha,
+      hora,
+      duracion,
+      resumen,
+      estado,
+      observaciones,
+      grupo,
+    } = comunicacion;
+
     return {
       id_com,
       fecha,
@@ -121,6 +130,14 @@ export class ComunicacionController {
       resumen,
       estado,
       observaciones,
+      grupo: grupo
+        ? {
+          id_grup: grupo.id_grup,
+          nombre: grupo.nombre,
+          descripcion: grupo.descripcion,
+          activo: grupo.activo,
+        }
+        : undefined,
     };
   }
 }

@@ -12,7 +12,7 @@ export class ComunicacionService {
   constructor(
     @InjectRepository(Comunicacion)
     private readonly comunicacionRepository: Repository<Comunicacion>,
-  ) {}
+  ) { }
 
   async create(dto: CreateComunicacionDTO): Promise<Comunicacion> {
     const comunicacion = this.comunicacionRepository.create({
@@ -28,11 +28,19 @@ export class ComunicacionService {
   }
 
   async findAll(): Promise<Comunicacion[]> {
-    return this.comunicacionRepository.find();
+    // Cargamos la relación 'grupo' para que las llamadas incluyan el grupo que las realizó.
+    return this.comunicacionRepository.find({
+      relations: {
+        grupo: true,
+      },
+    });
   }
 
   async findOne(id: number): Promise<Comunicacion | null> {
-    return this.comunicacionRepository.findOne({ where: { id_com: id } });
+    return this.comunicacionRepository.findOne({
+      where: { id_com: id },
+      relations: { grupo: true },
+    });
   }
 
   async update(

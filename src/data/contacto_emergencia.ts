@@ -25,14 +25,14 @@ export default [
         apellidos: 'Vega Ríos',
         telefono: '600400400',
         relacion: 'Vecina',
-        dni_usuario_ref: null,
+        dni_usuario_ref: '22222222B',
     },
     {
         nombre: 'Carmen',
         apellidos: 'Ruiz Díaz',
         telefono: '612398765',
         relacion: 'Hija',
-        dni_usuario_ref: null,
+        dni_usuario_ref: '33333333C',
     },
     {
         nombre: 'Carmen',

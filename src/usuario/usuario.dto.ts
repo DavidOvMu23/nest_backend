@@ -31,11 +31,6 @@ export class CreateUsuarioDTO {
   @ApiProperty({ example: 'Vive sola, pulsera SOS' })
   informacion: string;
 
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({ example: 'activo' })
-  estado_cuenta: EstadoCuenta;
-
   @IsDateString()
   @ApiProperty({ example: '1945-11-30' })
   f_nac: string;

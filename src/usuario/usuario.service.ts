@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUsuarioDTO, UpdateUsuarioDTO } from './usuario.dto';
-import { Usuario } from './usuario.entity';
+import { EstadoCuenta, Usuario } from './usuario.entity';
 
 @Injectable()
 export class UsuarioService {
@@ -19,7 +19,7 @@ export class UsuarioService {
       apellidos: dto.apellidos,
       dni: dto.dni,
       informacion: dto.informacion,
-      estado_cuenta: dto.estado_cuenta,
+      estado_cuenta: EstadoCuenta.ACTIVO,
       f_nac: new Date(dto.f_nac),
       nivel_dependencia: dto.nivel_dependencia,
       datos_medicos_dolencias: dto.datos_medicos_dolencias,

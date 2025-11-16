@@ -153,6 +153,9 @@ export class ComunicacionResponseDTO {
   })
   observaciones: string;
 
-  @ApiPropertyOptional({ description: 'Grupo que realizó la comunicación', type: () => GrupoResponseDTO })
+  @ApiPropertyOptional({
+    description: 'Grupo que realizó la comunicación',
+    type: () => GrupoResponseDTO,
+  })
   grupo?: GrupoResponseDTO;
 }

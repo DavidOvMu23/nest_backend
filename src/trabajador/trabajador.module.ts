@@ -9,6 +9,6 @@ import { Supervisor } from '../supervisor/supervisor.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Trabajador, Teleoperador, Supervisor])],
   providers: [TrabajadorService],
-  controllers: [TrabajadorController]
+  controllers: [TrabajadorController],
 })
 export class TrabajadorModule {}

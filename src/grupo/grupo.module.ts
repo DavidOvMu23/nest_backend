@@ -7,6 +7,6 @@ import { Grupo } from './grupo.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Grupo])],
   providers: [GrupoService],
-  controllers: [GrupoController]
+  controllers: [GrupoController],
 })
 export class GrupoModule {}

@@ -7,6 +7,6 @@ import { ContactoEmergencia } from './contacto_emergencia.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([ContactoEmergencia])],
   controllers: [ContactoEmergenciaController],
-  providers: [ContactoEmergenciaService]
+  providers: [ContactoEmergenciaService],
 })
 export class ContactoEmergenciaModule {}

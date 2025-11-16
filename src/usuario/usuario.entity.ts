@@ -41,17 +41,17 @@ export class Usuario {
   @Column()
   nivel_dependencia: string;
 
-  @Column({ nullable: true })
-  datos_medicos_dolencias: string;
+  @Column({ type: 'text', nullable: true })
+  datos_medicos_dolencias?: string | null;
 
-  @Column({ nullable: true })
-  medicacion: string;
+  @Column({ type: 'text', nullable: true })
+  medicacion?: string | null;
 
-  @Column({ nullable: true })
+  @Column()
   telefono: string;
 
-  @Column({ nullable: true })
-  direccion: string;
+  @Column({ type: 'text', nullable: true })
+  direccion?: string | null;
 
   @OneToMany(() => Comunicacion, (com) => com.usuario)
   comunicaciones: Comunicacion[];

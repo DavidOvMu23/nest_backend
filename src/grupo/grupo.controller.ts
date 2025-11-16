@@ -20,7 +20,7 @@ import { Grupo } from './grupo.entity';
 @Controller('grupo')
 export class GrupoController {
   // Nest crea el servicio y nos lo entrega por el constructor.
-  constructor(private readonly gruposService: GrupoService) { }
+  constructor(private readonly gruposService: GrupoService) {}
 
   // ====== CREAR ======
   @Post()

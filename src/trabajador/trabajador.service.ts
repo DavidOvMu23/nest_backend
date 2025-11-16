@@ -9,186 +9,197 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class TrabajadorService {
-    constructor(
-        @InjectRepository(Trabajador)
-        private readonly trabajadorRepository: Repository<Trabajador>,
-        @InjectRepository(Teleoperador)
-        private readonly teleoperadorRepository: Repository<Teleoperador>,
-        @InjectRepository(Supervisor)
-        private readonly supervisorRepository: Repository<Supervisor>,
-    ) { }
+  constructor(
+    @InjectRepository(Trabajador)
+    private readonly trabajadorRepository: Repository<Trabajador>,
+    @InjectRepository(Teleoperador)
+    private readonly teleoperadorRepository: Repository<Teleoperador>,
+    @InjectRepository(Supervisor)
+    private readonly supervisorRepository: Repository<Supervisor>,
+  ) {}
 
-    async create(dto: CreateTrabajadorDTO): Promise<Trabajador> {
-        const rol =
-            typeof dto.rol === 'string'
-                ? (dto.rol.toLowerCase() as TipoTrabajador)
-                : dto.rol;
+  async create(dto: CreateTrabajadorDTO): Promise<Trabajador> {
+    const rol =
+      typeof dto.rol === 'string'
+        ? (dto.rol.toLowerCase() as TipoTrabajador)
+        : dto.rol;
 
-        const hashedPassword = await bcrypt.hash(dto.contrasena, 10);
+    const hashedPassword = await bcrypt.hash(dto.contrasena, 10);
 
-        if (!rol) {
-            throw new BadRequestException('Debe indicar un rol válido para el trabajador');
-        }
-
-        if (rol === TipoTrabajador.TELEOPERADOR) {
-            if (!dto.nia) {
-                throw new BadRequestException('El NIA es obligatorio para crear un teleoperador');
-            }
-
-            const teleoperador = this.teleoperadorRepository.create({
-                nombre: dto.nombre,
-                apellidos: dto.apellidos,
-                correo: dto.correo,
-                contrasena: hashedPassword,
-                rol: TipoTrabajador.TELEOPERADOR,
-                nia: dto.nia,
-            });
-
-            return this.teleoperadorRepository.save(teleoperador);
-        }
-
-        if (rol === TipoTrabajador.SUPERVISOR) {
-            if (!dto.dni) {
-                throw new BadRequestException('El DNI es obligatorio para crear un supervisor');
-            }
-
-            const supervisor = this.supervisorRepository.create({
-                nombre: dto.nombre,
-                apellidos: dto.apellidos,
-                correo: dto.correo,
-                contrasena: hashedPassword,
-                rol: TipoTrabajador.SUPERVISOR,
-                dni: typeof dto.dni === 'string' ? dto.dni.toUpperCase() : dto.dni,
-            });
-
-            return this.supervisorRepository.save(supervisor);
-        }
-
-        const trabajador = this.trabajadorRepository.create({
-            nombre: dto.nombre,
-            apellidos: dto.apellidos,
-            correo: dto.correo,
-            contrasena: hashedPassword,
-            rol,
-        });
-        return this.trabajadorRepository.save(trabajador);
+    if (!rol) {
+      throw new BadRequestException(
+        'Debe indicar un rol válido para el trabajador',
+      );
     }
 
-    async findAll(): Promise<Trabajador[]> {
-        const trabajadores = await this.trabajadorRepository.find();
-        return this.mergeTeleoperadoresConGrupo(trabajadores);
-    }
-
-    async findOne(id: number): Promise<Trabajador | null> {
-        const trabajador = await this.trabajadorRepository.findOne({
-            where: {
-                id_trab: id,
-            },
-        });
-        return this.cargarGrupoSiTeleoperador(trabajador);
-    }
-
-    async update(id: number, dto: UpdateTrabajadorDTO): Promise<Trabajador | null> {
-        const trabajador = await this.trabajadorRepository.findOne({
-            where: {
-                id_trab: id,
-            },
-        });
-
-        if (!trabajador) {
-            return null;
-        }
-
-        const rolUpdate =
-            dto.rol === undefined
-                ? undefined
-                : typeof dto.rol === 'string'
-                    ? (dto.rol.toLowerCase() as TipoTrabajador)
-                    : dto.rol;
-
-        if (rolUpdate !== undefined && rolUpdate !== trabajador.rol) {
-            throw new BadRequestException('El rol de un trabajador no se puede cambiar desde este endpoint');
-        }
-
-        if (dto.nombre !== undefined) trabajador.nombre = dto.nombre;
-        if (dto.apellidos !== undefined) trabajador.apellidos = dto.apellidos;
-        if (dto.correo !== undefined) trabajador.correo = dto.correo;
-        if (dto.contrasena !== undefined) trabajador.contrasena = dto.contrasena;
-
-        if (trabajador instanceof Teleoperador) {
-            if (dto.nia !== undefined) {
-                trabajador.nia = dto.nia;
-            }
-            await this.teleoperadorRepository.save(trabajador);
-            return this.cargarGrupoSiTeleoperador(trabajador);
-        }
-
-        if (trabajador instanceof Supervisor) {
-            if (dto.dni !== undefined) {
-                trabajador.dni =
-                    typeof dto.dni === 'string' ? dto.dni.toUpperCase() : dto.dni;
-            }
-            return this.supervisorRepository.save(trabajador);
-        }
-
-        return this.trabajadorRepository.save(trabajador);
-    }
-
-    async remove(id: number): Promise<boolean> {
-        const result = await this.trabajadorRepository.delete({
-            id_trab: id,
-        });
-        const affected = result.affected ?? 0;
-        return affected > 0;
-    }
-
-    async findByEmail(correo: string) {
-        const trabajador = await this.trabajadorRepository.findOne({
-            where: { correo },
-        });
-        return this.cargarGrupoSiTeleoperador(trabajador);
-    }
-
-    private async mergeTeleoperadoresConGrupo(
-        trabajadores: Trabajador[],
-    ): Promise<Trabajador[]> {
-        const teleIds = trabajadores
-            .filter((trabajador) => trabajador.rol === TipoTrabajador.TELEOPERADOR)
-            .map((trabajador) => trabajador.id_trab);
-
-        if (teleIds.length === 0) {
-            return trabajadores;
-        }
-
-        const teleoperadores = await this.teleoperadorRepository.find({
-            where: { id_trab: In(teleIds) },
-            relations: {
-                grupo: true,
-            },
-        });
-
-        const teleoperadorMap = new Map<number, Teleoperador>();
-        teleoperadores.forEach((teleoperador) => {
-            teleoperadorMap.set(teleoperador.id_trab, teleoperador);
-        });
-
-        return trabajadores.map(
-            (trabajador) => teleoperadorMap.get(trabajador.id_trab) ?? trabajador,
+    if (rol === TipoTrabajador.TELEOPERADOR) {
+      if (!dto.nia) {
+        throw new BadRequestException(
+          'El NIA es obligatorio para crear un teleoperador',
         );
+      }
+
+      const teleoperador = this.teleoperadorRepository.create({
+        nombre: dto.nombre,
+        apellidos: dto.apellidos,
+        correo: dto.correo,
+        contrasena: hashedPassword,
+        rol: TipoTrabajador.TELEOPERADOR,
+        nia: dto.nia,
+      });
+
+      return this.teleoperadorRepository.save(teleoperador);
     }
 
-    private async cargarGrupoSiTeleoperador(
-        trabajador: Trabajador | null,
-    ): Promise<Trabajador | null> {
-        if (!trabajador || trabajador.rol !== TipoTrabajador.TELEOPERADOR) {
-            return trabajador;
-        }
+    if (rol === TipoTrabajador.SUPERVISOR) {
+      if (!dto.dni) {
+        throw new BadRequestException(
+          'El DNI es obligatorio para crear un supervisor',
+        );
+      }
 
-        return this.teleoperadorRepository.findOne({
-            where: { id_trab: trabajador.id_trab },
-            relations: {
-                grupo: true,
-            },
-        });
+      const supervisor = this.supervisorRepository.create({
+        nombre: dto.nombre,
+        apellidos: dto.apellidos,
+        correo: dto.correo,
+        contrasena: hashedPassword,
+        rol: TipoTrabajador.SUPERVISOR,
+        dni: typeof dto.dni === 'string' ? dto.dni.toUpperCase() : dto.dni,
+      });
+
+      return this.supervisorRepository.save(supervisor);
     }
+
+    const trabajador = this.trabajadorRepository.create({
+      nombre: dto.nombre,
+      apellidos: dto.apellidos,
+      correo: dto.correo,
+      contrasena: hashedPassword,
+      rol,
+    });
+    return this.trabajadorRepository.save(trabajador);
+  }
+
+  async findAll(): Promise<Trabajador[]> {
+    const trabajadores = await this.trabajadorRepository.find();
+    return this.mergeTeleoperadoresConGrupo(trabajadores);
+  }
+
+  async findOne(id: number): Promise<Trabajador | null> {
+    const trabajador = await this.trabajadorRepository.findOne({
+      where: {
+        id_trab: id,
+      },
+    });
+    return this.cargarGrupoSiTeleoperador(trabajador);
+  }
+
+  async update(
+    id: number,
+    dto: UpdateTrabajadorDTO,
+  ): Promise<Trabajador | null> {
+    const trabajador = await this.trabajadorRepository.findOne({
+      where: {
+        id_trab: id,
+      },
+    });
+
+    if (!trabajador) {
+      return null;
+    }
+
+    const rolUpdate =
+      dto.rol === undefined
+        ? undefined
+        : typeof dto.rol === 'string'
+          ? (dto.rol.toLowerCase() as TipoTrabajador)
+          : dto.rol;
+
+    if (rolUpdate !== undefined && rolUpdate !== trabajador.rol) {
+      throw new BadRequestException(
+        'El rol de un trabajador no se puede cambiar desde este endpoint',
+      );
+    }
+
+    if (dto.nombre !== undefined) trabajador.nombre = dto.nombre;
+    if (dto.apellidos !== undefined) trabajador.apellidos = dto.apellidos;
+    if (dto.correo !== undefined) trabajador.correo = dto.correo;
+    if (dto.contrasena !== undefined) trabajador.contrasena = dto.contrasena;
+
+    if (trabajador instanceof Teleoperador) {
+      if (dto.nia !== undefined) {
+        trabajador.nia = dto.nia;
+      }
+      await this.teleoperadorRepository.save(trabajador);
+      return this.cargarGrupoSiTeleoperador(trabajador);
+    }
+
+    if (trabajador instanceof Supervisor) {
+      if (dto.dni !== undefined) {
+        trabajador.dni =
+          typeof dto.dni === 'string' ? dto.dni.toUpperCase() : dto.dni;
+      }
+      return this.supervisorRepository.save(trabajador);
+    }
+
+    return this.trabajadorRepository.save(trabajador);
+  }
+
+  async remove(id: number): Promise<boolean> {
+    const result = await this.trabajadorRepository.delete({
+      id_trab: id,
+    });
+    const affected = result.affected ?? 0;
+    return affected > 0;
+  }
+
+  async findByEmail(correo: string) {
+    const trabajador = await this.trabajadorRepository.findOne({
+      where: { correo },
+    });
+    return this.cargarGrupoSiTeleoperador(trabajador);
+  }
+
+  private async mergeTeleoperadoresConGrupo(
+    trabajadores: Trabajador[],
+  ): Promise<Trabajador[]> {
+    const teleIds = trabajadores
+      .filter((trabajador) => trabajador.rol === TipoTrabajador.TELEOPERADOR)
+      .map((trabajador) => trabajador.id_trab);
+
+    if (teleIds.length === 0) {
+      return trabajadores;
+    }
+
+    const teleoperadores = await this.teleoperadorRepository.find({
+      where: { id_trab: In(teleIds) },
+      relations: {
+        grupo: true,
+      },
+    });
+
+    const teleoperadorMap = new Map<number, Teleoperador>();
+    teleoperadores.forEach((teleoperador) => {
+      teleoperadorMap.set(teleoperador.id_trab, teleoperador);
+    });
+
+    return trabajadores.map(
+      (trabajador) => teleoperadorMap.get(trabajador.id_trab) ?? trabajador,
+    );
+  }
+
+  private async cargarGrupoSiTeleoperador(
+    trabajador: Trabajador | null,
+  ): Promise<Trabajador | null> {
+    if (!trabajador || trabajador.rol !== TipoTrabajador.TELEOPERADOR) {
+      return trabajador;
+    }
+
+    return this.teleoperadorRepository.findOne({
+      where: { id_trab: trabajador.id_trab },
+      relations: {
+        grupo: true,
+      },
+    });
+  }
 }

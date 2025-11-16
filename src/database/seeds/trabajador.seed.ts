@@ -74,12 +74,10 @@ export class TrabajadorSeeder implements Seeder {
     );
 
     // Separar supervisores y teleoperadores
-    const supervisores = trabajadores.filter(
-      (t) => t instanceof Supervisor,
-    ) as Supervisor[];
+    const supervisores = trabajadores.filter((t) => t instanceof Supervisor);
     const teleoperadores = trabajadores.filter(
       (t) => t instanceof Teleoperador,
-    ) as Teleoperador[];
+    );
 
     // Guardar supervisores
     if (supervisores.length > 0) {

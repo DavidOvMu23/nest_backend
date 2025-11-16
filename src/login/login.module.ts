@@ -23,5 +23,4 @@ import { Supervisor } from '../supervisor/supervisor.entity';
   providers: [LoginService, JwtStrategy, TrabajadorService],
   exports: [LoginService],
 })
-export class LoginModule { }
-
+export class LoginModule {}

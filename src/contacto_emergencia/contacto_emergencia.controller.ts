@@ -27,7 +27,7 @@ export class ContactoEmergenciaController {
   // Nest crea el servicio y nos lo entrega por el constructor.
   constructor(
     private readonly contacto_emergenciaService: ContactoEmergenciaService,
-  ) { }
+  ) {}
 
   // ====== CREAR ======
   @Post()
@@ -81,7 +81,9 @@ export class ContactoEmergenciaController {
   }
 
   @Get('dni')
-  @ApiOperation({ summary: 'Listar contactos de emergencia por DNI de usuario' })
+  @ApiOperation({
+    summary: 'Listar contactos de emergencia por DNI de usuario',
+  })
   @ApiResponse({
     status: 200,
     description: 'Contactos de emergencia del usuario',

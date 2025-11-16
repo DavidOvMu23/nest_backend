@@ -7,6 +7,6 @@ import { Comunicacion } from './comunicacion.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Comunicacion])],
   providers: [ComunicacionService],
-  controllers: [ComunicacionController]
+  controllers: [ComunicacionController],
 })
 export class ComunicacionModule {}

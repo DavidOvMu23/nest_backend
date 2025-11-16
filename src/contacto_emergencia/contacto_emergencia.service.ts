@@ -12,7 +12,7 @@ export class ContactoEmergenciaService {
   constructor(
     @InjectRepository(ContactoEmergencia)
     private readonly contacto_emergenciaRepository: Repository<ContactoEmergencia>,
-  ) { }
+  ) {}
 
   async create(dto: CreateContactoEmergenciaDTO): Promise<ContactoEmergencia> {
     const contacto_emergencia = this.contacto_emergenciaRepository.create({

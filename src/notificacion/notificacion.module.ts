@@ -7,6 +7,6 @@ import { Notificacion } from './notificacion.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Notificacion])],
   providers: [NotificacionService],
-  controllers: [NotificacionController]
+  controllers: [NotificacionController],
 })
 export class NotificacionModule {}

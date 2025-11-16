@@ -12,6 +12,8 @@ export class UsuarioService {
   ) {}
 
   async create(dto: CreateUsuarioDTO): Promise<Usuario> {
+    // Dirección opcional: si llega vacía, la guardamos como null.
+    const direccionLimpia = dto.direccion?.trim() || null;
     const usuario = this.usuarioRepository.create({
       nombre: dto.nombre,
       apellidos: dto.apellidos,
@@ -23,7 +25,7 @@ export class UsuarioService {
       datos_medicos_dolencias: dto.datos_medicos_dolencias,
       medicacion: dto.medicacion,
       telefono: dto.telefono,
-      direccion: dto.direccion,
+      direccion: direccionLimpia,
     });
 
     return this.usuarioRepository.save(usuario);

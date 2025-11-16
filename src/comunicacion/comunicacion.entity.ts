@@ -1,41 +1,36 @@
-import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    ManyToOne,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Grupo } from '../grupo/grupo.entity';
 import { Usuario } from '../usuario/usuario.entity';
 
 @Entity('comunicacion')
 export class Comunicacion {
-    @PrimaryGeneratedColumn()
-    id_com: number;
+  @PrimaryGeneratedColumn()
+  id_com: number;
 
-    @Column()
-    fecha: Date;
+  @Column()
+  fecha: Date;
 
-    @Column()
-    hora: string;
+  @Column()
+  hora: string;
 
-    @Column()
-    duracion: string;
+  @Column()
+  duracion: string;
 
-    @Column()
-    resumen: string;
+  @Column()
+  resumen: string;
 
-    @Column()
-    estado: string;
+  @Column()
+  estado: string;
 
-    @Column()
-    observaciones: string;
+  @Column()
+  observaciones: string;
 
-    @ManyToOne(() => Grupo, (grupo) => grupo.comunicaciones, {
-        nullable: true,
-        onDelete: 'SET NULL',
-    })
-    grupo: Grupo | null;
+  @ManyToOne(() => Grupo, (grupo) => grupo.comunicaciones, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  grupo: Grupo | null;
 
-    @ManyToOne(() => Usuario, (usuario) => usuario.comunicaciones)
-    usuario: Usuario;
+  @ManyToOne(() => Usuario, (usuario) => usuario.comunicaciones)
+  usuario: Usuario;
 }

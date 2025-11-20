@@ -7,6 +7,7 @@ import {
 } from './comunicacion.dto';
 import { Comunicacion } from './comunicacion.entity';
 
+// Servicio para gestionar las comunicaciones
 @Injectable()
 export class ComunicacionService {
   constructor(
@@ -14,6 +15,8 @@ export class ComunicacionService {
     private readonly comunicacionRepository: Repository<Comunicacion>,
   ) {}
 
+  // ====== MÉTODOS CRUD ======
+  // Crear una nueva comunicación
   async create(dto: CreateComunicacionDTO): Promise<Comunicacion> {
     const comunicacion = this.comunicacionRepository.create({
       fecha: dto.fecha,
@@ -27,6 +30,7 @@ export class ComunicacionService {
     return this.comunicacionRepository.save(comunicacion);
   }
 
+  // Obtener todas las comunicaciones
   async findAll(): Promise<Comunicacion[]> {
     // Cargamos la relación 'grupo' para que las llamadas incluyan el grupo que las realizó.
     return this.comunicacionRepository.find({
@@ -36,6 +40,7 @@ export class ComunicacionService {
     });
   }
 
+  // Obtener una comunicación por su ID
   async findOne(id: number): Promise<Comunicacion | null> {
     return this.comunicacionRepository.findOne({
       where: { id_com: id },
@@ -43,6 +48,7 @@ export class ComunicacionService {
     });
   }
 
+  // Actualizar una comunicación existente
   async update(
     id: number,
     dto: UpdateComunicacionDTO,
@@ -65,6 +71,7 @@ export class ComunicacionService {
     return this.comunicacionRepository.save(comunicacion);
   }
 
+  // Eliminar una comunicación por su ID
   async remove(id: number): Promise<boolean> {
     const result = await this.comunicacionRepository.delete({ id_com: id });
     const affected = result.affected ?? 0;

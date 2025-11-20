@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { CreateGrupoDTO, UpdateGrupoDTO } from './grupo.dto';
 import { Grupo } from './grupo.entity';
 
+// Servicio para la entidad Grupo que maneja la lógica de negocio.
 @Injectable()
 export class GrupoService {
   constructor(
@@ -11,6 +12,7 @@ export class GrupoService {
     private readonly grupoRepository: Repository<Grupo>,
   ) {}
 
+  // Crear un nuevo Grupo
   async create(dto: CreateGrupoDTO): Promise<Grupo> {
     const grupo = this.grupoRepository.create({
       nombre: dto.nombre,
@@ -21,14 +23,17 @@ export class GrupoService {
     return this.grupoRepository.save(grupo);
   }
 
+  // Listar todos los Grupos activos
   async findAll(): Promise<Grupo[]> {
     return this.grupoRepository.find({ where: { activo: true } });
   }
 
+  // Obtener un Grupo por su ID
   async findOne(id: number): Promise<Grupo | null> {
     return this.grupoRepository.findOne({ where: { id_grup: id } });
   }
 
+  // Actualizar un Grupo existente
   async update(id: number, dto: UpdateGrupoDTO): Promise<Grupo | null> {
     const grupo = await this.grupoRepository.findOne({
       where: { id_grup: id },
@@ -44,6 +49,7 @@ export class GrupoService {
     return this.grupoRepository.save(grupo);
   }
 
+  // Eliminar (desactivar) un Grupo por su ID
   async remove(id: number): Promise<boolean> {
     const grupo = await this.grupoRepository.findOne({
       where: { id_grup: id },

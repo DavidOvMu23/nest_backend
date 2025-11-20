@@ -15,6 +15,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { GrupoResponseDTO } from '../grupo/grupo.dto';
 import { match } from 'assert';
 
+// DTO para crear una nueva comunicación
 export class CreateComunicacionDTO {
   @IsDate()
   @ApiProperty({
@@ -113,6 +114,7 @@ export class UpdateComunicacionDTO {
   observaciones: string;
 }
 
+// DTO para la respuesta de una comunicación
 export class ComunicacionResponseDTO {
   @ApiProperty({ description: 'Identificador único', example: 1 })
   id_com: number;

@@ -13,6 +13,7 @@ import {
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { match } from 'assert';
 
+// DTO para crear un contacto de emergencia
 export class CreateContactoEmergenciaDTO {
   @IsString()
   @Length(1, 500)
@@ -47,6 +48,7 @@ export class CreateContactoEmergenciaDTO {
   relacion: string;
 }
 
+// DTO para actualizar un contacto de emergencia
 export class UpdateContactoEmergenciaDTO {
   @IsString()
   @Length(1, 500)
@@ -81,6 +83,7 @@ export class UpdateContactoEmergenciaDTO {
   relacion: string;
 }
 
+// DTO para la respuesta de un contacto de emergencia
 export class ContactoEmergenciaResponseDTO {
   @ApiProperty({ description: 'Identificador único', example: 1 })
   id_cont: number;

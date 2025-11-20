@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GrupoService } from './grupo.service';
 
+//unit test para el servicio GrupoService
 describe('GrupoService', () => {
   let service: GrupoService;
 

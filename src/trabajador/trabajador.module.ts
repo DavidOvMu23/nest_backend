@@ -6,6 +6,7 @@ import { Trabajador } from './trabajador.entity';
 import { Teleoperador } from '../teleoperador/teleoperador.entity';
 import { Supervisor } from '../supervisor/supervisor.entity';
 
+// Módulo de Trabajador que importa las entidades, el servicio y el controlador.
 @Module({
   imports: [TypeOrmModule.forFeature([Trabajador, Teleoperador, Supervisor])],
   providers: [TrabajadorService],

@@ -7,6 +7,8 @@ import {
 } from './teleoperador.dto';
 import { Teleoperador } from './teleoperador.entity';
 import { TipoTrabajador } from 'src/trabajador/trabajador.entity';
+
+// Servicio de Teleoperador que maneja la lógica de negocio.
 @Injectable()
 export class TeleoperadorService {
   constructor(
@@ -14,6 +16,7 @@ export class TeleoperadorService {
     private readonly teleoperadorRepository: Repository<Teleoperador>,
   ) {}
 
+  // Método para crear un nuevo teleoperador.
   async create(dto: CreateTeleoperadorDTO): Promise<Teleoperador> {
     const teleoperador = this.teleoperadorRepository.create({
       nombre: dto.nombre,
@@ -27,14 +30,17 @@ export class TeleoperadorService {
     return this.teleoperadorRepository.save(teleoperador);
   }
 
+  // Método para obtener todos los teleoperadores.
   async findAll(): Promise<Teleoperador[]> {
     return this.teleoperadorRepository.find();
   }
 
+  // Método para obtener un teleoperador por su ID.
   async findOne(id: number): Promise<Teleoperador | null> {
     return this.teleoperadorRepository.findOne({ where: { id_trab: id } });
   }
 
+  // Método para actualizar un teleoperador existente.
   async update(
     id: number,
     dto: UpdateTeleoperadorDTO,
@@ -55,6 +61,7 @@ export class TeleoperadorService {
     return this.teleoperadorRepository.save(teleoperador);
   }
 
+  // Método para eliminar un teleoperador por su ID.
   async remove(id: number): Promise<boolean> {
     const result = await this.teleoperadorRepository.delete({ id_trab: id });
     const affected = result.affected ?? 0;

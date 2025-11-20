@@ -10,6 +10,7 @@ import { TrabajadorService } from '../trabajador/trabajador.service';
 import { Teleoperador } from '../teleoperador/teleoperador.entity';
 import { Supervisor } from '../supervisor/supervisor.entity';
 
+// Módulo de login que gestiona la autenticación
 @Module({
   imports: [
     TypeOrmModule.forFeature([Trabajador, Teleoperador, Supervisor]),

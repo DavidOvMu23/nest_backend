@@ -13,6 +13,7 @@ import {
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { match } from 'assert';
 
+// DTO para crear un nuevo Grupo
 export class CreateGrupoDTO {
   @IsString()
   @Length(1, 500)
@@ -37,6 +38,7 @@ export class CreateGrupoDTO {
   })
   activo: boolean;
 }
+// DTO para actualizar un Grupo existente
 export class UpdateGrupoDTO {
   @IsString()
   @Length(1, 500)
@@ -62,6 +64,7 @@ export class UpdateGrupoDTO {
   activo: boolean;
 }
 
+// DTO para la respuesta de un Grupo
 export class GrupoResponseDTO {
   @ApiProperty({ description: 'Identificador único', example: 1 })
   id_grup: number;

@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Usuario } from '../usuario/usuario.entity';
 
+// Entidad para el contacto de emergencia
 @Entity('contacto_emergencia')
 export class ContactoEmergencia extends BaseEntity {
   @PrimaryGeneratedColumn()
@@ -32,6 +33,7 @@ export class ContactoEmergencia extends BaseEntity {
   })
   usuarios?: Usuario[];
 
+  // Relación opcional con un usuario específico
   @ManyToOne(() => Usuario, (usuario) => usuario.contactosPropios, {
     nullable: true,
     onDelete: 'SET NULL',

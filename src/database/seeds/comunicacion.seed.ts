@@ -5,6 +5,7 @@ import { Grupo } from '../../grupo/grupo.entity';
 import { Usuario } from '../../usuario/usuario.entity';
 import { Seeder } from 'typeorm-extension';
 
+// Seed para la entidad Comunicacion, lo que hace es poblar la tabla Comunicacion con datos iniciales definidos en el archivo data/comunicacion.ts
 export class ComunicacionSeed implements Seeder {
   public async run(dataSource: DataSource) {
     const comunicacionRepository = dataSource.getRepository(Comunicacion);

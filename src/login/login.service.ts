@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { TrabajadorService } from '../trabajador/trabajador.service';
 import * as bcrypt from 'bcrypt';
 
+// Servicio de login que maneja la validación de usuarios y generación de tokens JWT
 @Injectable()
 export class LoginService {
   constructor(
@@ -11,6 +12,7 @@ export class LoginService {
     private readonly jwtService: JwtService,
   ) {}
 
+  // Valida las credenciales del usuario
   async validateUser(correo: string, contrasena: string): Promise<any> {
     const user = await this.trabajadorService.findByEmail(correo);
     if (!user) throw new UnauthorizedException('Usuario no encontrado');
@@ -23,6 +25,7 @@ export class LoginService {
     return user;
   }
 
+  // Genera un token JWT para el usuario autenticado
   async login(user: any) {
     const payload = { correo: user.correo, sub: user.id_trab, rol: user.rol };
     return {

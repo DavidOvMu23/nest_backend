@@ -21,6 +21,7 @@ import { ContactoEmergenciaService } from './contacto_emergencia.service';
 import { ContactoEmergencia } from './contacto_emergencia.entity';
 import contacto_emergencia from 'src/data/contacto_emergencia';
 
+// Controlador de Contacto de Emergencia.
 @ApiTags('contacto_emergencia') // Etiqueta bonita para Swagger.
 @Controller('contacto_emergencia')
 export class ContactoEmergenciaController {

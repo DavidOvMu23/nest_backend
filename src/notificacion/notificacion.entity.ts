@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Teleoperador } from '../teleoperador/teleoperador.entity';
 
+// Entidad Notificacion mapeada a la tabla 'notificacion'.
 @Entity('notificacion')
 export class Notificacion {
   @PrimaryGeneratedColumn()

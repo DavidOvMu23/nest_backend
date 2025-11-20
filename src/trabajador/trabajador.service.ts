@@ -7,6 +7,7 @@ import { Teleoperador } from '../teleoperador/teleoperador.entity';
 import { Supervisor } from '../supervisor/supervisor.entity';
 import * as bcrypt from 'bcrypt';
 
+// Servicio de Trabajador que maneja la lógica de negocio.
 @Injectable()
 export class TrabajadorService {
   constructor(
@@ -18,6 +19,7 @@ export class TrabajadorService {
     private readonly supervisorRepository: Repository<Supervisor>,
   ) {}
 
+  // Método para crear un nuevo trabajador.
   async create(dto: CreateTrabajadorDTO): Promise<Trabajador> {
     const rol =
       typeof dto.rol === 'string'
@@ -26,6 +28,7 @@ export class TrabajadorService {
 
     const hashedPassword = await bcrypt.hash(dto.contrasena, 10);
 
+    // Validar rol
     if (!rol) {
       throw new BadRequestException(
         'Debe indicar un rol válido para el trabajador',
@@ -39,6 +42,7 @@ export class TrabajadorService {
         );
       }
 
+      // Crear teleoperador
       const teleoperador = this.teleoperadorRepository.create({
         nombre: dto.nombre,
         apellidos: dto.apellidos,
@@ -51,6 +55,7 @@ export class TrabajadorService {
       return this.teleoperadorRepository.save(teleoperador);
     }
 
+    // Crear supervisor
     if (rol === TipoTrabajador.SUPERVISOR) {
       if (!dto.dni) {
         throw new BadRequestException(
@@ -58,6 +63,7 @@ export class TrabajadorService {
         );
       }
 
+      // Crear supervisor
       const supervisor = this.supervisorRepository.create({
         nombre: dto.nombre,
         apellidos: dto.apellidos,
@@ -67,9 +73,11 @@ export class TrabajadorService {
         dni: typeof dto.dni === 'string' ? dto.dni.toUpperCase() : dto.dni,
       });
 
+      // Guardar supervisor
       return this.supervisorRepository.save(supervisor);
     }
 
+    // Crear trabajador genérico
     const trabajador = this.trabajadorRepository.create({
       nombre: dto.nombre,
       apellidos: dto.apellidos,
@@ -80,11 +88,13 @@ export class TrabajadorService {
     return this.trabajadorRepository.save(trabajador);
   }
 
+  // Método para obtener todos los trabajadores.
   async findAll(): Promise<Trabajador[]> {
     const trabajadores = await this.trabajadorRepository.find();
     return this.mergeTeleoperadoresConGrupo(trabajadores);
   }
 
+  // Método para obtener un trabajador por su ID.
   async findOne(id: number): Promise<Trabajador | null> {
     const trabajador = await this.trabajadorRepository.findOne({
       where: {
@@ -94,6 +104,7 @@ export class TrabajadorService {
     return this.cargarGrupoSiTeleoperador(trabajador);
   }
 
+  // Método para actualizar un trabajador existente.
   async update(
     id: number,
     dto: UpdateTrabajadorDTO,
@@ -104,10 +115,12 @@ export class TrabajadorService {
       },
     });
 
+    // Verificar si el trabajador existe
     if (!trabajador) {
       return null;
     }
 
+    // Procesar actualización del rol
     const rolUpdate =
       dto.rol === undefined
         ? undefined
@@ -115,17 +128,20 @@ export class TrabajadorService {
           ? (dto.rol.toLowerCase() as TipoTrabajador)
           : dto.rol;
 
+    // Validar que el rol no cambie
     if (rolUpdate !== undefined && rolUpdate !== trabajador.rol) {
       throw new BadRequestException(
         'El rol de un trabajador no se puede cambiar desde este endpoint',
       );
     }
 
+    // Actualizar campos básicos si están definidos
     if (dto.nombre !== undefined) trabajador.nombre = dto.nombre;
     if (dto.apellidos !== undefined) trabajador.apellidos = dto.apellidos;
     if (dto.correo !== undefined) trabajador.correo = dto.correo;
     if (dto.contrasena !== undefined) trabajador.contrasena = dto.contrasena;
 
+    // Actualizar campos específicos si están definidos
     if (trabajador instanceof Teleoperador) {
       if (dto.nia !== undefined) {
         trabajador.nia = dto.nia;
@@ -134,6 +150,7 @@ export class TrabajadorService {
       return this.cargarGrupoSiTeleoperador(trabajador);
     }
 
+    // Actualizar campos específicos si están definidos
     if (trabajador instanceof Supervisor) {
       if (dto.dni !== undefined) {
         trabajador.dni =
@@ -145,6 +162,7 @@ export class TrabajadorService {
     return this.trabajadorRepository.save(trabajador);
   }
 
+  // Método para eliminar un trabajador por su ID.
   async remove(id: number): Promise<boolean> {
     const result = await this.trabajadorRepository.delete({
       id_trab: id,
@@ -153,6 +171,7 @@ export class TrabajadorService {
     return affected > 0;
   }
 
+  // Método para encontrar un trabajador por su correo electrónico.
   async findByEmail(correo: string) {
     const trabajador = await this.trabajadorRepository.findOne({
       where: { correo },
@@ -160,6 +179,7 @@ export class TrabajadorService {
     return this.cargarGrupoSiTeleoperador(trabajador);
   }
 
+  // Método privado para fusionar teleoperadores con su grupo correspondiente.
   private async mergeTeleoperadoresConGrupo(
     trabajadores: Trabajador[],
   ): Promise<Trabajador[]> {
@@ -188,6 +208,7 @@ export class TrabajadorService {
     );
   }
 
+  // Método privado para cargar el grupo si el trabajador es un teleoperador.
   private async cargarGrupoSiTeleoperador(
     trabajador: Trabajador | null,
   ): Promise<Trabajador | null> {

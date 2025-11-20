@@ -26,11 +26,13 @@ import {
 import { TeleoperadorService } from './teleoperador.service';
 import { Teleoperador } from './teleoperador.entity';
 
+// Controlador de Teleoperador que maneja las rutas y las solicitudes HTTP.
 @ApiTags('teleoperador')
 @Controller('teleoperador')
 export class TeleoperadorController {
   constructor(private readonly teleoperadorService: TeleoperadorService) {}
 
+  // ====== CREAR ======
   @Post()
   @ApiOperation({ summary: 'Crear un Teleoperador' })
   @ApiBody({ type: CreateTeleoperadorDTO })
@@ -43,6 +45,7 @@ export class TeleoperadorController {
     const created = await this.teleoperadorService.create(createDto);
     return this.toResponse(created);
   }
+  // ====== OBTENER UNO ======
   @Get('id')
   @ApiOperation({ summary: 'Obtener teleoperador por id' })
   @ApiResponse({
@@ -50,6 +53,7 @@ export class TeleoperadorController {
     description: 'Supervisor encontrado',
     type: TeleoperadorResponseDTO,
   })
+  // ====== OBTENER UNO ======
   @ApiResponse({ status: 404, description: 'No encontrado' })
   async findOne(@Body('id', ParseIntPipe) id: number): Promise<Teleoperador> {
     const found = await this.teleoperadorService.findOne(id);
@@ -59,6 +63,7 @@ export class TeleoperadorController {
     return found;
   }
 
+  // ====== OBTENER TODOS ======
   @Get()
   @ApiOperation({ summary: 'Listar todos los Teleoperadores' })
   @ApiResponse({
@@ -72,6 +77,7 @@ export class TeleoperadorController {
     return teleoperador.map((item) => this.toResponse(item));
   }
 
+  // ====== ACTUALIZAR ======
   @Patch(':id')
   @ApiOperation({ summary: 'Actualziar teleoperadores (parcial)' })
   @ApiBody({ type: UpdateTeleoperadorDTO })
@@ -91,7 +97,7 @@ export class TeleoperadorController {
     }
     return this.toResponse(updated);
   }
-
+  // ====== ELIMINAR ======
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Eliminar teleoperador' })
@@ -104,6 +110,7 @@ export class TeleoperadorController {
     }
   }
 
+  // Método privado para convertir una entidad Teleoperador a su DTO de respuesta.
   private toResponse(teleoperador: Teleoperador): TeleoperadorResponseDTO {
     const { id_trab, nombre, apellidos, correo, nia } = teleoperador;
     return {

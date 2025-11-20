@@ -16,6 +16,7 @@ import { CreateGrupoDTO, UpdateGrupoDTO, GrupoResponseDTO } from './grupo.dto';
 import { GrupoService } from './grupo.service';
 import { Grupo } from './grupo.entity';
 
+// Controlador REST para la entidad Grupo.
 @ApiTags('grupo') // Etiqueta bonita para Swagger.
 @Controller('grupo')
 export class GrupoController {

@@ -13,13 +13,16 @@ import { TeleoperadorModule } from './teleoperador/teleoperador.module';
 import { TrabajadorModule } from './trabajador/trabajador.module';
 import { LoginModule } from './login/login.module';
 
+// Módulo principal de la aplicación que importa otros módulos, configura la conexión a la base de datos y define los controladores y proveedores globales
 @Module({
   imports: [
+    // Carga de variables de entorno desde archivos .env
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: ['.env', '../env', '../../env'],
     }),
 
+    // Configuración de la conexión a la base de datos PostgreSQL usando TypeORM
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,

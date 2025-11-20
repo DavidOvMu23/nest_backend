@@ -4,6 +4,7 @@ import { Usuario } from '../../usuario/usuario.entity';
 import contactoEmergenciaData from '../../data/contacto_emergencia';
 import { ContactoEmergencia } from '../../contacto_emergencia/contacto_emergencia.entity';
 
+// Seed para la entidad ContactoEmergencia, lo que hace es poblar la tabla ContactoEmergencia con datos iniciales definidos en el archivo data/contacto_emergencia.ts
 export class ContactoEmergenciaSeeder implements Seeder {
   public async run(dataSource: DataSource) {
     const contactoRepo = dataSource.getRepository(ContactoEmergencia);

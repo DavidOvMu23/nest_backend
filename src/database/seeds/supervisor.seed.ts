@@ -5,6 +5,7 @@ import supervisorData from '../../data/supervisor';
 import { Supervisor } from '../../supervisor/supervisor.entity';
 import { Trabajador, TipoTrabajador } from '../../trabajador/trabajador.entity';
 
+// Seed para la entidad Supervisor, lo que hace es poblar la tabla Supervisor con datos iniciales definidos en el archivo data/supervisor.ts
 export class SupervisorSeeder implements Seeder {
   public async run(dataSource: DataSource) {
     const supervisorRepo = dataSource.getRepository(Supervisor);
@@ -18,7 +19,7 @@ export class SupervisorSeeder implements Seeder {
 
         if (!trabajador) {
           console.error(
-            `❌ Trabajador no encontrado para supervisor: ${data.correo}`,
+            `Trabajador no encontrado para supervisor: ${data.correo}`,
           );
           return null;
         }

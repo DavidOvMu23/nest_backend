@@ -3,6 +3,7 @@ import { Trabajador } from '../trabajador/trabajador.entity';
 import { Grupo } from '../grupo/grupo.entity';
 import { Notificacion } from '../notificacion/notificacion.entity';
 
+// Entidad Teleoperador que extiende de Trabajador.
 @ChildEntity()
 export class Teleoperador extends Trabajador {
   @Column({ unique: true })

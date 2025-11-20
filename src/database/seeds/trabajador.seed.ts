@@ -10,6 +10,7 @@ import { Teleoperador } from '../../teleoperador/teleoperador.entity';
 import { Grupo } from '../../grupo/grupo.entity';
 import * as bcrypt from 'bcrypt';
 
+// Seed para la entidad Trabajador, lo que hace es poblar la tabla Trabajador con datos iniciales definidos en el archivo data/trabajador.ts
 export class TrabajadorSeeder implements Seeder {
   public async run(dataSource: DataSource) {
     const trabajadorRepo = dataSource.getRepository(Trabajador);
@@ -89,6 +90,6 @@ export class TrabajadorSeeder implements Seeder {
       await teleoperadorRepo.save(teleoperadores);
     }
 
-    console.log('✅ Trabajadores creados');
+    console.log('Trabajadores creados');
   }
 }

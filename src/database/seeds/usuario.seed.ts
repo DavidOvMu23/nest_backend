@@ -3,6 +3,7 @@ import usuarioData from '../../data/usuario';
 import { Seeder } from 'typeorm-extension';
 import { EstadoCuenta, Usuario } from '../../usuario/usuario.entity';
 
+// Seed para la entidad Usuario, lo que hace es poblar la tabla Usuario con datos iniciales definidos en el archivo data/usuario.ts
 export class UsuarioSeed implements Seeder {
   public async run(dataSource: DataSource): Promise<void> {
     const usuarioRepository = dataSource.getRepository(Usuario);

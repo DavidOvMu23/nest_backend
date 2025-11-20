@@ -6,6 +6,7 @@ import { Teleoperador } from '../../teleoperador/teleoperador.entity';
 import { Trabajador, TipoTrabajador } from '../../trabajador/trabajador.entity';
 import { Grupo } from '../../grupo/grupo.entity';
 
+// Seed para la entidad Teleoperador, lo que hace es poblar la tabla Teleoperador con datos iniciales definidos en el archivo data/teleoperador.ts
 export class TeleoperadorSeeder implements Seeder {
   public async run(dataSource: DataSource) {
     const teleRepo = dataSource.getRepository(Teleoperador);
@@ -19,14 +20,14 @@ export class TeleoperadorSeeder implements Seeder {
         });
         if (!trabajador) {
           console.error(
-            `❌ Trabajador no encontrado para teleoperador: ${data.correo}`,
+            `Trabajador no encontrado para teleoperador: ${data.correo}`,
           );
           return null;
         }
 
         const grupo = await grupoRepo.findOneBy({ id_grup: data.grupo });
         if (!grupo) {
-          console.error(`❌ Grupo no encontrado: ${data.grupo}`);
+          console.error(`Grupo no encontrado: ${data.grupo}`);
           return null;
         }
 
@@ -43,10 +44,11 @@ export class TeleoperadorSeeder implements Seeder {
       }),
     );
 
+    // Filtrar los teleoperadores válidos antes de guardarlos
     const validTeleoperadores = teleoperadores.filter((t) => t !== null);
     if (validTeleoperadores.length > 0) {
       await teleRepo.save(validTeleoperadores);
     }
-    console.log('✅ Teleoperadores creados');
+    console.log('Teleoperadores creados');
   }
 }

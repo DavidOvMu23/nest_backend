@@ -20,11 +20,13 @@ import {
 import { UsuarioService } from './usuario.service';
 import { Usuario } from './usuario.entity';
 
+// Controlador de Usuario que maneja las rutas y las solicitudes HTTP.
 @ApiTags('usuario')
 @Controller('usuario')
 export class UsuarioController {
   constructor(private readonly usuarioService: UsuarioService) {}
 
+  // ====== CREAR ======
   @Post()
   @ApiOperation({ summary: 'Crear un nuevo usuario' })
   @ApiResponse({ status: 201, type: Usuario })

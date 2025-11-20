@@ -8,6 +8,7 @@ import {
 } from 'class-validator';
 import { ApiPropertyOptional, ApiProperty } from '@nestjs/swagger';
 
+// DTO para crear un teleoperador.
 export class CreateTeleoperadorDTO {
   @IsString()
   @Length(1, 120)
@@ -46,6 +47,7 @@ export class CreateTeleoperadorDTO {
   nia: string;
 }
 
+// DTO para actualizar un teleoperador (parcial).
 export class UpdateTeleoperadorDTO {
   @IsOptional()
   @IsString()
@@ -92,6 +94,7 @@ export class UpdateTeleoperadorDTO {
   nia?: string;
 }
 
+// DTO para la respuesta de un teleoperador.
 export class TeleoperadorResponseDTO {
   @ApiProperty({ description: 'Identificador único', example: 1 })
   id_trab: number;

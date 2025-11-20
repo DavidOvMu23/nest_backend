@@ -7,6 +7,7 @@ import {
 } from './contacto_emergencia.dto';
 import { ContactoEmergencia } from './contacto_emergencia.entity';
 
+// Servicio para gestionar contactos de emergencia
 @Injectable()
 export class ContactoEmergenciaService {
   constructor(
@@ -14,6 +15,7 @@ export class ContactoEmergenciaService {
     private readonly contacto_emergenciaRepository: Repository<ContactoEmergencia>,
   ) {}
 
+  // Crear un nuevo contacto de emergencia
   async create(dto: CreateContactoEmergenciaDTO): Promise<ContactoEmergencia> {
     const contacto_emergencia = this.contacto_emergenciaRepository.create({
       nombre: dto.nombre,
@@ -25,22 +27,26 @@ export class ContactoEmergenciaService {
     return this.contacto_emergenciaRepository.save(contacto_emergencia);
   }
 
+  // Obtener todos los contactos de emergencia
   async findAll(): Promise<ContactoEmergencia[]> {
     return this.contacto_emergenciaRepository.find();
   }
 
+  // Obtener contactos de emergencia por DNI de usuario
   async findByUsuarioDni(dni: string): Promise<ContactoEmergencia[]> {
     return this.contacto_emergenciaRepository.find({
       where: { usuarioReferenciado: { dni } },
     });
   }
 
+  // Obtener un contacto de emergencia por su ID
   async findOne(id: number): Promise<ContactoEmergencia | null> {
     return this.contacto_emergenciaRepository.findOne({
       where: { id_cont: id },
     });
   }
 
+  // Actualizar un contacto de emergencia existente
   async update(
     id: number,
     dto: UpdateContactoEmergenciaDTO,
@@ -62,6 +68,7 @@ export class ContactoEmergenciaService {
     return this.contacto_emergenciaRepository.save(contacto_emergencia);
   }
 
+  // Eliminar un contacto de emergencia por su ID
   async remove(id: number): Promise<boolean> {
     const result = await this.contacto_emergenciaRepository.delete({
       id_cont: id,

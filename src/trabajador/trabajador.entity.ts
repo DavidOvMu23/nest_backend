@@ -6,11 +6,13 @@ import {
   BaseEntity,
 } from 'typeorm';
 
+// Enum para los tipos de trabajador.
 export enum TipoTrabajador {
   SUPERVISOR = 'supervisor',
   TELEOPERADOR = 'teleoperador',
 }
 
+// Entidad Trabajador mapeada a la tabla 'trabajador'.
 @Entity('trabajador')
 @TableInheritance({ column: { type: 'varchar', name: 'tipo' } })
 export class Trabajador extends BaseEntity {

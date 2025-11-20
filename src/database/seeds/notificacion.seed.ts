@@ -4,6 +4,7 @@ import notificacionData from '../../data/notificacion';
 import { Notificacion } from '../../notificacion/notificacion.entity';
 import { Teleoperador } from '../../teleoperador/teleoperador.entity';
 
+// Seed para la entidad Notificacion, lo que hace es poblar la tabla Notificacion con datos iniciales definidos en el archivo data/notificacion.ts
 export class NotificacionSeed implements Seeder {
   public async run(dataSource: DataSource) {
     const notificacionRepository = dataSource.getRepository(Notificacion);

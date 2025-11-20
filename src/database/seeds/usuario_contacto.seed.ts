@@ -4,6 +4,7 @@ import usuario_contacto from 'src/data/usuario_contacto';
 import { Usuario } from '../../usuario/usuario.entity';
 import { ContactoEmergencia } from '../../contacto_emergencia/contacto_emergencia.entity';
 
+// Seed para la relación entre Usuario y ContactoEmergencia, lo que hace es poblar la tabla Usuario con sus contactos de emergencia asociados, definidos en el archivo data/usuario_contacto.ts
 export class UsuarioContactoSeed implements Seeder {
   public async run(dataSource: DataSource) {
     const usuarioRepository = dataSource.getRepository(Usuario);

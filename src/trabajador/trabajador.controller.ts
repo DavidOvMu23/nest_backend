@@ -30,6 +30,7 @@ import { Teleoperador } from '../teleoperador/teleoperador.entity';
 import { Supervisor } from '../supervisor/supervisor.entity';
 import * as bcrypt from 'bcrypt';
 
+// Controlador de Trabajador que maneja las rutas y las solicitudes HTTP.
 @ApiTags('trabajador')
 @Controller('trabajador')
 export class TrabajadorController {

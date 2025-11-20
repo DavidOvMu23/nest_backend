@@ -30,6 +30,7 @@ import { UsuarioSeed } from './database/seeds/usuario.seed';
 //Usuario-Contacto relación
 import { UsuarioContactoSeed } from './database/seeds/usuario_contacto.seed';
 
+// Configuración de la fuente de datos para los seeders
 const options: DataSourceOptions & SeederOptions = {
   type: 'postgres',
   host: process.env.DB_HOST,
@@ -59,8 +60,10 @@ const options: DataSourceOptions & SeederOptions = {
   ],
 };
 
+// Creación de la fuente de datos
 const dataSource = new DataSource(options);
 
+// Función para inicializar la conexión a la base de datos con reintentos
 async function initializeWithRetry(maxRetries = 10, delayMs = 3000) {
   for (let attempt = 1; attempt <= maxRetries; attempt += 1) {
     try {
@@ -79,6 +82,7 @@ async function initializeWithRetry(maxRetries = 10, delayMs = 3000) {
   }
 }
 
+// Inicialización de la conexión a la base de datos con reintentos
 initializeWithRetry()
   .then(async () => {
     try {

@@ -12,6 +12,7 @@ import {
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { match } from 'assert';
 
+// DTO para crear una notificación.
 export class CreateNotificacionDTO {
   @IsString()
   @Length(1, 500)
@@ -30,6 +31,7 @@ export class CreateNotificacionDTO {
   estado: string;
 }
 
+// DTO para actualizar una notificación (parcial).
 export class UpdateNotificacionDTO {
   @ApiProperty({
     description: 'Contenido de la notificación',
@@ -44,6 +46,7 @@ export class UpdateNotificacionDTO {
   estado: string;
 }
 
+// DTO para la respuesta de una notificación.
 export class NotificacionResponseDTO {
   @ApiProperty({ description: 'Identificador único', example: 1 })
   id_not: number;

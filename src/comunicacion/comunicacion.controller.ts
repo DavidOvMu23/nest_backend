@@ -20,6 +20,7 @@ import {
 import { ComunicacionService } from './comunicacion.service';
 import { Comunicacion } from './comunicacion.entity';
 
+// Controlador para gestionar las comunicaciones (es lo que engloba llamadas, mensajes, etc.).
 @ApiTags('comunicacion') // Etiqueta bonita para Swagger.
 @Controller('comunicacion')
 export class ComunicacionController {

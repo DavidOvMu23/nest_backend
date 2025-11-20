@@ -11,12 +11,14 @@ import { ApiPropertyOptional, ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { TipoTrabajador } from './trabajador.entity';
 
+// DTO para crear un trabajador.
 export class CreateTrabajadorDTO {
   @IsString()
   @Length(1, 120)
   @ApiProperty({ description: 'Nombre del trabajador', example: 'Julen' })
   nombre: string;
 
+  // DTO para actualizar un trabajador.
   @IsString()
   @Length(1, 150)
   @ApiProperty({
@@ -25,6 +27,7 @@ export class CreateTrabajadorDTO {
   })
   apellidos: string;
 
+  // DTO para la respuesta de un trabajador.
   @IsEmail()
   @ApiProperty({
     description: 'Correo electronico del trabajador',
@@ -32,6 +35,7 @@ export class CreateTrabajadorDTO {
   })
   correo: string;
 
+  // Contraseña temporal o definitiva
   @IsString()
   @Length(6, 128)
   @ApiProperty({
@@ -40,6 +44,7 @@ export class CreateTrabajadorDTO {
   })
   contrasena: string;
 
+  // Rol del trabajador
   @IsEnum(TipoTrabajador)
   @Transform(({ value }) =>
     typeof value === 'string' ? value.toLowerCase() : value,
@@ -51,6 +56,7 @@ export class CreateTrabajadorDTO {
   })
   rol: TipoTrabajador;
 
+  // NIA obligatorio para teleoperadores
   @ValidateIf((dto) => dto.rol === TipoTrabajador.TELEOPERADOR)
   @IsString()
   @Matches(/^[0-9]{8}$/, { message: 'Formato de NIA incorrecto' })
@@ -60,6 +66,7 @@ export class CreateTrabajadorDTO {
   })
   nia?: string;
 
+  // DNI obligatorio para supervisores
   @ValidateIf((dto) => dto.rol === TipoTrabajador.SUPERVISOR)
   @IsString()
   @Matches(/^[0-9]{8}[A-Z]$/, { message: 'Formato de DNI incorrecto' })
@@ -72,7 +79,7 @@ export class CreateTrabajadorDTO {
   })
   dni?: string;
 }
-
+// DTO para actualizar un trabajador (parcial).
 export class UpdateTrabajadorDTO {
   @IsOptional()
   @IsString()
@@ -142,7 +149,7 @@ export class UpdateTrabajadorDTO {
   })
   dni?: string;
 }
-
+// DTO para la respuesta de un trabajador.
 export class TrabajadorReponseDTO {
   @ApiProperty({ description: 'Identificador unico', example: 1 })
   id_trab: number;

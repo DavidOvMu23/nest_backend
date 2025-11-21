@@ -9,7 +9,7 @@ export class UsuarioService {
   constructor(
     @InjectRepository(Usuario)
     private readonly usuarioRepository: Repository<Usuario>,
-  ) {}
+  ) { }
 
   async create(dto: CreateUsuarioDTO): Promise<Usuario> {
     // Dirección opcional: si llega vacía, la guardamos como null.
@@ -67,8 +67,16 @@ export class UsuarioService {
   }
 
   async remove(dni: string): Promise<boolean> {
-    const result = await this.usuarioRepository.delete({ dni: dni });
-    const affected = result.affected ?? 0;
-    return affected > 0;
+    const usuario = await this.usuarioRepository.findOne({
+      where: { dni: dni },
+    });
+
+    if (!usuario) {
+      return false;
+    }
+
+    usuario.estado_cuenta = EstadoCuenta.SUSPENDIDO;
+    await this.usuarioRepository.save(usuario);
+    return true;
   }
 }

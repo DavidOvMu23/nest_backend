@@ -25,7 +25,7 @@ import { Comunicacion } from './comunicacion.entity';
 @Controller('comunicacion')
 export class ComunicacionController {
   // Nest crea el servicio y nos lo entrega por el constructor.
-  constructor(private readonly comunicationsService: ComunicacionService) {}
+  constructor(private readonly comunicationsService: ComunicacionService) { }
 
   // ====== CREAR ======
   @Post()
@@ -93,19 +93,6 @@ export class ComunicacionController {
     return this.toResponse(updated);
   }
 
-  // ====== ELIMINAR ======
-  @Delete('id')
-  @HttpCode(HttpStatus.NO_CONTENT) // HTTP 204 = se borró, no hace falta cuerpo de respuesta.
-  @ApiOperation({ summary: 'Eliminar comunicacion' })
-  @ApiResponse({ status: 204, description: 'Eliminado correctamente' })
-  @ApiResponse({ status: 404, description: 'No encontrado' })
-  async remove(@Body('id', ParseIntPipe) id: number): Promise<void> {
-    const removed = await this.comunicationsService.remove(id);
-    if (!removed) {
-      throw new NotFoundException(`Comunicacion con id ${id} no encontrado`);
-    }
-    // No devolvemos nada porque el 204 indica “todo bien, sin contenido”.
-  }
 
   /**
    * Función privada para centralizar cómo transformamos la entidad a DTO.
@@ -133,11 +120,11 @@ export class ComunicacionController {
       observaciones,
       grupo: grupo
         ? {
-            id_grup: grupo.id_grup,
-            nombre: grupo.nombre,
-            descripcion: grupo.descripcion,
-            activo: grupo.activo,
-          }
+          id_grup: grupo.id_grup,
+          nombre: grupo.nombre,
+          descripcion: grupo.descripcion,
+          activo: grupo.activo,
+        }
         : undefined,
     };
   }

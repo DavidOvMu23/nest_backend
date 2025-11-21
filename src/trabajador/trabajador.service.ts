@@ -5,6 +5,7 @@ import { CreateTrabajadorDTO, UpdateTrabajadorDTO } from './trabajador.dto';
 import { Trabajador, TipoTrabajador } from './trabajador.entity';
 import { Teleoperador } from '../teleoperador/teleoperador.entity';
 import { Supervisor } from '../supervisor/supervisor.entity';
+import { Grupo } from 'src/grupo/grupo.entity';
 import * as bcrypt from 'bcrypt';
 
 // Servicio de Trabajador que maneja la lógica de negocio.
@@ -17,7 +18,9 @@ export class TrabajadorService {
     private readonly teleoperadorRepository: Repository<Teleoperador>,
     @InjectRepository(Supervisor)
     private readonly supervisorRepository: Repository<Supervisor>,
-  ) {}
+    @InjectRepository(Grupo)
+    private readonly grupoRepository: Repository<Grupo>,
+  ) { }
 
   // Método para crear un nuevo trabajador.
   async create(dto: CreateTrabajadorDTO): Promise<Trabajador> {
@@ -26,6 +29,9 @@ export class TrabajadorService {
         ? (dto.rol.toLowerCase() as TipoTrabajador)
         : dto.rol;
 
+    if (!dto.contrasena) {
+      throw new BadRequestException('La contraseña es obligatoria');
+    }
     const hashedPassword = await bcrypt.hash(dto.contrasena, 10);
 
     // Validar rol
@@ -41,7 +47,16 @@ export class TrabajadorService {
           'El NIA es obligatorio para crear un teleoperador',
         );
       }
+      let grupo: Grupo | null = null;
+      if (dto.grupoId) {
+        grupo = await this.grupoRepository.findOneBy({
+          id_grup: dto.grupoId
+        });
 
+        if (!grupo) {
+          throw new BadRequestException(`El grupo con ID ${dto.grupoId} no existe`);
+        }
+      }
       // Crear teleoperador
       const teleoperador = this.teleoperadorRepository.create({
         nombre: dto.nombre,
@@ -50,9 +65,21 @@ export class TrabajadorService {
         contrasena: hashedPassword,
         rol: TipoTrabajador.TELEOPERADOR,
         nia: dto.nia,
+        grupo: grupo,
       });
 
-      return this.teleoperadorRepository.save(teleoperador);
+      await this.teleoperadorRepository.save(teleoperador);
+      const resultado = await this.teleoperadorRepository.findOne({
+        where: { id_trab: teleoperador.id_trab },
+        relations: { grupo: true },
+      });
+
+      if (!resultado) {
+        throw new Error('Error al recuperar el teleoperador creado');
+      }
+
+      return resultado;
+
     }
 
     // Crear supervisor

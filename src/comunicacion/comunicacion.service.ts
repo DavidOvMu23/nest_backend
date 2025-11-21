@@ -13,7 +13,7 @@ export class ComunicacionService {
   constructor(
     @InjectRepository(Comunicacion)
     private readonly comunicacionRepository: Repository<Comunicacion>,
-  ) {}
+  ) { }
 
   // ====== MÉTODOS CRUD ======
   // Crear una nueva comunicación
@@ -71,10 +71,4 @@ export class ComunicacionService {
     return this.comunicacionRepository.save(comunicacion);
   }
 
-  // Eliminar una comunicación por su ID
-  async remove(id: number): Promise<boolean> {
-    const result = await this.comunicacionRepository.delete({ id_com: id });
-    const affected = result.affected ?? 0;
-    return affected > 0;
-  }
 }

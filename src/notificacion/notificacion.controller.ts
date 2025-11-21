@@ -25,7 +25,7 @@ import { Comunicacion } from 'src/comunicacion/comunicacion.entity';
 @Controller('notificacion')
 export class NotificacionController {
   // Nest crea el servicio y nos lo entrega por el constructor.
-  constructor(private readonly notificacionService: NotificacionService) {}
+  constructor(private readonly notificacionService: NotificacionService) { }
 
   // ====== CREAR ======
   @Post()
@@ -73,26 +73,6 @@ export class NotificacionController {
     return await this.notificacionService.findAll();
   }
 
-  // ====== ACTUALIZAR PARCIAL (PATCH) ======
-  @Patch('id')
-  @ApiOperation({ summary: 'Actualizar notificacion (parcial)' })
-  @ApiBody({ type: UpdateNotificacionDTO })
-  @ApiResponse({
-    status: 200,
-    description: 'Notificacion actualizada',
-    type: NotificacionResponseDTO,
-  })
-  @ApiResponse({ status: 404, description: 'No encontrado' })
-  async update(
-    @Body('id', ParseIntPipe) id: number,
-    @Body() updateDto: UpdateNotificacionDTO,
-  ): Promise<Notificacion> {
-    const updated = await this.notificacionService.update(id, updateDto);
-    if (!updated) {
-      throw new NotFoundException(`Notificacion con id ${id} no encontrada`);
-    }
-    return updated;
-  }
 
   // ====== ELIMINAR ======
   @Delete('id')

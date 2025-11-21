@@ -21,7 +21,7 @@ import { Grupo } from './grupo.entity';
 @Controller('grupo')
 export class GrupoController {
   // Nest crea el servicio y nos lo entrega por el constructor.
-  constructor(private readonly gruposService: GrupoService) {}
+  constructor(private readonly gruposService: GrupoService) { }
 
   // ====== CREAR ======
   @Post()
@@ -38,7 +38,7 @@ export class GrupoController {
   }
 
   // ====== OBTENER UNO ======
-  @Get(':id')
+  @Get('id')
   @ApiOperation({ summary: 'Obtener grupo por id' })
   @ApiResponse({
     status: 200,
@@ -46,7 +46,7 @@ export class GrupoController {
     type: GrupoResponseDTO,
   })
   @ApiResponse({ status: 404, description: 'No encontrado' })
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Grupo> {
+  async findOne(@Body('id', ParseIntPipe) id: number): Promise<Grupo> {
     // ParseIntPipe convierte el parámetro a number y lanza 400 si no puede.
     const found = await this.gruposService.findOne(id);
     if (!found) {
@@ -71,7 +71,7 @@ export class GrupoController {
   }
 
   // ====== ACTUALIZAR PARCIAL (PATCH) ======
-  @Patch(':id')
+  @Patch('id')
   @ApiOperation({ summary: 'Actualizar grupo (parcial)' })
   @ApiBody({ type: UpdateGrupoDTO })
   @ApiResponse({
@@ -81,7 +81,7 @@ export class GrupoController {
   })
   @ApiResponse({ status: 404, description: 'No encontrado' })
   async update(
-    @Param('id', ParseIntPipe) id: number,
+    @Body('id', ParseIntPipe) id: number,
     @Body() updateDto: UpdateGrupoDTO,
   ) {
     const updated = await this.gruposService.update(id, updateDto);
@@ -92,12 +92,12 @@ export class GrupoController {
   }
 
   // ====== ELIMINAR ======
-  @Delete(':id')
+  @Delete('id')
   @HttpCode(HttpStatus.NO_CONTENT) // HTTP 204 = se borró, no hace falta cuerpo de respuesta.
   @ApiOperation({ summary: 'Eliminar grupo' })
   @ApiResponse({ status: 204, description: 'Eliminado correctamente' })
   @ApiResponse({ status: 404, description: 'No encontrado' })
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
+  async remove(@Body('id', ParseIntPipe) id: number): Promise<void> {
     const removed = await this.gruposService.remove(id);
     if (!removed) {
       throw new NotFoundException(`Grupo con id ${id} no encontrado`);

@@ -24,7 +24,7 @@ import { Usuario } from './usuario.entity';
 @ApiTags('usuario')
 @Controller('usuario')
 export class UsuarioController {
-  constructor(private readonly usuarioService: UsuarioService) {}
+  constructor(private readonly usuarioService: UsuarioService) { }
 
   // ====== CREAR ======
   @Post()
@@ -37,7 +37,8 @@ export class UsuarioController {
     };
     return this.usuarioService.create(payload);
   }
-  //? No se que cojones hace pero funciona (Habrá que mirar si el resto tambien)
+
+
   @Get('dni')
   @ApiOperation({ summary: 'Obtener un usuario por DNI' })
   @ApiResponse({ status: 200, type: UsuarioResponseDTO })
@@ -72,6 +73,8 @@ export class UsuarioController {
     return result;
   }
 
+
+  //Eliminar un usuario
   @Delete('dni')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Eliminar un usuario' })

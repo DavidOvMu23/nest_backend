@@ -1,6 +1,7 @@
 import {
   IsEmail,
   IsEnum,
+  IsNumber,
   IsOptional,
   IsString,
   Length,
@@ -42,6 +43,8 @@ export class CreateTrabajadorDTO {
     description: 'Contraseña temporal o definitiva',
     example: 'temporal123',
   })
+
+
   contrasena: string;
 
   // Rol del trabajador
@@ -65,6 +68,14 @@ export class CreateTrabajadorDTO {
     example: '12345678',
   })
   nia?: string;
+
+  @ValidateIf((dto) => dto.rol === TipoTrabajador.TELEOPERADOR)
+  @IsNumber()
+  @ApiPropertyOptional({
+    description: 'Grupo al que pertenece',
+    example: 1,
+  })
+  grupoId?: number;
 
   // DNI obligatorio para supervisores
   @ValidateIf((dto) => dto.rol === TipoTrabajador.SUPERVISOR)

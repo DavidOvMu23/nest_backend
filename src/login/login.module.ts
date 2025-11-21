@@ -9,11 +9,12 @@ import { Trabajador } from '../trabajador/trabajador.entity';
 import { TrabajadorService } from '../trabajador/trabajador.service';
 import { Teleoperador } from '../teleoperador/teleoperador.entity';
 import { Supervisor } from '../supervisor/supervisor.entity';
+import { Grupo } from '../grupo/grupo.entity';
 
 // Módulo de login que gestiona la autenticación
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Trabajador, Teleoperador, Supervisor]),
+    TypeOrmModule.forFeature([Trabajador, Teleoperador, Supervisor, Grupo]),
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'secreto-dev',
@@ -24,4 +25,4 @@ import { Supervisor } from '../supervisor/supervisor.entity';
   providers: [LoginService, JwtStrategy, TrabajadorService],
   exports: [LoginService],
 })
-export class LoginModule {}
+export class LoginModule { }

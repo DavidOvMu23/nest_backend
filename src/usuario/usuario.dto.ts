@@ -12,7 +12,7 @@ import { EstadoCuenta } from './usuario.entity';
 
 export class CreateUsuarioDTO {
   @IsString()
-  @Length(9, 9, { message: 'El DNI debe tener 8 dígitos y 1 letra' })
+  @Matches(/^[0-9]{8}[A-Z]$/, { message: 'Formato de DNI incorrecto' })
   @ApiProperty({ example: '12345678A' })
   dni: string;
 

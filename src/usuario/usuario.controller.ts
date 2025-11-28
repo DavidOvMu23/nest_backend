@@ -39,11 +39,11 @@ export class UsuarioController {
   }
 
 
-  @Get('dni')
+  @Get(':dni')
   @ApiOperation({ summary: 'Obtener un usuario por DNI' })
   @ApiResponse({ status: 200, type: UsuarioResponseDTO })
   @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
-  async findOne(@Body('dni') dni: string): Promise<Usuario> {
+  async findOne(@Param('dni') dni: string): Promise<Usuario> {
     const usuario = await this.usuarioService.findOne(dni);
     if (!usuario) {
       throw new NotFoundException('Usuario no encontrado');
@@ -58,12 +58,12 @@ export class UsuarioController {
     return this.usuarioService.findAll();
   }
 
-  @Patch('dni')
+  @Patch(':dni')
   @ApiOperation({ summary: 'Actualizar datos de un usuario' })
   @ApiResponse({ status: 200, type: UsuarioResponseDTO })
   @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
   async update(
-    @Body('dni') dni: string,
+    @Param('dni') dni: string,
     @Body() dto: UpdateUsuarioDTO,
   ): Promise<Usuario> {
     const result = await this.usuarioService.update(dni.toUpperCase(), dto);
@@ -75,12 +75,12 @@ export class UsuarioController {
 
 
   //Eliminar un usuario
-  @Delete('dni')
+  @Delete(':dni')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Eliminar un usuario' })
   @ApiResponse({ status: 204, description: 'Eliminado correctamente' })
   @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
-  async remove(@Body('dni') dni: string): Promise<void> {
+  async remove(@Param('dni') dni: string): Promise<void> {
     const removed = await this.usuarioService.remove(dni.toUpperCase());
     if (!removed) {
       throw new NotFoundException('Usuario no encontrado');

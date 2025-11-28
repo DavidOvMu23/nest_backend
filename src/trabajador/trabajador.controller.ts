@@ -93,7 +93,7 @@ export class TrabajadorController {
   }
 
   // ======= Actualizar parcialmente=======
-  @Patch('id')
+  @Patch(':id')
   @ApiOperation({
     summary: 'Actualizar trabajador (parcial)',
   })
@@ -110,7 +110,7 @@ export class TrabajadorController {
     description: 'No encontrado',
   })
   async update(
-    @Body('id', ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateDto: UpdateTrabajadorDTO,
   ) {
     const update = await this.trabajadorService.update(id, updateDto);
@@ -121,7 +121,7 @@ export class TrabajadorController {
   }
 
   // ====== Eliminar ======
-  @Delete('id')
+  @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     summary: 'Eliminar trabajador',
@@ -134,7 +134,7 @@ export class TrabajadorController {
     status: 404,
     description: 'No encontrado',
   })
-  async remove(@Body('id', ParseIntPipe) id: number) {
+  async remove(@Param('id', ParseIntPipe) id: number) {
     const removed = await this.trabajadorService.remove(id);
     if (!removed) {
       throw new NotFoundException(`Trabajador con id ${id} no encontrado`);

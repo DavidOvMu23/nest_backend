@@ -99,7 +99,7 @@ export class ContactoEmergenciaController {
   }
 
   // ====== ACTUALIZAR PARCIAL (PATCH) ======
-  @Patch('id')
+  @Patch(':id')
   @ApiOperation({ summary: 'Actualizar contacto de emergencia (parcial)' })
   @ApiBody({ type: UpdateContactoEmergenciaDTO })
   @ApiResponse({
@@ -109,7 +109,7 @@ export class ContactoEmergenciaController {
   })
   @ApiResponse({ status: 404, description: 'No encontrado' })
   async update(
-    @Body('id', ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateDto: UpdateContactoEmergenciaDTO,
   ) {
     const updated = await this.contacto_emergenciaService.update(id, updateDto);
@@ -122,12 +122,12 @@ export class ContactoEmergenciaController {
   }
 
   // ====== ELIMINAR ======
-  @Delete('id')
+  @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT) // HTTP 204 = se borró, no hace falta cuerpo de respuesta.
   @ApiOperation({ summary: 'Eliminar contacto de emergencia ' })
   @ApiResponse({ status: 204, description: 'Eliminado correctamente' })
   @ApiResponse({ status: 404, description: 'No encontrado' })
-  async remove(@Body('id', ParseIntPipe) id: number): Promise<void> {
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     const removed = await this.contacto_emergenciaService.remove(id);
     if (!removed) {
       throw new NotFoundException(

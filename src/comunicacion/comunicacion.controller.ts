@@ -73,7 +73,7 @@ export class ComunicacionController {
   }
 
   // ====== ACTUALIZAR PARCIAL (PATCH) ======
-  @Patch('id')
+  @Patch(':id')
   @ApiOperation({ summary: 'Actualizar comuncacion (parcial)' })
   @ApiBody({ type: UpdateComunicacionDTO })
   @ApiResponse({
@@ -83,7 +83,7 @@ export class ComunicacionController {
   })
   @ApiResponse({ status: 404, description: 'No encontrado' })
   async update(
-    @Body('id', ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateDto: UpdateComunicacionDTO,
   ) {
     const updated = await this.comunicationsService.update(id, updateDto);

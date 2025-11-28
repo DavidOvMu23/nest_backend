@@ -75,12 +75,12 @@ export class NotificacionController {
 
 
   // ====== ELIMINAR ======
-  @Delete('id')
+  @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT) // HTTP 204 = se borró, no hace falta cuerpo de respuesta.
   @ApiOperation({ summary: 'Eliminar notificacion' })
   @ApiResponse({ status: 204, description: 'Eliminada correctamente' })
   @ApiResponse({ status: 404, description: 'No encontrado' })
-  async remove(@Body('id', ParseIntPipe) id: number): Promise<void> {
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     const removed = await this.notificacionService.remove(id);
     if (!removed) {
       throw new NotFoundException(`Notificacion con id ${id} no encontrada`);

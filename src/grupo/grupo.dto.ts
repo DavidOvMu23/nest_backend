@@ -47,7 +47,7 @@ export class UpdateGrupoDTO {
     description: 'Nombre del grupo',
     example: 'Grupo1',
   })
-  nombre: string;
+  nombre?: string;
 
 
   @IsOptional()
@@ -57,7 +57,7 @@ export class UpdateGrupoDTO {
     description: 'Descripción del grupo',
     example: 'Gupo de alex y miriam',
   })
-  descripcion: string;
+  descripcion?: string;
 
 
   @IsOptional()
@@ -66,7 +66,7 @@ export class UpdateGrupoDTO {
     description: 'Estado del grupo',
     example: true,
   })
-  activo: boolean;
+  activo?: boolean;
 }
 
 // DTO para la respuesta de un Grupo

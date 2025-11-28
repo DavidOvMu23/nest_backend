@@ -7,6 +7,7 @@ import {
   Length,
   Matches,
   ValidateIf,
+  IsNotEmpty,
 } from 'class-validator';
 import { ApiPropertyOptional, ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
@@ -204,4 +205,10 @@ export class TrabajadorReponseDTO {
     example: 2,
   })
   grupoId?: number;
+}
+export class LoginDTO {
+  @IsEmail()
+  correo: string;
+  @IsNotEmpty()
+  contrasena: string;
 }

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { CreateTrabajadorDTO, UpdateTrabajadorDTO } from './trabajador.dto';
@@ -29,6 +29,10 @@ export class TrabajadorService {
         ? (dto.rol.toLowerCase() as TipoTrabajador)
         : dto.rol;
 
+    const existingEmail = await this.trabajadorRepository.findOne({ where: { correo: dto.correo } });
+    if (existingEmail) {
+      throw new ConflictException('El correo electrónico ya está registrado');
+    }
     if (!dto.contrasena) {
       throw new BadRequestException('La contraseña es obligatoria');
     }
@@ -47,6 +51,12 @@ export class TrabajadorService {
           'El NIA es obligatorio para crear un teleoperador',
         );
       }
+
+      const existingNia = await this.teleoperadorRepository.findOne({ where: { nia: dto.nia } });
+      if (existingNia) {
+        throw new ConflictException('El NIA ya está registrado');
+      }
+
       let grupo: Grupo | null = null;
       if (dto.grupoId) {
         grupo = await this.grupoRepository.findOneBy({
@@ -88,6 +98,11 @@ export class TrabajadorService {
         throw new BadRequestException(
           'El DNI es obligatorio para crear un supervisor',
         );
+      }
+
+      const existingDni = await this.supervisorRepository.findOne({ where: { dni: dto.dni } });
+      if (existingDni) {
+        throw new ConflictException('El DNI ya está registrado');
       }
 
       // Crear supervisor

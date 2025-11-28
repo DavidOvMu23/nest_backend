@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateUsuarioDTO, UpdateUsuarioDTO } from './usuario.dto';
@@ -9,11 +9,18 @@ export class UsuarioService {
   constructor(
     @InjectRepository(Usuario)
     private readonly usuarioRepository: Repository<Usuario>,
-  ) {}
+  ) { }
 
   async create(dto: CreateUsuarioDTO): Promise<Usuario> {
     // Dirección opcional: si llega vacía, la guardamos como null.
     const direccionLimpia = dto.direccion?.trim() || null;
+
+    const existingUsuario = await this.usuarioRepository.findOne({ where: { dni: dto.dni } });
+    if (existingUsuario) {
+      throw new ConflictException('El usuario con este DNI ya existe');
+    }
+
+
     const usuario = this.usuarioRepository.create({
       nombre: dto.nombre,
       apellidos: dto.apellidos,

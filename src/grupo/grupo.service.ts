@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateGrupoDTO, UpdateGrupoDTO } from './grupo.dto';
@@ -10,10 +10,16 @@ export class GrupoService {
   constructor(
     @InjectRepository(Grupo)
     private readonly grupoRepository: Repository<Grupo>,
-  ) {}
+  ) { }
 
   // Crear un nuevo Grupo
   async create(dto: CreateGrupoDTO): Promise<Grupo> {
+    const existingGrupo = await this.grupoRepository.findOne({ where: { nombre: dto.nombre } });
+    if (existingGrupo) {
+      throw new ConflictException('El grupo con este nombre ya existe');
+    }
+
+
     const grupo = this.grupoRepository.create({
       nombre: dto.nombre,
       descripcion: dto.descripcion,

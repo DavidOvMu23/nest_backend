@@ -40,24 +40,29 @@ export class CreateGrupoDTO {
 }
 // DTO para actualizar un Grupo existente
 export class UpdateGrupoDTO {
+  @IsOptional()
   @IsString()
   @Length(1, 500)
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Nombre del grupo',
     example: 'Grupo1',
   })
   nombre: string;
 
+
+  @IsOptional()
   @IsString()
   @Length(1, 500)
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Descripción del grupo',
     example: 'Gupo de alex y miriam',
   })
   descripcion: string;
 
+
+  @IsOptional()
   @IsBoolean()
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Estado del grupo',
     example: true,
   })

@@ -23,6 +23,7 @@ import {
   CreateTrabajadorDTO,
   UpdateTrabajadorDTO,
   TrabajadorReponseDTO,
+  LoginDTO,
 } from './trabajador.dto';
 import { TrabajadorService } from './trabajador.service';
 import { Trabajador } from './trabajador.entity';
@@ -174,14 +175,13 @@ export class TrabajadorController {
     description: 'No encontrado',
   })
   async findOneEmail(
-    @Body('correo') correo: string,
-    @Body('contrasena') contrasena: string,
+    @Body() loginDTO: LoginDTO
   ): Promise<Trabajador> {
-    const user = await this.trabajadorService.findByEmail(correo);
+    const user = await this.trabajadorService.findByEmail(loginDTO.correo);
     if (!user) throw new UnauthorizedException('Usuario no encontrado');
 
     // compara contraseñas
-    const isPasswordValid = await bcrypt.compare(contrasena, user.contrasena);
+    const isPasswordValid = await bcrypt.compare(loginDTO.contrasena, user.contrasena);
     if (!isPasswordValid)
       throw new UnauthorizedException('Contraseña incorrecta');
 

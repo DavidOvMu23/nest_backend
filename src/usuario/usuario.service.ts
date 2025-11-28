@@ -9,7 +9,7 @@ export class UsuarioService {
   constructor(
     @InjectRepository(Usuario)
     private readonly usuarioRepository: Repository<Usuario>,
-  ) { }
+  ) {}
 
   async create(dto: CreateUsuarioDTO): Promise<Usuario> {
     // Dirección opcional: si llega vacía, la guardamos como null.
@@ -32,7 +32,9 @@ export class UsuarioService {
   }
 
   async findAll(): Promise<Usuario[]> {
-    return this.usuarioRepository.find();
+    return this.usuarioRepository.find({
+      where: { estado_cuenta: EstadoCuenta.ACTIVO },
+    });
   }
 
   async findOne(dni: string): Promise<Usuario | null> {

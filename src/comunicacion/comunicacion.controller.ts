@@ -41,7 +41,7 @@ export class ComunicacionController {
     return this.toResponse(created);
   }
   // ====== OBTENER UNO ======
-  @Get('id')
+  @Get(':id')
   @ApiOperation({ summary: 'Obtener comunicacion por id' })
   @ApiResponse({
     status: 200,
@@ -49,7 +49,7 @@ export class ComunicacionController {
     type: ComunicacionResponseDTO,
   })
   @ApiResponse({ status: 404, description: 'No encontrado' })
-  async findOne(@Body('id', ParseIntPipe) id: number): Promise<Comunicacion> {
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Comunicacion> {
     // ParseIntPipe convierte el parámetro a number y lanza 400 si no puede.
     const found = await this.comunicationsService.findOne(id);
     if (!found) {

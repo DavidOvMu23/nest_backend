@@ -55,7 +55,7 @@ export class TrabajadorController {
   }
 
   // ========== Obtener uno ==========
-  @Get('id')
+  @Get(':id')
   @ApiOperation({
     summary: 'Obtener trabajador por ID',
   })
@@ -68,7 +68,7 @@ export class TrabajadorController {
     status: 404,
     description: 'No encontrado',
   })
-  async findOne(@Body('id', ParseIntPipe) id: number): Promise<Trabajador> {
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Trabajador> {
     const found = await this.trabajadorService.findOne(id);
     if (!found) {
       throw new NotFoundException(`Trabajador con id ${id} no encontrado`);

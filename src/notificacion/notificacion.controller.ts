@@ -42,7 +42,7 @@ export class NotificacionController {
   }
 
   // ====== OBTENER UNO ======
-  @Get('id')
+  @Get(':id')
   @ApiOperation({ summary: 'Obtener notificacion por id' })
   @ApiResponse({
     status: 200,
@@ -50,7 +50,7 @@ export class NotificacionController {
     type: NotificacionResponseDTO,
   })
   @ApiResponse({ status: 404, description: 'No encontrada' })
-  async findOne(@Body('id', ParseIntPipe) id: number): Promise<Notificacion> {
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Notificacion> {
     // ParseIntPipe convierte el parámetro a number y lanza 400 si no puede.
     const found = await this.notificacionService.findOne(id);
     if (!found) {

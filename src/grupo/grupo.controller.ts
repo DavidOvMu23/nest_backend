@@ -38,7 +38,7 @@ export class GrupoController {
   }
 
   // ====== OBTENER UNO ======
-  @Get('id')
+  @Get(':id')
   @ApiOperation({ summary: 'Obtener grupo por id' })
   @ApiResponse({
     status: 200,
@@ -46,7 +46,7 @@ export class GrupoController {
     type: GrupoResponseDTO,
   })
   @ApiResponse({ status: 404, description: 'No encontrado' })
-  async findOne(@Body('id', ParseIntPipe) id: number): Promise<Grupo> {
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Grupo> {
     // ParseIntPipe convierte el parámetro a number y lanza 400 si no puede.
     const found = await this.gruposService.findOne(id);
     if (!found) {

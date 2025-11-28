@@ -14,7 +14,7 @@ import { Supervisor } from './supervisor.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Supervisor])], // TypeORM nos da el Repository<Supervisor>
   providers: [SupervisorService],
-  controllers: [SupervisorController],
+  // controllers: [SupervisorController], // Comentado porque está vacío
   exports: [SupervisorService], // Por si otro módulo quiere reutilizar la lógica.
 })
-export class SupervisorModule {}
+export class SupervisorModule { }

@@ -8,6 +8,6 @@ import { Teleoperador } from './teleoperador.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([Teleoperador])],
   providers: [TeleoperadorService],
-  controllers: [TeleoperadorController],
+  // controllers: [TeleoperadorController], // Comentado porque está vacío
 })
-export class TeleoperadorModule {}
+export class TeleoperadorModule { }

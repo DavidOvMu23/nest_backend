@@ -28,7 +28,7 @@ export class ContactoEmergenciaController {
   // Nest crea el servicio y nos lo entrega por el constructor.
   constructor(
     private readonly contacto_emergenciaService: ContactoEmergenciaService,
-  ) {}
+  ) { }
 
   // ====== CREAR ======
   @Post()
@@ -45,7 +45,7 @@ export class ContactoEmergenciaController {
   }
 
   // ====== OBTENER UNO ======
-  @Get('id')
+  @Get(':id')
   @ApiOperation({ summary: 'Obtener contacto de emergencia por id' })
   @ApiResponse({
     status: 200,
@@ -54,7 +54,7 @@ export class ContactoEmergenciaController {
   })
   @ApiResponse({ status: 404, description: 'No encontrado' })
   async findOne(
-    @Body('id', ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe) id: number,
   ): Promise<ContactoEmergencia> {
     // ParseIntPipe convierte el parámetro a number y lanza 400 si no puede.
     const found = await this.contacto_emergenciaService.findOne(id);

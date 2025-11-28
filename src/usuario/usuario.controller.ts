@@ -39,11 +39,11 @@ export class UsuarioController {
   }
 
 
-  @Get('dni')
+  @Get(':dni')
   @ApiOperation({ summary: 'Obtener un usuario por DNI' })
   @ApiResponse({ status: 200, type: UsuarioResponseDTO })
   @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
-  async findOne(@Body('dni') dni: string): Promise<Usuario> {
+  async findOne(@Param('dni') dni: string): Promise<Usuario> {
     const usuario = await this.usuarioService.findOne(dni);
     if (!usuario) {
       throw new NotFoundException('Usuario no encontrado');

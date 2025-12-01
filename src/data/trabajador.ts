@@ -2,13 +2,6 @@ import { TipoTrabajador } from 'src/trabajador/trabajador.entity';
 
 export default [
   {
-    nombre: 'admin',
-    apellidos: 'Dani calvo',
-    correo: 'admin',
-    contrasena: '123',
-    rol: TipoTrabajador.SUPERVISOR,
-  },
-  {
     nombre: 'Sofía',
     apellidos: 'Martín Prado',
     correo: 'sofia.martin@cuidem.local',
@@ -59,9 +52,16 @@ export default [
   },
   {
     nombre: 'Hugo',
-    apellidos: 'Santos Ibarra',
+    apellidos: 'Santos',
     correo: 'hugo.santos@cuidem.local',
     contrasena: 'temporal123',
     rol: TipoTrabajador.TELEOPERADOR,
+  },
+  {
+    nombre: 'Admin',
+    apellidos: 'Admin',
+    correo: 'a@a.com',
+    contrasena: '123',
+    rol: TipoTrabajador.SUPERVISOR,
   },
 ];

@@ -41,6 +41,7 @@ export class UsuarioService {
   async findAll(): Promise<Usuario[]> {
     return this.usuarioRepository.find({
       where: { estado_cuenta: EstadoCuenta.ACTIVO },
+      relations: ['contactosEmergencia']
     });
   }
 

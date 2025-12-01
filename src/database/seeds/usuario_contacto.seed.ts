@@ -20,10 +20,10 @@ export class UsuarioContactoSeed implements Seeder {
         }
 
         const contactos = await Promise.all(
-          usuario_contacto.contactos.map(async (telefono) => {
-            const contacto = await contactoRepository.findOneBy({ telefono });
+          usuario_contacto.contactos.map(async (id_cont) => {
+            const contacto = await contactoRepository.findOneBy({ id_cont });
             if (!contacto) {
-              throw new Error(`ContactoEmergencia no encontrado: ${telefono}`);
+              throw new Error(`ContactoEmergencia no encontrado: ${id_cont}`);
             }
             return contacto;
           }),

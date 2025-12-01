@@ -1,18 +1,18 @@
 export default [
   {
     usuario: '11111111A', // Carmen
-    contactos: ['645678901', '678112233'], // Laura (hija), Antonio (esposo)
+    contactos: [1, 2], // Laura Rodríguez (hija), Antonio López (esposo)
   },
   {
     usuario: '22222222B', // José
-    contactos: ['698765432', '612398765'], // Pedro, Carmen Ruiz
+    contactos: [3, 5], // Pedro Martínez (hijo), Carmen Ruiz (hija)
   },
   {
     usuario: '55555555E', // Eduardo
-    contactos: ['600400400'], // Marta (vecina)
+    contactos: [4], // Marta Vega (vecina)
   },
   {
     usuario: '77777777G', // Antonio
-    contactos: ['634567890', '645678901'], // Carmen (esposa), Laura (hija)
+    contactos: [6, 1], // Carmen Rodríguez (esposa), Laura Rodríguez (hija)
   },
 ];

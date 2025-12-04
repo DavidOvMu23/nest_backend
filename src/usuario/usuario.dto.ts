@@ -6,7 +6,9 @@ import {
   Length,
   IsNotEmpty,
   IsDateString,
+  IsEnum,
 } from 'class-validator';
+import { Transform } from 'class-transformer';
 import { ApiPropertyOptional, ApiProperty } from '@nestjs/swagger';
 import { EstadoCuenta } from './usuario.entity';
 
@@ -25,6 +27,18 @@ export class CreateUsuarioDTO {
   @IsNotEmpty()
   @ApiProperty({ example: 'Rodríguez Sanz' })
   apellidos: string;
+
+  @IsEnum(EstadoCuenta)
+  @Transform(({ value }) =>
+    typeof value === 'string' ? value.toLowerCase() : value,
+  )
+  @ApiProperty({
+    description: 'Rol del trabajador',
+    enum: EstadoCuenta,
+    example: EstadoCuenta.ACTIVO,
+  })
+  estado_cuenta: EstadoCuenta;
+
 
   @IsString()
   @IsNotEmpty()
@@ -50,10 +64,10 @@ export class CreateUsuarioDTO {
   @ApiPropertyOptional({ example: 'Lisinopril 10mg' })
   medicacion?: string;
 
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty({ example: '600123456' })
-    telefono: string;
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ example: '600123456' })
+  telefono: string;
 
   @IsOptional()
   @IsString()

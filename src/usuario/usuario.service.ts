@@ -9,28 +9,32 @@ export class UsuarioService {
   constructor(
     @InjectRepository(Usuario)
     private readonly usuarioRepository: Repository<Usuario>,
-  ) { }
+  ) {}
 
   async create(dto: CreateUsuarioDTO): Promise<Usuario> {
-    // Dirección opcional: si llega vacía, la guardamos como null.
+    // Campos opcionales: si llegan vacíos, los guardamos como null
+    const informacionLimpia = dto.informacion?.trim() || null;
+    const datosMedicosLimpia = dto.datos_medicos_dolencias?.trim() || null;
+    const medicacionLimpia = dto.medicacion?.trim() || null;
     const direccionLimpia = dto.direccion?.trim() || null;
 
-    const existingUsuario = await this.usuarioRepository.findOne({ where: { dni: dto.dni } });
+    const existingUsuario = await this.usuarioRepository.findOne({
+      where: { dni: dto.dni },
+    });
     if (existingUsuario) {
       throw new ConflictException('El usuario con este DNI ya existe');
     }
-
 
     const usuario = this.usuarioRepository.create({
       nombre: dto.nombre,
       apellidos: dto.apellidos,
       dni: dto.dni,
-      informacion: dto.informacion,
+      informacion: informacionLimpia,
       estado_cuenta: EstadoCuenta.ACTIVO,
       f_nac: new Date(dto.f_nac),
       nivel_dependencia: dto.nivel_dependencia,
-      datos_medicos_dolencias: dto.datos_medicos_dolencias,
-      medicacion: dto.medicacion,
+      datos_medicos_dolencias: datosMedicosLimpia,
+      medicacion: medicacionLimpia,
       telefono: dto.telefono,
       direccion: direccionLimpia,
     });
@@ -41,7 +45,7 @@ export class UsuarioService {
   async findAll(): Promise<Usuario[]> {
     return this.usuarioRepository.find({
       where: { estado_cuenta: EstadoCuenta.ACTIVO },
-      relations: ['contactosEmergencia']
+      relations: ['contactosEmergencia'],
     });
   }
 

@@ -26,10 +26,10 @@ export class CreateUsuarioDTO {
   @ApiProperty({ example: 'Rodríguez Sanz' })
   apellidos: string;
 
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  @ApiProperty({ example: 'Vive sola, pulsera SOS' })
-  informacion: string;
+  @ApiPropertyOptional({ example: 'Vive sola, pulsera SOS' })
+  informacion?: string;
 
   @IsDateString()
   @ApiProperty({ example: '1945-11-30' })
@@ -50,10 +50,10 @@ export class CreateUsuarioDTO {
   @ApiPropertyOptional({ example: 'Lisinopril 10mg' })
   medicacion?: string;
 
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty({ example: '600123456' })
-    telefono: string;
+  @IsString()
+  @IsNotEmpty()
+  @ApiProperty({ example: '600123456' })
+  telefono: string;
 
   @IsOptional()
   @IsString()
@@ -129,8 +129,8 @@ export class UsuarioResponseDTO {
   @ApiProperty({ example: 'Rodríguez Sanz' })
   apellidos: string;
 
-  @ApiProperty({ example: 'Vive sola, pulsera SOS' })
-  informacion: string;
+  @ApiPropertyOptional({ example: 'Vive sola, pulsera SOS' })
+  informacion?: string;
 
   @ApiProperty({ example: 'activo' })
   estado_cuenta: EstadoCuenta;

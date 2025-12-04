@@ -25,8 +25,8 @@ export class Usuario {
   @Column()
   apellidos: string;
 
-  @Column()
-  informacion: string;
+  @Column({ type: 'text', nullable: true })
+  informacion?: string | null;
 
   @Column({
     type: 'enum',

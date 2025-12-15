@@ -11,6 +11,7 @@ import { NotificacionModule } from './notificacion/notificacion.module';
 import { SupervisorModule } from './supervisor/supervisor.module';
 import { TeleoperadorModule } from './teleoperador/teleoperador.module';
 import { TrabajadorModule } from './trabajador/trabajador.module';
+import { AuthModule } from './auth/auth.module';
 
 // Módulo principal de la aplicación que importa otros módulos, configura la conexión a la base de datos y define los controladores y proveedores globales
 @Module({
@@ -40,6 +41,7 @@ import { TrabajadorModule } from './trabajador/trabajador.module';
     SupervisorModule,
     TeleoperadorModule,
     TrabajadorModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

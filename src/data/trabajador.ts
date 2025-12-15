@@ -61,7 +61,7 @@ export default [
     nombre: 'Admin',
     apellidos: 'Admin',
     correo: 'a@a.com',
-    contrasena: '123',
+    contrasena: 'admin123',
     rol: TipoTrabajador.SUPERVISOR,
   },
 ];

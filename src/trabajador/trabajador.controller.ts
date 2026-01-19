@@ -11,6 +11,7 @@ import {
   HttpStatus,
   NotFoundException,
   UnauthorizedException,
+  UseGuards
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -30,15 +31,21 @@ import { Trabajador } from './trabajador.entity';
 import { Teleoperador } from '../teleoperador/teleoperador.entity';
 import { Supervisor } from '../supervisor/supervisor.entity';
 import * as bcrypt from 'bcrypt';
+import { RolesGuard } from '../auth/guard/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { AuthGuard } from '../auth/guard/auth.guard';
+
 
 // Controlador de Trabajador que maneja las rutas y las solicitudes HTTP.
 @ApiTags('trabajador')
 @Controller('trabajador')
+@UseGuards(AuthGuard, RolesGuard)
 export class TrabajadorController {
   constructor(private readonly trabajadorService: TrabajadorService) { }
 
   // ======= Crear ========
   @Post()
+  @Roles('supervisor')
   @ApiOperation({
     summary: 'Crear un trabajador',
   })
@@ -57,6 +64,7 @@ export class TrabajadorController {
 
   // ========== Obtener uno ==========
   @Get(':id')
+  @Roles('supervisor')
   @ApiOperation({
     summary: 'Obtener trabajador por ID',
   })
@@ -79,6 +87,7 @@ export class TrabajadorController {
 
   // ======= Obtener todos ========
   @Get()
+  @Roles('supervisor')
   @ApiOperation({
     summary: 'Listar todos los trabajadores',
   })
@@ -95,6 +104,7 @@ export class TrabajadorController {
 
   // ======= Actualizar parcialmente=======
   @Patch(':id')
+  @Roles('supervisor')
   @ApiOperation({
     summary: 'Actualizar trabajador (parcial)',
   })
@@ -123,6 +133,7 @@ export class TrabajadorController {
 
   // ====== Eliminar ======
   @Delete(':id')
+  @Roles('supervisor')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     summary: 'Eliminar trabajador',
@@ -162,6 +173,7 @@ export class TrabajadorController {
   }
 
   @Post('login')
+  @Roles('supervisor')
   @ApiOperation({
     summary: 'Obtener el Usuario por su correo',
   })

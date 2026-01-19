@@ -10,6 +10,7 @@ import {
   HttpCode,
   HttpStatus,
   NotFoundException,
+  UseGuards
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import {
@@ -19,11 +20,15 @@ import {
 } from './contacto_emergencia.dto';
 import { ContactoEmergenciaService } from './contacto_emergencia.service';
 import { ContactoEmergencia } from './contacto_emergencia.entity';
-import contacto_emergencia from 'src/data/contacto_emergencia';
+import { RolesGuard } from '../auth/guard/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { AuthGuard } from '../auth/guard/auth.guard';
+
 
 // Controlador de Contacto de Emergencia.
 @ApiTags('contacto_emergencia') // Etiqueta bonita para Swagger.
 @Controller('contacto_emergencia')
+@UseGuards(AuthGuard, RolesGuard)
 export class ContactoEmergenciaController {
   // Nest crea el servicio y nos lo entrega por el constructor.
   constructor(
@@ -32,6 +37,7 @@ export class ContactoEmergenciaController {
 
   // ====== CREAR ======
   @Post()
+  @Roles('supervisor')
   @ApiOperation({ summary: 'Crear un contacto de emergencia' })
   @ApiBody({ type: CreateContactoEmergenciaDTO })
   @ApiResponse({
@@ -46,6 +52,7 @@ export class ContactoEmergenciaController {
 
   // ====== OBTENER UNO ======
   @Get(':id')
+  @Roles('supervisor', 'teleoperador')
   @ApiOperation({ summary: 'Obtener contacto de emergencia por id' })
   @ApiResponse({
     status: 200,
@@ -69,6 +76,7 @@ export class ContactoEmergenciaController {
 
   // ====== LISTAR TODOS ======
   @Get()
+  @Roles('supervisor', 'teleoperador')
   @ApiOperation({ summary: 'Listar todos los contactos de emergencia' })
   @ApiResponse({
     status: 200,
@@ -82,6 +90,7 @@ export class ContactoEmergenciaController {
   }
 
   @Get('dni')
+  @Roles('supervisor', 'teleoperador')
   @ApiOperation({
     summary: 'Listar contactos de emergencia por DNI de usuario',
   })
@@ -100,6 +109,7 @@ export class ContactoEmergenciaController {
 
   // ====== ACTUALIZAR PARCIAL (PATCH) ======
   @Patch(':id')
+  @Roles('supervisor')
   @ApiOperation({ summary: 'Actualizar contacto de emergencia (parcial)' })
   @ApiBody({ type: UpdateContactoEmergenciaDTO })
   @ApiResponse({
@@ -123,6 +133,7 @@ export class ContactoEmergenciaController {
 
   // ====== ELIMINAR ======
   @Delete(':id')
+  @Roles('supervisor')
   @HttpCode(HttpStatus.NO_CONTENT) // HTTP 204 = se borró, no hace falta cuerpo de respuesta.
   @ApiOperation({ summary: 'Eliminar contacto de emergencia ' })
   @ApiResponse({ status: 204, description: 'Eliminado correctamente' })

@@ -10,6 +10,7 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
@@ -19,15 +20,20 @@ import {
 } from './usuario.dto';
 import { UsuarioService } from './usuario.service';
 import { Usuario } from './usuario.entity';
+import { RolesGuard } from '../auth/guard/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { AuthGuard } from '../auth/guard/auth.guard';
 
 // Controlador de Usuario que maneja las rutas y las solicitudes HTTP.
 @ApiTags('usuario')
 @Controller('usuario')
+@UseGuards(AuthGuard, RolesGuard)
 export class UsuarioController {
   constructor(private readonly usuarioService: UsuarioService) { }
 
   // ====== CREAR ======
   @Post()
+  @Roles('supervisor')
   @ApiOperation({ summary: 'Crear un nuevo usuario' })
   @ApiResponse({ status: 201, type: Usuario })
   async create(@Body() dto: CreateUsuarioDTO): Promise<Usuario> {
@@ -38,8 +44,9 @@ export class UsuarioController {
     return this.usuarioService.create(payload);
   }
 
-
+  // ====== OBTENER UNO ======
   @Get(':dni')
+  @Roles('supervisor', 'teleoperador')
   @ApiOperation({ summary: 'Obtener un usuario por DNI' })
   @ApiResponse({ status: 200, type: UsuarioResponseDTO })
   @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
@@ -51,14 +58,20 @@ export class UsuarioController {
     return usuario;
   }
 
+  // ====== LISTAR TODOS ======
+
   @Get()
+  @Roles('supervisor', 'teleoperador')
   @ApiOperation({ summary: 'Listar usuarios' })
   @ApiResponse({ status: 200, type: [UsuarioResponseDTO] })
   async findAll(): Promise<Usuario[]> {
     return this.usuarioService.findAll();
   }
 
+  // ====== ACTUALIZAR ======
+
   @Patch(':dni')
+  @Roles('supervisor')
   @ApiOperation({ summary: 'Actualizar datos de un usuario' })
   @ApiResponse({ status: 200, type: UsuarioResponseDTO })
   @ApiResponse({ status: 404, description: 'Usuario no encontrado' })
@@ -74,8 +87,9 @@ export class UsuarioController {
   }
 
 
-  //Eliminar un usuario
+  // ====== ELIMINAR ======
   @Delete(':dni')
+  @Roles('supervisor')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Eliminar un usuario' })
   @ApiResponse({ status: 204, description: 'Eliminado correctamente' })

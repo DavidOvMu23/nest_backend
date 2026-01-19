@@ -10,6 +10,7 @@ import {
   HttpCode,
   HttpStatus,
   NotFoundException,
+  UseGuards
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import {
@@ -19,16 +20,22 @@ import {
 } from './comunicacion.dto';
 import { ComunicacionService } from './comunicacion.service';
 import { Comunicacion } from './comunicacion.entity';
+import { RolesGuard } from '../auth/guard/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { AuthGuard } from '../auth/guard/auth.guard';
+
 
 // Controlador para gestionar las comunicaciones (es lo que engloba llamadas, mensajes, etc.).
 @ApiTags('comunicacion') // Etiqueta bonita para Swagger.
 @Controller('comunicacion')
+@UseGuards(AuthGuard, RolesGuard)
 export class ComunicacionController {
   // Nest crea el servicio y nos lo entrega por el constructor.
   constructor(private readonly comunicationsService: ComunicacionService) { }
 
   // ====== CREAR ======
   @Post()
+  @Roles('supervisor', 'teleoperador')
   @ApiOperation({ summary: 'Crear una comunicacion' })
   @ApiBody({ type: CreateComunicacionDTO })
   @ApiResponse({
@@ -60,6 +67,7 @@ export class ComunicacionController {
   }
   // ====== LISTAR TODOS ======
   @Get()
+  @Roles('supervisor', 'teleoperador')
   @ApiOperation({ summary: 'Listar todos las comunicaciones' })
   @ApiResponse({
     status: 200,
@@ -74,6 +82,7 @@ export class ComunicacionController {
 
   // ====== ACTUALIZAR PARCIAL (PATCH) ======
   @Patch(':id')
+  @Roles('supervisor')
   @ApiOperation({ summary: 'Actualizar comuncacion (parcial)' })
   @ApiBody({ type: UpdateComunicacionDTO })
   @ApiResponse({

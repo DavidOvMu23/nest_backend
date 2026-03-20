@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { BadRequestException } from '@nestjs/common';
 import {
   CreateContactoEmergenciaDTO,
   UpdateContactoEmergenciaDTO,
 } from './contacto_emergencia.dto';
 import { ContactoEmergencia } from './contacto_emergencia.entity';
+import { Usuario } from '../usuario/usuario.entity';
 
 // Servicio para gestionar contactos de emergencia
 @Injectable()
@@ -13,29 +15,54 @@ export class ContactoEmergenciaService {
   constructor(
     @InjectRepository(ContactoEmergencia)
     private readonly contacto_emergenciaRepository: Repository<ContactoEmergencia>,
-  ) {}
+    @InjectRepository(Usuario)
+    private readonly usuarioRepository: Repository<Usuario>,
+  ) { }
 
   // Crear un nuevo contacto de emergencia
   async create(dto: CreateContactoEmergenciaDTO): Promise<ContactoEmergencia> {
+    let usuarioReferenciado: Usuario | null = null;
+    if (dto.dniUsuarioRef) {
+      usuarioReferenciado = await this.usuarioRepository.findOne({
+        where: { dni: dto.dniUsuarioRef.toUpperCase() },
+      });
+      if (!usuarioReferenciado) {
+        throw new BadRequestException(
+          `No existe usuario con DNI ${dto.dniUsuarioRef}`,
+        );
+      }
+    }
+
     const contacto_emergencia = this.contacto_emergenciaRepository.create({
       nombre: dto.nombre,
       apellidos: dto.apellidos,
       telefono: dto.telefono,
       relacion: dto.relacion,
+      usuarioReferenciado,
     });
 
-    return this.contacto_emergenciaRepository.save(contacto_emergencia);
+    const saved = await this.contacto_emergenciaRepository.save(
+      contacto_emergencia,
+    );
+
+    return this.contacto_emergenciaRepository.findOne({
+      where: { id_cont: saved.id_cont },
+      relations: { usuarioReferenciado: true },
+    }) as Promise<ContactoEmergencia>;
   }
 
   // Obtener todos los contactos de emergencia
   async findAll(): Promise<ContactoEmergencia[]> {
-    return this.contacto_emergenciaRepository.find();
+    return this.contacto_emergenciaRepository.find({
+      relations: { usuarioReferenciado: true },
+    });
   }
 
   // Obtener contactos de emergencia por DNI de usuario
   async findByUsuarioDni(dni: string): Promise<ContactoEmergencia[]> {
     return this.contacto_emergenciaRepository.find({
       where: { usuarioReferenciado: { dni } },
+      relations: { usuarioReferenciado: true },
     });
   }
 
@@ -43,6 +70,7 @@ export class ContactoEmergenciaService {
   async findOne(id: number): Promise<ContactoEmergencia | null> {
     return this.contacto_emergenciaRepository.findOne({
       where: { id_cont: id },
+      relations: { usuarioReferenciado: true },
     });
   }
 
@@ -65,7 +93,32 @@ export class ContactoEmergenciaService {
     if (dto.telefono !== undefined) contacto_emergencia.telefono = dto.telefono;
     if (dto.relacion !== undefined) contacto_emergencia.relacion = dto.relacion;
 
-    return this.contacto_emergenciaRepository.save(contacto_emergencia);
+    if (dto.dniUsuarioRef !== undefined) {
+      if (dto.dniUsuarioRef.trim() === '') {
+        contacto_emergencia.usuarioReferenciado = null;
+      } else {
+        const usuarioReferenciado = await this.usuarioRepository.findOne({
+          where: { dni: dto.dniUsuarioRef.toUpperCase() },
+        });
+
+        if (!usuarioReferenciado) {
+          throw new BadRequestException(
+            `No existe usuario con DNI ${dto.dniUsuarioRef}`,
+          );
+        }
+
+        contacto_emergencia.usuarioReferenciado = usuarioReferenciado;
+      }
+    }
+
+    const saved = await this.contacto_emergenciaRepository.save(
+      contacto_emergencia,
+    );
+
+    return this.contacto_emergenciaRepository.findOne({
+      where: { id_cont: saved.id_cont },
+      relations: { usuarioReferenciado: true },
+    });
   }
 
   // Eliminar un contacto de emergencia por su ID

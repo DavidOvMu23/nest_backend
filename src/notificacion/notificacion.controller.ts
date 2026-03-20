@@ -19,7 +19,6 @@ import {
 } from './notificacion.dto';
 import { NotificacionService } from './notificacion.service';
 import { Notificacion } from './notificacion.entity';
-import { Comunicacion } from 'src/comunicacion/comunicacion.entity';
 
 @ApiTags('notificacion') // Etiqueta bonita para Swagger.
 @Controller('notificacion')
@@ -71,6 +70,44 @@ export class NotificacionController {
   })
   async findAll() {
     return await this.notificacionService.findAll();
+  }
+
+  // ====== ACTUALIZAR ======
+  @Patch(':id')
+  @ApiOperation({ summary: 'Actualizar notificacion' })
+  @ApiBody({ type: UpdateNotificacionDTO })
+  @ApiResponse({
+    status: 200,
+    description: 'Notificacion actualizada',
+    type: NotificacionResponseDTO,
+  })
+  @ApiResponse({ status: 404, description: 'No encontrada' })
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateDto: UpdateNotificacionDTO,
+  ) {
+    const updated = await this.notificacionService.update(id, updateDto);
+    if (!updated) {
+      throw new NotFoundException(`Notificacion con id ${id} no encontrada`);
+    }
+    return this.toResponse(updated);
+  }
+
+  // ====== MARCAR LEÍDA ======
+  @Patch(':id/mark-read')
+  @ApiOperation({ summary: 'Marcar notificacion como leída' })
+  @ApiResponse({
+    status: 200,
+    description: 'Notificacion marcada como leída',
+    type: NotificacionResponseDTO,
+  })
+  @ApiResponse({ status: 404, description: 'No encontrada' })
+  async markAsRead(@Param('id', ParseIntPipe) id: number) {
+    const updated = await this.notificacionService.markAsRead(id);
+    if (!updated) {
+      throw new NotFoundException(`Notificacion con id ${id} no encontrada`);
+    }
+    return this.toResponse(updated);
   }
 
 

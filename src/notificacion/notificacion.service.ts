@@ -35,6 +35,35 @@ export class NotificacionService {
     return this.notificacionRepository.findOne({ where: { id_not: id } });
   }
 
+  // Método para actualizar una notificación por su ID.
+  async update(
+    id: number,
+    dto: UpdateNotificacionDTO,
+  ): Promise<Notificacion | null> {
+    const notificacion = await this.notificacionRepository.findOne({
+      where: { id_not: id },
+    });
+
+    if (!notificacion) {
+      return null;
+    }
+
+    if (dto.contenido !== undefined) {
+      notificacion.contenido = dto.contenido;
+    }
+
+    if (dto.estado !== undefined) {
+      notificacion.estado = dto.estado;
+    }
+
+    return this.notificacionRepository.save(notificacion);
+  }
+
+  // Método para marcar una notificación como leída.
+  async markAsRead(id: number): Promise<Notificacion | null> {
+    return this.update(id, { estado: 'leida' });
+  }
+
 
   // Método para eliminar una notificación por su ID.
   async remove(id: number): Promise<boolean> {

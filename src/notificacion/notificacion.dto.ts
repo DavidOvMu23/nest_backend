@@ -1,16 +1,5 @@
-import {
-  IsEmail,
-  IsString,
-  IsOptional,
-  IsInt,
-  Min,
-  Max,
-  Length,
-  IsDateString,
-  Matches,
-} from 'class-validator';
+import { IsOptional, IsString, Length } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { match } from 'assert';
 
 // DTO para crear una notificación.
 export class CreateNotificacionDTO {
@@ -33,17 +22,23 @@ export class CreateNotificacionDTO {
 
 // DTO para actualizar una notificación (parcial).
 export class UpdateNotificacionDTO {
-  @ApiProperty({
+  @IsOptional()
+  @IsString()
+  @Length(1, 500)
+  @ApiPropertyOptional({
     description: 'Contenido de la notificación',
     example: 'Tienes 3 llamadas programadas para hoy a partir de las 10:00.',
   })
-  contenido: string;
+  contenido?: string;
 
-  @ApiProperty({
+  @IsOptional()
+  @IsString()
+  @Length(1, 500)
+  @ApiPropertyOptional({
     description: 'Estado de la notificación',
     example: 'sin_leer',
   })
-  estado: string;
+  estado?: string;
 }
 
 // DTO para la respuesta de una notificación.

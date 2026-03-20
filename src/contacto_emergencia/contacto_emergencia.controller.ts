@@ -155,14 +155,22 @@ export class ContactoEmergenciaController {
   private toResponse(
     contacto_emergencia: ContactoEmergencia,
   ): ContactoEmergenciaResponseDTO {
-    const { id_cont, nombre, apellidos, telefono, relacion } =
+    const { id_cont, nombre, apellidos, telefono, relacion, usuarioReferenciado } =
       contacto_emergencia;
+
+    const dniUsuarioRef = usuarioReferenciado?.dni;
+    const pacienteNombre = usuarioReferenciado
+      ? `${usuarioReferenciado.nombre} ${usuarioReferenciado.apellidos}`.trim()
+      : undefined;
+
     return {
       id_cont,
       nombre,
       apellidos,
       telefono,
       relacion,
+      dniUsuarioRef,
+      pacienteNombre,
     };
   }
 }

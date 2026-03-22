@@ -82,7 +82,9 @@ export class ComunicacionController {
 
   // ====== ACTUALIZAR PARCIAL (PATCH) ======
   @Patch(':id')
-  @Roles('supervisor')
+  // Permitir que tanto supervisores como teleoperadores puedan actualizar comunicaciones.
+  // Si prefieres que solo supervisores actualicen, revertir a @Roles('supervisor').
+  @Roles('supervisor', 'teleoperador')
   @ApiOperation({ summary: 'Actualizar comuncacion (parcial)' })
   @ApiBody({ type: UpdateComunicacionDTO })
   @ApiResponse({
@@ -102,6 +104,21 @@ export class ComunicacionController {
     return this.toResponse(updated);
   }
 
+  // ====== ELIMINAR ======
+  @Delete(':id')
+  @Roles('supervisor', 'teleoperador')
+  @ApiOperation({ summary: 'Eliminar comunicacion' })
+  @ApiResponse({ status: 204, description: 'Comunicacion eliminada' })
+  @ApiResponse({ status: 404, description: 'No encontrado' })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    const deleted = await this.comunicationsService.delete(id);
+    if (!deleted) {
+      throw new NotFoundException(`Comunicacion con id ${id} no encontrada`);
+    }
+    return;
+  }
+
 
   /**
    * Función privada para centralizar cómo transformamos la entidad a DTO.
@@ -117,6 +134,7 @@ export class ComunicacionController {
       estado,
       observaciones,
       grupo,
+      usuario,
     } = comunicacion;
 
     return {
@@ -133,6 +151,13 @@ export class ComunicacionController {
           nombre: grupo.nombre,
           descripcion: grupo.descripcion,
           activo: grupo.activo,
+        }
+        : undefined,
+      usuario: usuario
+        ? {
+          id_usu: usuario.dni,
+          nombre: usuario.nombre,
+          apellidos: usuario.apellidos,
         }
         : undefined,
     };

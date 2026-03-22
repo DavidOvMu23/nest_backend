@@ -37,7 +37,7 @@ export class ContactoEmergenciaController {
 
   // ====== CREAR ======
   @Post()
-  @Roles('supervisor')
+  @Roles('supervisor', 'teleoperador')
   @ApiOperation({ summary: 'Crear un contacto de emergencia' })
   @ApiBody({ type: CreateContactoEmergenciaDTO })
   @ApiResponse({
@@ -104,6 +104,22 @@ export class ContactoEmergenciaController {
     const normalized = dni.toUpperCase();
     const contactos =
       await this.contacto_emergenciaService.findByUsuarioDni(normalized);
+    return contactos.map((item) => this.toResponse(item));
+  }
+
+  // ====== LISTAR POR USUARIO (PARÁMETRO) ======
+  @Get('usuario/:dni')
+  @Roles('supervisor', 'teleoperador')
+  @ApiOperation({ summary: 'Listar contactos de emergencia por DNI de usuario (param)' })
+  @ApiResponse({
+    status: 200,
+    description: 'Contactos de emergencia del usuario',
+    type: ContactoEmergenciaResponseDTO,
+    isArray: true,
+  })
+  async findByUsuarioParam(@Param('dni') dni: string) {
+    const normalized = dni.toUpperCase();
+    const contactos = await this.contacto_emergenciaService.findByUsuarioDni(normalized);
     return contactos.map((item) => this.toResponse(item));
   }
 

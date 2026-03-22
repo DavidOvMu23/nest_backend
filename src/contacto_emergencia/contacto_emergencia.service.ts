@@ -45,6 +45,11 @@ export class ContactoEmergenciaService {
       contacto_emergencia,
     );
 
+    await this.sincronizarUsuarioContacto(
+      saved.id_cont,
+      usuarioReferenciado?.dni ?? null,
+    );
+
     return this.contacto_emergenciaRepository.findOne({
       where: { id_cont: saved.id_cont },
       relations: { usuarioReferenciado: true },
@@ -115,6 +120,11 @@ export class ContactoEmergenciaService {
       contacto_emergencia,
     );
 
+    await this.sincronizarUsuarioContacto(
+      saved.id_cont,
+      contacto_emergencia.usuarioReferenciado?.dni ?? null,
+    );
+
     return this.contacto_emergenciaRepository.findOne({
       where: { id_cont: saved.id_cont },
       relations: { usuarioReferenciado: true },
@@ -128,5 +138,52 @@ export class ContactoEmergenciaService {
     });
     const affected = result.affected ?? 0;
     return affected > 0;
+  }
+
+  private async sincronizarUsuarioContacto(
+    contactoId: number,
+    dniUsuarioObjetivo: string | null,
+  ): Promise<void> {
+    const contacto = await this.contacto_emergenciaRepository.findOne({
+      where: { id_cont: contactoId },
+    });
+
+    if (!contacto) {
+      return;
+    }
+
+    // Quitar el contacto de cualquier usuario previamente vinculado
+    const usuariosConContacto = await this.usuarioRepository
+      .createQueryBuilder('usuario')
+      .leftJoinAndSelect('usuario.contactosEmergencia', 'contacto')
+      .where('contacto.id_cont = :contactoId', { contactoId })
+      .getMany();
+
+    for (const usuario of usuariosConContacto) {
+      usuario.contactosEmergencia = usuario.contactosEmergencia
+        .filter((c) => c.id_cont !== contactoId);
+      await this.usuarioRepository.save(usuario);
+    }
+
+    // Añadir el contacto al usuario objetivo (si existe)
+    if (dniUsuarioObjetivo != null && dniUsuarioObjetivo.trim() !== '') {
+      const usuarioObjetivo = await this.usuarioRepository.findOne({
+        where: { dni: dniUsuarioObjetivo.toUpperCase() },
+        relations: ['contactosEmergencia'],
+      });
+
+      if (usuarioObjetivo !== null) {
+        const yaExiste = usuarioObjetivo.contactosEmergencia.some(
+          (c) => c.id_cont === contactoId,
+        );
+        if (!yaExiste) {
+          usuarioObjetivo.contactosEmergencia = [
+            ...usuarioObjetivo.contactosEmergencia,
+            contacto,
+          ];
+          await this.usuarioRepository.save(usuarioObjetivo);
+        }
+      }
+    }
   }
 }

@@ -44,6 +44,10 @@ export class CreateUsuarioDTO {
   @ApiPropertyOptional({ example: 'Vive sola, pulsera SOS' })
   informacion?: string;
 
+  @IsOptional()
+  @ApiPropertyOptional({ description: 'Marca si el usuario fue creado desde la app cliente', example: false })
+  creado_desde_cliente?: boolean;
+
   @IsDateString()
   @ApiProperty({ example: '1945-11-30' })
   f_nac: string;
@@ -165,4 +169,7 @@ export class UsuarioResponseDTO {
 
   @ApiPropertyOptional({ example: 'Plaza España 8, Barcelona' })
   direccion?: string;
+
+  @ApiPropertyOptional({ example: false })
+  creado_desde_cliente?: boolean;
 }

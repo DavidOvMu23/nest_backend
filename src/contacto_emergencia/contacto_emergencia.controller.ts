@@ -171,22 +171,26 @@ export class ContactoEmergenciaController {
   private toResponse(
     contacto_emergencia: ContactoEmergencia,
   ): ContactoEmergenciaResponseDTO {
-    const { id_cont, nombre, apellidos, telefono, relacion, usuarioReferenciado } =
+    const { id_cont, nombre, apellidos, telefono, usuarioReferenciado } =
       contacto_emergencia;
+    const creado_desde_usuario = contacto_emergencia.creado_desde_usuario ?? false;
 
     const dniUsuarioRef = usuarioReferenciado?.dni;
     const pacienteNombre = usuarioReferenciado
       ? `${usuarioReferenciado.nombre} ${usuarioReferenciado.apellidos}`.trim()
       : undefined;
 
+    const usuariosDnis = contacto_emergencia.usuarios?.map((u) => u.dni) ?? [];
+
     return {
       id_cont,
       nombre,
       apellidos,
       telefono,
-      relacion,
       dniUsuarioRef,
       pacienteNombre,
-    };
+      usuariosDnis,
+      creado_desde_usuario,
+    } as any;
   }
 }

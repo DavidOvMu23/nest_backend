@@ -16,7 +16,6 @@ export class ContactoEmergenciaSeeder implements Seeder {
         contacto.nombre = data.nombre;
         contacto.apellidos = data.apellidos;
         contacto.telefono = data.telefono;
-        contacto.relacion = data.relacion;
         contacto.usuarioReferenciado =
           data.dni_usuario_ref != null
             ? await usuarioRepo.findOneBy({ dni: data.dni_usuario_ref })

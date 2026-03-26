@@ -1,4 +1,4 @@
-import { IsOptional, IsString, Length, Matches } from 'class-validator';
+import { IsOptional, IsString, Length, Matches, IsArray, ArrayUnique, ArrayNotEmpty, ValidateIf } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 // DTO para crear un contacto de emergencia
@@ -27,13 +27,6 @@ export class CreateContactoEmergenciaDTO {
   })
   telefono: string;
 
-  @IsString()
-  @Length(1, 500)
-  @ApiProperty({
-    description: 'Relación del contacto de emergencia con el usuario',
-    example: 'Hija',
-  })
-  relacion: string;
 
   @IsOptional()
   @IsString()
@@ -43,6 +36,20 @@ export class CreateContactoEmergenciaDTO {
     example: '11111111A',
   })
   dniUsuarioRef?: string;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayUnique()
+  @ValidateIf((o) => Array.isArray((o as any).usuariosDnis))
+  @ApiPropertyOptional({
+    description: 'Lista de DNIs de usuarios asociados a este contacto',
+    example: ['11111111A', '22222222B'],
+    isArray: true,
+  })
+  usuariosDnis?: string[];
+
+  @ApiPropertyOptional({ description: 'Indica si el contacto fue generado automáticamente al crear un usuario', example: false })
+  creado_desde_usuario?: boolean;
 }
 
 // DTO para actualizar un contacto de emergencia
@@ -74,14 +81,6 @@ export class UpdateContactoEmergenciaDTO {
   })
   telefono?: string;
 
-  @IsOptional()
-  @IsString()
-  @Length(1, 500)
-  @ApiPropertyOptional({
-    description: 'Relación del contacto de emergencia con el usuario',
-    example: 'Hija',
-  })
-  relacion?: string;
 
   @IsOptional()
   @IsString()
@@ -91,6 +90,20 @@ export class UpdateContactoEmergenciaDTO {
     example: '11111111A',
   })
   dniUsuarioRef?: string;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayUnique()
+  @ValidateIf((o) => Array.isArray((o as any).usuariosDnis))
+  @ApiPropertyOptional({
+    description: 'Lista de DNIs de usuarios asociados a este contacto',
+    example: ['11111111A', '22222222B'],
+    isArray: true,
+  })
+  usuariosDnis?: string[];
+
+  @ApiPropertyOptional({ description: 'Indica si el contacto fue generado automáticamente al crear un usuario', example: false })
+  creado_desde_usuario?: boolean;
 }
 
 // DTO para la respuesta de un contacto de emergencia
@@ -116,11 +129,6 @@ export class ContactoEmergenciaResponseDTO {
   })
   telefono: string;
 
-  @ApiProperty({
-    description: 'Relación del contacto de emergencia con el usuario',
-    example: 'Hija',
-  })
-  relacion: string;
 
   @ApiPropertyOptional({
     description: 'DNI del usuario/paciente referenciado',
@@ -133,4 +141,11 @@ export class ContactoEmergenciaResponseDTO {
     example: 'José Martínez',
   })
   pacienteNombre?: string;
+
+  @ApiPropertyOptional({
+    description: 'Lista de DNIs de usuarios asociados a este contacto',
+    example: ['11111111A', '22222222B'],
+    isArray: true,
+  })
+  usuariosDnis?: string[];
 }

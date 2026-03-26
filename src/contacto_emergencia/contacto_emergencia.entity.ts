@@ -24,8 +24,6 @@ export class ContactoEmergencia extends BaseEntity {
   @Column()
   telefono: string;
 
-  @Column()
-  relacion: string;
 
   // En tu SQL, algunos contactos están vinculados a usuarios, otros son genéricos
   @ManyToMany(() => Usuario, (usuario) => usuario.contactosEmergencia, {
@@ -40,4 +38,7 @@ export class ContactoEmergencia extends BaseEntity {
   })
   @JoinColumn({ name: 'dni_usuario_ref', referencedColumnName: 'dni' })
   usuarioReferenciado?: Usuario | null;
+
+  @Column({ type: 'boolean', default: false })
+  creado_desde_usuario?: boolean;
 }

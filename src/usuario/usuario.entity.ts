@@ -71,4 +71,7 @@ export class Usuario {
     (contacto) => contacto.usuarioReferenciado,
   )
   contactosPropios?: ContactoEmergencia[];
+
+  @Column({ type: 'boolean', default: false })
+  creado_desde_cliente?: boolean;
 }

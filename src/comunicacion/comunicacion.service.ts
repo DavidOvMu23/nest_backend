@@ -131,4 +131,17 @@ export class ComunicacionService {
 
     return this.comunicacionRepository.save(comunicacion);
   }
+
+  // Eliminar una comunicación por su ID
+  async delete(id: number): Promise<boolean> {
+    const comunicacion = await this.comunicacionRepository.findOne({
+      where: { id_com: id },
+    });
+    if (!comunicacion) {
+      return false;
+    }
+
+    await this.comunicacionRepository.remove(comunicacion);
+    return true;
+  }
 }

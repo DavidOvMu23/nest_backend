@@ -20,7 +20,6 @@ export class CreateTrabajadorDTO {
   @ApiProperty({ description: 'Nombre del trabajador', example: 'Julen' })
   nombre: string;
 
-  // DTO para actualizar un trabajador.
   @IsString()
   @Length(1, 150)
   @ApiProperty({
@@ -29,7 +28,6 @@ export class CreateTrabajadorDTO {
   })
   apellidos: string;
 
-  // DTO para la respuesta de un trabajador.
   @IsEmail()
   @ApiProperty({
     description: 'Correo electronico del trabajador',
@@ -37,7 +35,6 @@ export class CreateTrabajadorDTO {
   })
   correo: string;
 
-  // Contraseña temporal o definitiva
   @IsString()
   @Length(6, 128)
   @ApiProperty({
@@ -46,7 +43,6 @@ export class CreateTrabajadorDTO {
   })
   contrasena: string;
 
-  // Rol del trabajador
   @IsEnum(TipoTrabajador)
   @Transform(
     ({ value }): TipoTrabajador =>
@@ -60,8 +56,6 @@ export class CreateTrabajadorDTO {
     example: TipoTrabajador.TELEOPERADOR,
   })
   rol: TipoTrabajador;
-
-  // NIA obligatorio para teleoperadores
 
   @ValidateIf(
     (dto: unknown) => (dto as any)?.rol === TipoTrabajador.TELEOPERADOR,
@@ -98,6 +92,7 @@ export class CreateTrabajadorDTO {
   })
   dni?: string;
 }
+
 // DTO para actualizar un trabajador (parcial).
 export class UpdateTrabajadorDTO {
   @IsOptional()

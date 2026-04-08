@@ -1,22 +1,33 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, Logger } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorators/roles.decorator';
+
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  private readonly logger = new Logger(RolesGuard.name);
+  constructor(private reflector: Reflector) { }
   canActivate(context: ExecutionContext): boolean {
-    const requiredRoles = this.reflector.getAllAndOverride<string[]>(
-      ROLES_KEY,
-      [context.getHandler(), context.getClass()],
-    );
+    const requiredRoles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
     if (!requiredRoles) {
       return true;
     }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const request = context.switchToHttp().getRequest();
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const { user } = request;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    return requiredRoles.some((role) => (user as unknown as any).rol === role);
+    const { user } = context.switchToHttp().getRequest() as { user?: any };
+    // Log for debugging when access is denied
+    if (!user) {
+      this.logger.warn(`Acceso denegado: no hay usuario en la request. Roles requeridos: ${JSON.stringify(requiredRoles)}`);
+      return false;
+    }
+    const userRole = (user.rol ?? '').toString().toLowerCase();
+    const allowed = requiredRoles
+      .map((r) => r.toString().toLowerCase())
+      .some((role) => role === userRole);
+    if (!allowed) {
+      this.logger.warn(`Acceso denegado: rol del usuario '${userRole}' no está entre ${JSON.stringify(requiredRoles)}`);
+      this.logger.debug(`User payload: ${JSON.stringify(user)}`);
+    }
+    return allowed;
   }
 }

@@ -77,9 +77,10 @@ export class CreateTrabajadorDTO {
   @ValidateIf(
     (dto: unknown) => (dto as any)?.rol === TipoTrabajador.TELEOPERADOR,
   )
-  @IsNumber()
+  @IsNotEmpty({ message: 'El grupo es obligatorio para teleoperadores' })
+  @IsNumber({}, { message: 'El grupo debe ser un número' })
   @ApiPropertyOptional({
-    description: 'Grupo al que pertenece',
+    description: 'Grupo al que pertenece (obligatorio para teleoperadores)',
     example: 1,
   })
   grupoId?: number;

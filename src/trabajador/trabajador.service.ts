@@ -24,7 +24,7 @@ export class TrabajadorService {
     private readonly supervisorRepository: Repository<Supervisor>,
     @InjectRepository(Grupo)
     private readonly grupoRepository: Repository<Grupo>,
-  ) {}
+  ) { }
 
   // Método para crear un nuevo trabajador.
   async create(dto: CreateTrabajadorDTO): Promise<Trabajador> {
@@ -65,17 +65,16 @@ export class TrabajadorService {
         throw new ConflictException('El NIA ya está registrado');
       }
 
-      let grupo: Grupo | null = null;
-      if (dto.grupoId) {
-        grupo = await this.grupoRepository.findOneBy({
-          id_grup: dto.grupoId,
-        });
-
-        if (!grupo) {
-          throw new BadRequestException(
-            `El grupo con ID ${dto.grupoId} no existe`,
-          );
-        }
+      if (!dto.grupoId) {
+        throw new BadRequestException('El grupo es obligatorio para crear un teleoperador');
+      }
+      const grupo = await this.grupoRepository.findOneBy({
+        id_grup: dto.grupoId,
+      });
+      if (!grupo) {
+        throw new BadRequestException(
+          `El grupo con ID ${dto.grupoId} no existe`,
+        );
       }
       // Crear teleoperador
       const teleoperador = this.teleoperadorRepository.create({

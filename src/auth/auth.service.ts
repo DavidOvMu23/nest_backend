@@ -22,7 +22,7 @@ export class AuthService {
     private readonly supervisorRepository: Repository<Supervisor>,
     @InjectRepository(Teleoperador)
     private readonly teleoperadorRepository: Repository<Teleoperador>,
-  ) {}
+  ) { }
 
   async login(loginDto: LoginDto) {
     const { correo, contrasena } = loginDto;
@@ -59,9 +59,10 @@ export class AuthService {
     } else if (trabajador.rol === TipoTrabajador.TELEOPERADOR) {
       const teleoperador = await this.teleoperadorRepository.findOne({
         where: { correo },
+        relations: ['grupo'],
       });
       if (teleoperador) {
-        datosAdicionales = { nia: teleoperador.nia };
+        datosAdicionales = { nia: teleoperador.nia, grupoId: teleoperador.grupo?.id_grup };
       }
     }
 

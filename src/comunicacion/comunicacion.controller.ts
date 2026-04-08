@@ -27,7 +27,7 @@ import { AuthGuard } from '../auth/guard/auth.guard';
 @UseGuards(AuthGuard, RolesGuard)
 export class ComunicacionController {
   // Nest crea el servicio y nos lo entrega por el constructor.
-  constructor(private readonly comunicationsService: ComunicacionService) {}
+  constructor(private readonly comunicationsService: ComunicacionService) { }
 
   // ====== CREAR ======
   @Post()
@@ -78,7 +78,9 @@ export class ComunicacionController {
 
   // ====== ACTUALIZAR PARCIAL (PATCH) ======
   @Patch(':id')
-  @Roles('supervisor')
+  // Permitir que tanto supervisores como teleoperadores puedan actualizar comunicaciones.
+  // Si prefieres que solo supervisores actualicen, revertir a @Roles('supervisor').
+  @Roles('supervisor', 'teleoperador')
   @ApiOperation({ summary: 'Actualizar comuncacion (parcial)' })
   @ApiBody({ type: UpdateComunicacionDTO })
   @ApiResponse({
@@ -98,6 +100,22 @@ export class ComunicacionController {
     return this.toResponse(updated);
   }
 
+  // ====== ELIMINAR ======
+  @Delete(':id')
+  @Roles('supervisor', 'teleoperador')
+  @ApiOperation({ summary: 'Eliminar comunicacion' })
+  @ApiResponse({ status: 204, description: 'Comunicacion eliminada' })
+  @ApiResponse({ status: 404, description: 'No encontrado' })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    const deleted = await this.comunicationsService.delete(id);
+    if (!deleted) {
+      throw new NotFoundException(`Comunicacion con id ${id} no encontrada`);
+    }
+    return;
+  }
+
+
   /**
    * Función privada para centralizar cómo transformamos la entidad a DTO.
    * Así evitamos repetir lógica en cada método.
@@ -112,6 +130,7 @@ export class ComunicacionController {
       estado,
       observaciones,
       grupo,
+      usuario,
     } = comunicacion;
 
     return {
@@ -124,11 +143,18 @@ export class ComunicacionController {
       observaciones,
       grupo: grupo
         ? {
-            id_grup: grupo.id_grup,
-            nombre: grupo.nombre,
-            descripcion: grupo.descripcion,
-            activo: grupo.activo,
-          }
+          id_grup: grupo.id_grup,
+          nombre: grupo.nombre,
+          descripcion: grupo.descripcion,
+          activo: grupo.activo,
+        }
+        : undefined,
+      usuario: usuario
+        ? {
+          id_usu: usuario.dni,
+          nombre: usuario.nombre,
+          apellidos: usuario.apellidos,
+        }
         : undefined,
     };
   }

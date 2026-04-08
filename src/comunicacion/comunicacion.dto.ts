@@ -4,7 +4,7 @@ import { GrupoResponseDTO } from '../grupo/grupo.dto';
 
 // DTO para crear una nueva comunicación
 export class CreateComunicacionDTO {
-  @IsDate()
+  @IsDateString()
   @ApiProperty({
     description: 'Fecha de la comunicación',
     example: '2025-01-14',
@@ -50,58 +50,105 @@ export class CreateComunicacionDTO {
     example: 'Conversación fluida. Anima a continuar paseos.',
   })
   observaciones: string;
+
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional({
+    description: 'DNI del usuario al que se le hizo la llamada',
+    example: '10101010K',
+  })
+  usuarioId?: string;
+
+  @IsOptional()
+  @IsInt()
+  @ApiPropertyOptional({
+    description: 'ID del grupo que realizó la llamada',
+    example: 1,
+  })
+  grupoId?: number;
 }
 
 export class UpdateComunicacionDTO {
-  @IsDate()
-  @ApiProperty({
+  @IsOptional()
+  @IsDateString()
+  @ApiPropertyOptional({
     description: 'Fecha de la comunicación',
     example: '2025-01-14',
   })
-  fecha: Date;
+  fecha?: Date;
 
+  @IsOptional()
   @IsString()
   @Length(1, 500)
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Hora de la comunicación',
     example: '16:00',
   })
-  hora: string;
+  hora?: string;
 
+  @IsOptional()
   @IsString()
   @Length(1, 500)
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Duración de la comunicación',
     example: '20',
   })
-  duracion: string;
+  duracion?: string;
 
+  @IsOptional()
   @IsString()
   @Length(1, 500)
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Resumen de la comunicación',
     example: 'Conversación fluida. Anima a continuar paseos.',
   })
-  resumen: string;
+  resumen?: string;
 
+  @IsOptional()
   @IsString()
   @Length(1, 500)
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Estado de la llamada',
     example: 'completada',
   })
-  estado: string;
+  estado?: string;
 
+  @IsOptional()
   @IsString()
   @Length(1, 500)
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Observaciones de la llamada',
     example: 'Conversación fluida. Anima a continuar paseos.',
   })
-  observaciones: string;
+  observaciones?: string;
+
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional({
+    description: 'DNI del usuario al que se le hizo la llamada',
+    example: '10101010K',
+  })
+  usuarioId?: string;
+
+  @IsOptional()
+  @IsInt()
+  @ApiPropertyOptional({
+    description: 'ID del grupo que realizó la llamada',
+    example: 1,
+  })
+  grupoId?: number;
 }
 
 // DTO para la respuesta de una comunicación
+export class UsuarioComunicacionResponseDTO {
+  @ApiProperty({ description: 'ID usuario', example: '10101010K' })
+  id_usu: string;
+  @ApiProperty({ description: 'Nombre', example: 'Beatriz' })
+  nombre: string;
+  @ApiProperty({ description: 'Apellidos', example: 'Fernández Luna' })
+  apellidos: string;
+}
+
 export class ComunicacionResponseDTO {
   @ApiProperty({ description: 'Identificador único', example: 1 })
   id_com: number;
@@ -147,4 +194,10 @@ export class ComunicacionResponseDTO {
     type: () => GrupoResponseDTO,
   })
   grupo?: GrupoResponseDTO;
+
+  @ApiPropertyOptional({
+    description: 'Usuario al que se le ha hecho la llamada',
+    type: () => UsuarioComunicacionResponseDTO,
+  })
+  usuario?: UsuarioComunicacionResponseDTO;
 }

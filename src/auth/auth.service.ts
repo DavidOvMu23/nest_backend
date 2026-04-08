@@ -22,7 +22,7 @@ export class AuthService {
     private readonly supervisorRepository: Repository<Supervisor>,
     @InjectRepository(Teleoperador)
     private readonly teleoperadorRepository: Repository<Teleoperador>,
-  ) { }
+  ) {}
 
   async login(loginDto: LoginDto) {
     const { correo, contrasena } = loginDto;
@@ -62,7 +62,10 @@ export class AuthService {
         relations: ['grupo'],
       });
       if (teleoperador) {
-        datosAdicionales = { nia: teleoperador.nia, grupoId: teleoperador.grupo?.id_grup };
+        datosAdicionales = {
+          nia: teleoperador.nia,
+          grupoId: teleoperador.grupo?.id_grup,
+        };
       }
     }
 

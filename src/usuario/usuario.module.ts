@@ -10,4 +10,4 @@ import { ContactoEmergencia } from '../contacto_emergencia/contacto_emergencia.e
   providers: [UsuarioService],
   controllers: [UsuarioController],
 })
-export class UsuarioModule { }
+export class UsuarioModule {}

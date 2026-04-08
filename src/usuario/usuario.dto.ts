@@ -45,7 +45,10 @@ export class CreateUsuarioDTO {
   informacion?: string;
 
   @IsOptional()
-  @ApiPropertyOptional({ description: 'Marca si el usuario fue creado desde la app cliente', example: false })
+  @ApiPropertyOptional({
+    description: 'Marca si el usuario fue creado desde la app cliente',
+    example: false,
+  })
   creado_desde_cliente?: boolean;
 
   @IsDateString()

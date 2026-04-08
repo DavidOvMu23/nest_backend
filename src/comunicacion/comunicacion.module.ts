@@ -12,4 +12,4 @@ import { Usuario } from '../usuario/usuario.entity';
   providers: [ComunicacionService],
   controllers: [ComunicacionController],
 })
-export class ComunicacionModule { }
+export class ComunicacionModule {}

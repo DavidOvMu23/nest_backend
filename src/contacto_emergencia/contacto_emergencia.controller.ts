@@ -32,7 +32,7 @@ export class ContactoEmergenciaController {
   // Nest crea el servicio y nos lo entrega por el constructor.
   constructor(
     private readonly contacto_emergenciaService: ContactoEmergenciaService,
-  ) { }
+  ) {}
 
   // ====== CREAR ======
   @Post()
@@ -109,7 +109,9 @@ export class ContactoEmergenciaController {
   // ====== LISTAR POR USUARIO (PARÁMETRO) ======
   @Get('usuario/:dni')
   @Roles('supervisor', 'teleoperador')
-  @ApiOperation({ summary: 'Listar contactos de emergencia por DNI de usuario (param)' })
+  @ApiOperation({
+    summary: 'Listar contactos de emergencia por DNI de usuario (param)',
+  })
   @ApiResponse({
     status: 200,
     description: 'Contactos de emergencia del usuario',
@@ -118,7 +120,8 @@ export class ContactoEmergenciaController {
   })
   async findByUsuarioParam(@Param('dni') dni: string) {
     const normalized = dni.toUpperCase();
-    const contactos = await this.contacto_emergenciaService.findByUsuarioDni(normalized);
+    const contactos =
+      await this.contacto_emergenciaService.findByUsuarioDni(normalized);
     return contactos.map((item) => this.toResponse(item));
   }
 
@@ -178,7 +181,8 @@ export class ContactoEmergenciaController {
 
       usuarioReferenciado,
     } = contacto_emergencia;
-    const creado_desde_usuario = contacto_emergencia.creado_desde_usuario ?? false;
+    const creado_desde_usuario =
+      contacto_emergencia.creado_desde_usuario ?? false;
 
     const dniUsuarioRef = usuarioReferenciado?.dni;
     const pacienteNombre = usuarioReferenciado

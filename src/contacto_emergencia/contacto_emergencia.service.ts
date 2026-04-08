@@ -17,7 +17,7 @@ export class ContactoEmergenciaService {
     private readonly contacto_emergenciaRepository: Repository<ContactoEmergencia>,
     @InjectRepository(Usuario)
     private readonly usuarioRepository: Repository<Usuario>,
-  ) { }
+  ) {}
 
   // Crear un nuevo contacto de emergencia
   async create(dto: CreateContactoEmergenciaDTO): Promise<ContactoEmergencia> {
@@ -42,10 +42,14 @@ export class ContactoEmergenciaService {
 
     const savedRaw =
       await this.contacto_emergenciaRepository.save(contacto_emergencia);
-    const saved = Array.isArray(savedRaw) ? savedRaw[0] : (savedRaw as ContactoEmergencia);
+    const saved = Array.isArray(savedRaw)
+      ? savedRaw[0]
+      : (savedRaw as ContactoEmergencia);
 
     // sincronizar asociaciones many-to-many usando lista de DNIs si se proporcionó
-    const usuariosDnis = dto.usuariosDnis ?? (usuarioReferenciado ? [usuarioReferenciado.dni] : []);
+    const usuariosDnis =
+      dto.usuariosDnis ??
+      (usuarioReferenciado ? [usuarioReferenciado.dni] : []);
     await this.sincronizarUsuarioContactoBulk(saved.id_cont, usuariosDnis);
 
     return this.contacto_emergenciaRepository.findOne({
@@ -117,7 +121,8 @@ export class ContactoEmergenciaService {
       if (dto.nombre !== undefined) contacto_emergencia.nombre = dto.nombre;
       if (dto.apellidos !== undefined)
         contacto_emergencia.apellidos = dto.apellidos;
-      if (dto.telefono !== undefined) contacto_emergencia.telefono = dto.telefono;
+      if (dto.telefono !== undefined)
+        contacto_emergencia.telefono = dto.telefono;
 
       if (dto.dniUsuarioRef !== undefined) {
         if (dto.dniUsuarioRef.trim() === '') {
@@ -140,11 +145,14 @@ export class ContactoEmergenciaService {
 
     const savedRaw =
       await this.contacto_emergenciaRepository.save(contacto_emergencia);
-    const saved = Array.isArray(savedRaw) ? savedRaw[0] : (savedRaw as ContactoEmergencia);
+    const saved = Array.isArray(savedRaw) ? savedRaw[0] : savedRaw;
 
     // Si se proporcionó lista de DNIs, sincronizamos asociaciones many-to-many
     if (dto.usuariosDnis !== undefined) {
-      await this.sincronizarUsuarioContactoBulk(saved.id_cont, dto.usuariosDnis ?? []);
+      await this.sincronizarUsuarioContactoBulk(
+        saved.id_cont,
+        dto.usuariosDnis ?? [],
+      );
     } else {
       // mantener comportamiento previo: sincronizar con usuarioReferenciado
       await this.sincronizarUsuarioContacto(
@@ -179,7 +187,10 @@ export class ContactoEmergenciaService {
 
     // Si está vinculado a un usuario (como referencia directa) o está en la lista
     // many-to-many de usuarios, impedimos la eliminación directa.
-    if (contacto.usuarioReferenciado || (contacto.usuarios && contacto.usuarios.length > 0)) {
+    if (
+      contacto.usuarioReferenciado ||
+      (contacto.usuarios && contacto.usuarios.length > 0)
+    ) {
       throw new BadRequestException(
         'Este contacto está asociado a uno o varios usuarios. Primero desvincula las asociaciones o elimina la referencia desde el perfil del cliente.',
       );
@@ -284,7 +295,10 @@ export class ContactoEmergenciaService {
         (c) => c.id_cont === contactoId,
       );
       if (!yaExiste) {
-        usuario.contactosEmergencia = [...usuario.contactosEmergencia, contacto];
+        usuario.contactosEmergencia = [
+          ...usuario.contactosEmergencia,
+          contacto,
+        ];
         await this.usuarioRepository.save(usuario);
       }
     }

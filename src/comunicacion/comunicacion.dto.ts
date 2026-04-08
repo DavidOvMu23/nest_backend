@@ -1,4 +1,4 @@
-import { IsString, Length, IsDate } from 'class-validator';
+import { IsString, Length } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { GrupoResponseDTO } from '../grupo/grupo.dto';
 

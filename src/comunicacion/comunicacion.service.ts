@@ -20,7 +20,7 @@ export class ComunicacionService {
     private readonly grupoRepository: Repository<Grupo>,
     @InjectRepository(Usuario)
     private readonly usuarioRepository: Repository<Usuario>,
-  ) { }
+  ) {}
 
   // ====== MÉTODOS CRUD ======
   // Crear una nueva comunicación
@@ -36,15 +36,25 @@ export class ComunicacionService {
 
     // Asociar grupo si se proporciona
     if (dto.grupoId !== undefined && dto.grupoId !== null) {
-      const grupo = await this.grupoRepository.findOne({ where: { id_grup: dto.grupoId } });
-      if (!grupo) throw new BadRequestException(`El grupo con ID ${dto.grupoId} no existe`);
+      const grupo = await this.grupoRepository.findOne({
+        where: { id_grup: dto.grupoId },
+      });
+      if (!grupo)
+        throw new BadRequestException(
+          `El grupo con ID ${dto.grupoId} no existe`,
+        );
       comunicacion.grupo = grupo as any;
     }
 
     // Asociar usuario si se proporciona (usuarioId es DNI)
     if (dto.usuarioId) {
-      const usuario = await this.usuarioRepository.findOne({ where: { dni: dto.usuarioId } });
-      if (!usuario) throw new BadRequestException(`El usuario con DNI ${dto.usuarioId} no existe`);
+      const usuario = await this.usuarioRepository.findOne({
+        where: { dni: dto.usuarioId },
+      });
+      if (!usuario)
+        throw new BadRequestException(
+          `El usuario con DNI ${dto.usuarioId} no existe`,
+        );
       comunicacion.usuario = usuario as any;
     }
 
@@ -96,8 +106,11 @@ export class ComunicacionService {
       if (gid === null) {
         comunicacion.grupo = null;
       } else {
-        const grupo = await this.grupoRepository.findOne({ where: { id_grup: gid } });
-        if (!grupo) throw new BadRequestException(`El grupo con ID ${gid} no existe`);
+        const grupo = await this.grupoRepository.findOne({
+          where: { id_grup: gid },
+        });
+        if (!grupo)
+          throw new BadRequestException(`El grupo con ID ${gid} no existe`);
         comunicacion.grupo = grupo as any;
       }
     }
@@ -107,13 +120,15 @@ export class ComunicacionService {
       if (uid === null) {
         comunicacion.usuario = null as any;
       } else {
-        const usuario = await this.usuarioRepository.findOne({ where: { dni: uid } });
-        if (!usuario) throw new BadRequestException(`El usuario con DNI ${uid} no existe`);
+        const usuario = await this.usuarioRepository.findOne({
+          where: { dni: uid },
+        });
+        if (!usuario)
+          throw new BadRequestException(`El usuario con DNI ${uid} no existe`);
         comunicacion.usuario = usuario as any;
       }
     }
 
     return this.comunicacionRepository.save(comunicacion);
   }
-
 }

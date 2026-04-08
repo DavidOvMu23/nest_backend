@@ -1,6 +1,10 @@
-import { ConflictException, Injectable, BadRequestException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateUsuarioDTO, UpdateUsuarioDTO } from './usuario.dto';
 import { EstadoCuenta, Usuario } from './usuario.entity';
 import { ContactoEmergencia } from '../contacto_emergencia/contacto_emergencia.entity';
@@ -12,7 +16,7 @@ export class UsuarioService {
     private readonly usuarioRepository: Repository<Usuario>,
     @InjectRepository(ContactoEmergencia)
     private readonly contactoRepository: Repository<ContactoEmergencia>,
-  ) { }
+  ) {}
 
   async create(dto: CreateUsuarioDTO): Promise<Usuario> {
     // Campos opcionales: si llegan vacíos, los guardamos como null
@@ -62,7 +66,7 @@ export class UsuarioService {
         } as any);
         await this.contactoRepository.save(contacto);
       }
-    } catch (err) {
+    } catch {
       // No queremos que la creación del usuario falle si por algún motivo
       // la creación del contacto falla. Loggear sería ideal; por ahora
       // dejamos que la creación del usuario proceda.
@@ -134,7 +138,7 @@ export class UsuarioService {
         contacto.telefono = saved.telefono || contacto.telefono;
         await this.contactoRepository.save(contacto);
       }
-    } catch (err) {
+    } catch {
       // No queremos que falle la actualización del usuario si la sincronización falla.
     }
 

@@ -11,4 +11,4 @@ import { Usuario } from '../usuario/usuario.entity';
   controllers: [ContactoEmergenciaController],
   providers: [ContactoEmergenciaService],
 })
-export class ContactoEmergenciaModule { }
+export class ContactoEmergenciaModule {}

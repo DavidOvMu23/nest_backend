@@ -6,7 +6,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Trabajador } from '../trabajador/trabajador.entity';
+import { Trabajador, TipoTrabajador } from '../trabajador/trabajador.entity';
 import { Supervisor } from '../supervisor/supervisor.entity';
 import { Teleoperador } from '../teleoperador/teleoperador.entity';
 import { LoginDto } from './dto/login.dto';
@@ -47,16 +47,16 @@ export class AuthService {
     }
 
     // Obtener datos adicionales según el tipo de trabajador
-    let datosAdicionales: any = {};
+    const datosAdicionales: Record<string, string | number> = {};
 
-    if (trabajador.rol === 'supervisor') {
+    if (trabajador.rol === TipoTrabajador.SUPERVISOR) {
       const supervisor = await this.supervisorRepository.findOne({
         where: { correo },
       });
       if (supervisor) {
         datosAdicionales = { dni: supervisor.dni };
       }
-    } else if (trabajador.rol === 'teleoperador') {
+    } else if (trabajador.rol === TipoTrabajador.TELEOPERADOR) {
       const teleoperador = await this.teleoperadorRepository.findOne({
         where: { correo },
       });

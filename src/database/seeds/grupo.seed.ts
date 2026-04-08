@@ -9,7 +9,7 @@ export class GrupoSeed implements Seeder {
     const grupoRepository = dataSource.getRepository(Grupo);
 
     const grupoEntries = await Promise.all(
-      grupoData.map(async (grupo) => {
+      grupoData.map((grupo) => {
         const grupoEntry = new Grupo();
         grupoEntry.nombre = grupo.nombre;
         grupoEntry.descripcion = grupo.descripcion;

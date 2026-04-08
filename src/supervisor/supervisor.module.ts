@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SupervisorService } from './supervisor.service';
-import { SupervisorController } from './supervisor.controller';
 import { Supervisor } from './supervisor.entity';
 
 /**
@@ -17,4 +16,4 @@ import { Supervisor } from './supervisor.entity';
   // controllers: [SupervisorController], // Comentado porque está vacío
   exports: [SupervisorService], // Por si otro módulo quiere reutilizar la lógica.
 })
-export class SupervisorModule { }
+export class SupervisorModule {}

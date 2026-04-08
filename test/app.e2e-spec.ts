@@ -17,7 +17,8 @@ describe('AppController (e2e)', () => {
   });
 
   it('/ (GET)', () => {
-    return request(app.getHttpServer())
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return
+    return (request(app.getHttpServer() as any) as any)
       .get('/')
       .expect(200)
       .expect('Hello World!');

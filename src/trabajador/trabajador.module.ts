@@ -9,8 +9,10 @@ import { Grupo } from 'src/grupo/grupo.entity';
 
 // Módulo de Trabajador que importa las entidades, el servicio y el controlador.
 @Module({
-  imports: [TypeOrmModule.forFeature([Trabajador, Teleoperador, Supervisor, Grupo])],
+  imports: [
+    TypeOrmModule.forFeature([Trabajador, Teleoperador, Supervisor, Grupo]),
+  ],
   providers: [TrabajadorService],
   controllers: [TrabajadorController],
 })
-export class TrabajadorModule { }
+export class TrabajadorModule {}

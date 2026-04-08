@@ -44,14 +44,15 @@ export class CreateTrabajadorDTO {
     description: 'Contraseña temporal o definitiva',
     example: 'temporal123',
   })
-
-
   contrasena: string;
 
   // Rol del trabajador
   @IsEnum(TipoTrabajador)
-  @Transform(({ value }) =>
-    typeof value === 'string' ? value.toLowerCase() : value,
+  @Transform(
+    ({ value }): TipoTrabajador =>
+      typeof value === 'string'
+        ? (value.toLowerCase() as TipoTrabajador)
+        : value,
   )
   @ApiProperty({
     description: 'Rol del trabajador',
@@ -61,7 +62,10 @@ export class CreateTrabajadorDTO {
   rol: TipoTrabajador;
 
   // NIA obligatorio para teleoperadores
-  @ValidateIf((dto) => dto.rol === TipoTrabajador.TELEOPERADOR)
+
+  @ValidateIf(
+    (dto: unknown) => (dto as any)?.rol === TipoTrabajador.TELEOPERADOR,
+  )
   @IsString()
   @Matches(/^[0-9]{8}$/, { message: 'Formato de NIA incorrecto' })
   @ApiPropertyOptional({
@@ -70,7 +74,9 @@ export class CreateTrabajadorDTO {
   })
   nia?: string;
 
-  @ValidateIf((dto) => dto.rol === TipoTrabajador.TELEOPERADOR)
+  @ValidateIf(
+    (dto: unknown) => (dto as any)?.rol === TipoTrabajador.TELEOPERADOR,
+  )
   @IsNumber()
   @ApiPropertyOptional({
     description: 'Grupo al que pertenece',
@@ -78,11 +84,11 @@ export class CreateTrabajadorDTO {
   })
   grupoId?: number;
 
-  // DNI obligatorio para supervisores
-  @ValidateIf((dto) => dto.rol === TipoTrabajador.SUPERVISOR)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  @ValidateIf((dto: unknown) => (dto as any)?.rol === TipoTrabajador.SUPERVISOR)
   @IsString()
   @Matches(/^[0-9]{8}[A-Z]$/, { message: 'Formato de DNI incorrecto' })
-  @Transform(({ value }) =>
+  @Transform(({ value }): string =>
     typeof value === 'string' ? value.toUpperCase() : value,
   )
   @ApiPropertyOptional({
@@ -130,8 +136,8 @@ export class UpdateTrabajadorDTO {
 
   @IsOptional()
   @IsEnum(TipoTrabajador)
-  @Transform(({ value }) =>
-    typeof value === 'string' ? value.toLowerCase() : value,
+  @Transform(({ value }): TipoTrabajador | undefined =>
+    typeof value === 'string' ? (value.toLowerCase() as TipoTrabajador) : value,
   )
   @ApiPropertyOptional({
     description: 'Rol del trabajador',
@@ -152,7 +158,7 @@ export class UpdateTrabajadorDTO {
   @IsOptional()
   @IsString()
   @Matches(/^[0-9]{8}[A-Z]$/, { message: 'Formato de DNI incorrecto' })
-  @Transform(({ value }) =>
+  @Transform(({ value }): string | undefined =>
     typeof value === 'string' ? value.toUpperCase() : value,
   )
   @ApiPropertyOptional({

@@ -24,7 +24,7 @@ import { Notificacion } from './notificacion.entity';
 @Controller('notificacion')
 export class NotificacionController {
   // Nest crea el servicio y nos lo entrega por el constructor.
-  constructor(private readonly notificacionService: NotificacionService) { }
+  constructor(private readonly notificacionService: NotificacionService) {}
 
   // ====== CREAR ======
   @Post()
@@ -109,7 +109,6 @@ export class NotificacionController {
     }
     return this.toResponse(updated);
   }
-
 
   // ====== ELIMINAR ======
   @Delete(':id')

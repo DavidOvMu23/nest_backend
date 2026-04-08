@@ -1,4 +1,8 @@
-import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { CreateTrabajadorDTO, UpdateTrabajadorDTO } from './trabajador.dto';
@@ -20,7 +24,7 @@ export class TrabajadorService {
     private readonly supervisorRepository: Repository<Supervisor>,
     @InjectRepository(Grupo)
     private readonly grupoRepository: Repository<Grupo>,
-  ) { }
+  ) {}
 
   // Método para crear un nuevo trabajador.
   async create(dto: CreateTrabajadorDTO): Promise<Trabajador> {
@@ -29,7 +33,9 @@ export class TrabajadorService {
         ? (dto.rol.toLowerCase() as TipoTrabajador)
         : dto.rol;
 
-    const existingEmail = await this.trabajadorRepository.findOne({ where: { correo: dto.correo } });
+    const existingEmail = await this.trabajadorRepository.findOne({
+      where: { correo: dto.correo },
+    });
     if (existingEmail) {
       throw new ConflictException('El correo electrónico ya está registrado');
     }
@@ -52,7 +58,9 @@ export class TrabajadorService {
         );
       }
 
-      const existingNia = await this.teleoperadorRepository.findOne({ where: { nia: dto.nia } });
+      const existingNia = await this.teleoperadorRepository.findOne({
+        where: { nia: dto.nia },
+      });
       if (existingNia) {
         throw new ConflictException('El NIA ya está registrado');
       }
@@ -60,11 +68,13 @@ export class TrabajadorService {
       let grupo: Grupo | null = null;
       if (dto.grupoId) {
         grupo = await this.grupoRepository.findOneBy({
-          id_grup: dto.grupoId
+          id_grup: dto.grupoId,
         });
 
         if (!grupo) {
-          throw new BadRequestException(`El grupo con ID ${dto.grupoId} no existe`);
+          throw new BadRequestException(
+            `El grupo con ID ${dto.grupoId} no existe`,
+          );
         }
       }
       // Crear teleoperador
@@ -89,7 +99,6 @@ export class TrabajadorService {
       }
 
       return resultado;
-
     }
 
     // Crear supervisor
@@ -100,7 +109,9 @@ export class TrabajadorService {
         );
       }
 
-      const existingDni = await this.supervisorRepository.findOne({ where: { dni: dto.dni } });
+      const existingDni = await this.supervisorRepository.findOne({
+        where: { dni: dto.dni },
+      });
       if (existingDni) {
         throw new ConflictException('El DNI ya está registrado');
       }

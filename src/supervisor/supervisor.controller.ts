@@ -1,3 +1,1 @@
-
-export class SupervisorController {
-}
+export class SupervisorController {}

@@ -11,15 +11,9 @@ import {
   HttpStatus,
   NotFoundException,
   UnauthorizedException,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBody,
-  ApiResponseProperty,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import {
   CreateTrabajadorDTO,
   UpdateTrabajadorDTO,
@@ -35,13 +29,12 @@ import { RolesGuard } from '../auth/guard/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { AuthGuard } from '../auth/guard/auth.guard';
 
-
 // Controlador de Trabajador que maneja las rutas y las solicitudes HTTP.
 @ApiTags('trabajador')
 @Controller('trabajador')
 @UseGuards(AuthGuard, RolesGuard)
 export class TrabajadorController {
-  constructor(private readonly trabajadorService: TrabajadorService) { }
+  constructor(private readonly trabajadorService: TrabajadorService) {}
 
   // ======= Crear ========
   @Post()
@@ -186,14 +179,15 @@ export class TrabajadorController {
     status: 404,
     description: 'No encontrado',
   })
-  async findOneEmail(
-    @Body() loginDTO: LoginDTO
-  ): Promise<Trabajador> {
+  async findOneEmail(@Body() loginDTO: LoginDTO): Promise<Trabajador> {
     const user = await this.trabajadorService.findByEmail(loginDTO.correo);
     if (!user) throw new UnauthorizedException('Usuario no encontrado');
 
     // compara contraseñas
-    const isPasswordValid = await bcrypt.compare(loginDTO.contrasena, user.contrasena);
+    const isPasswordValid = await bcrypt.compare(
+      loginDTO.contrasena,
+      user.contrasena,
+    );
     if (!isPasswordValid)
       throw new UnauthorizedException('Contraseña incorrecta');
 

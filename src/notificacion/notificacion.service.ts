@@ -13,7 +13,7 @@ export class NotificacionService {
   constructor(
     @InjectRepository(Notificacion)
     private readonly notificacionRepository: Repository<Notificacion>,
-  ) { }
+  ) {}
 
   // Método para crear una nueva notificación.
   async create(dto: CreateNotificacionDTO): Promise<Notificacion> {
@@ -63,7 +63,6 @@ export class NotificacionService {
   async markAsRead(id: number): Promise<Notificacion | null> {
     return this.update(id, { estado: 'leida' });
   }
-
 
   // Método para eliminar una notificación por su ID.
   async remove(id: number): Promise<boolean> {

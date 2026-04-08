@@ -17,7 +17,7 @@ export class ContactoEmergenciaService {
     private readonly contacto_emergenciaRepository: Repository<ContactoEmergencia>,
     @InjectRepository(Usuario)
     private readonly usuarioRepository: Repository<Usuario>,
-  ) { }
+  ) {}
 
   // Crear un nuevo contacto de emergencia
   async create(dto: CreateContactoEmergenciaDTO): Promise<ContactoEmergencia> {
@@ -41,9 +41,8 @@ export class ContactoEmergenciaService {
       usuarioReferenciado,
     });
 
-    const saved = await this.contacto_emergenciaRepository.save(
-      contacto_emergencia,
-    );
+    const saved =
+      await this.contacto_emergenciaRepository.save(contacto_emergencia);
 
     await this.sincronizarUsuarioContacto(
       saved.id_cont,
@@ -116,9 +115,8 @@ export class ContactoEmergenciaService {
       }
     }
 
-    const saved = await this.contacto_emergenciaRepository.save(
-      contacto_emergencia,
-    );
+    const saved =
+      await this.contacto_emergenciaRepository.save(contacto_emergencia);
 
     await this.sincronizarUsuarioContacto(
       saved.id_cont,
@@ -160,8 +158,9 @@ export class ContactoEmergenciaService {
       .getMany();
 
     for (const usuario of usuariosConContacto) {
-      usuario.contactosEmergencia = usuario.contactosEmergencia
-        .filter((c) => c.id_cont !== contactoId);
+      usuario.contactosEmergencia = usuario.contactosEmergencia.filter(
+        (c) => c.id_cont !== contactoId,
+      );
       await this.usuarioRepository.save(usuario);
     }
 

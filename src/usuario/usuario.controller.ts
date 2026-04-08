@@ -9,8 +9,7 @@ import {
   Param,
   Patch,
   Post,
-  Query,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
@@ -29,7 +28,7 @@ import { AuthGuard } from '../auth/guard/auth.guard';
 @Controller('usuario')
 @UseGuards(AuthGuard, RolesGuard)
 export class UsuarioController {
-  constructor(private readonly usuarioService: UsuarioService) { }
+  constructor(private readonly usuarioService: UsuarioService) {}
 
   // ====== CREAR ======
   @Post()
@@ -85,7 +84,6 @@ export class UsuarioController {
     }
     return result;
   }
-
 
   // ====== ELIMINAR ======
   @Delete(':dni')

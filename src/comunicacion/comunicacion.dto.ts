@@ -1,19 +1,6 @@
-import {
-  IsEmail,
-  IsString,
-  IsOptional,
-  IsInt,
-  Min,
-  Max,
-  Length,
-  IsDateString,
-  Matches,
-  IsBoolean,
-  IsDate,
-} from 'class-validator';
+import { IsString, Length, IsDate } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { GrupoResponseDTO } from '../grupo/grupo.dto';
-import { match } from 'assert';
 
 // DTO para crear una nueva comunicación
 export class CreateComunicacionDTO {

@@ -1,17 +1,5 @@
-import {
-  IsEmail,
-  IsString,
-  IsOptional,
-  IsInt,
-  Min,
-  Max,
-  Length,
-  IsDateString,
-  Matches,
-  IsBoolean,
-} from 'class-validator';
+import { IsString, IsOptional, IsBoolean, Length } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { match } from 'assert';
 
 // DTO para crear un nuevo Grupo
 export class CreateGrupoDTO {
@@ -49,7 +37,6 @@ export class UpdateGrupoDTO {
   })
   nombre?: string;
 
-
   @IsOptional()
   @IsString()
   @Length(1, 500)
@@ -58,7 +45,6 @@ export class UpdateGrupoDTO {
     example: 'Gupo de alex y miriam',
   })
   descripcion?: string;
-
 
   @IsOptional()
   @IsBoolean()

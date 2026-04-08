@@ -17,8 +17,8 @@ async function bootstrap() {
       whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
-    })
-  )
+    }),
+  );
   const config = new DocumentBuilder()
     .setTitle('CuidemJunts API')
     .setDescription('API del backend de CuidemJunts')
@@ -34,4 +34,7 @@ async function bootstrap() {
 }
 
 // Iniciamos la aplicación
-bootstrap();
+bootstrap().catch((err) => {
+  console.error('Error during bootstrap:', err);
+  process.exit(1);
+});

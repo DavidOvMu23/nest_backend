@@ -1,3 +1,1 @@
-
-export class SupervisorService {
-}
+export class SupervisorService {}

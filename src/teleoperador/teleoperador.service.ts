@@ -1,4 +1,1 @@
-
-export class TeleoperadorService {
-
-}
+export class TeleoperadorService {}

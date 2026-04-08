@@ -1,5 +1,4 @@
 import {
-  IsEmail,
   IsOptional,
   IsString,
   Matches,
@@ -29,8 +28,9 @@ export class CreateUsuarioDTO {
   apellidos: string;
 
   @IsEnum(EstadoCuenta)
-  @Transform(({ value }) =>
-    typeof value === 'string' ? value.toLowerCase() : value,
+  @Transform(
+    ({ value }): EstadoCuenta =>
+      typeof value === 'string' ? (value.toLowerCase() as EstadoCuenta) : value,
   )
   @ApiProperty({
     description: 'Rol del trabajador',

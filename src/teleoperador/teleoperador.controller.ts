@@ -1,4 +1,1 @@
-
-export class TeleoperadorController {
-
-}
+export class TeleoperadorController {}

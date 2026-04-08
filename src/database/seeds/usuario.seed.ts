@@ -7,8 +7,9 @@ import { EstadoCuenta, Usuario } from '../../usuario/usuario.entity';
 export class UsuarioSeed implements Seeder {
   public async run(dataSource: DataSource): Promise<void> {
     const usuarioRepository = dataSource.getRepository(Usuario);
+
     const usuarioEntries = await Promise.all(
-      usuarioData.map(async (usuario) => {
+      usuarioData.map((usuario) => {
         const usuarioEntry = new Usuario();
         usuarioEntry.dni = usuario.dni;
         usuarioEntry.nombre = usuario.nombre;

@@ -13,7 +13,7 @@ export class ComunicacionService {
   constructor(
     @InjectRepository(Comunicacion)
     private readonly comunicacionRepository: Repository<Comunicacion>,
-  ) { }
+  ) {}
 
   // ====== MÉTODOS CRUD ======
   // Crear una nueva comunicación
@@ -70,5 +70,4 @@ export class ComunicacionService {
 
     return this.comunicacionRepository.save(comunicacion);
   }
-
 }

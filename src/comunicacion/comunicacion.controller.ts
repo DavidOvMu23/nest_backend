@@ -3,14 +3,11 @@ import {
   Get,
   Post,
   Patch,
-  Delete,
   Body,
   Param,
   ParseIntPipe,
-  HttpCode,
-  HttpStatus,
   NotFoundException,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import {
@@ -24,14 +21,13 @@ import { RolesGuard } from '../auth/guard/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { AuthGuard } from '../auth/guard/auth.guard';
 
-
 // Controlador para gestionar las comunicaciones (es lo que engloba llamadas, mensajes, etc.).
 @ApiTags('comunicacion') // Etiqueta bonita para Swagger.
 @Controller('comunicacion')
 @UseGuards(AuthGuard, RolesGuard)
 export class ComunicacionController {
   // Nest crea el servicio y nos lo entrega por el constructor.
-  constructor(private readonly comunicationsService: ComunicacionService) { }
+  constructor(private readonly comunicationsService: ComunicacionService) {}
 
   // ====== CREAR ======
   @Post()
@@ -102,7 +98,6 @@ export class ComunicacionController {
     return this.toResponse(updated);
   }
 
-
   /**
    * Función privada para centralizar cómo transformamos la entidad a DTO.
    * Así evitamos repetir lógica en cada método.
@@ -129,11 +124,11 @@ export class ComunicacionController {
       observaciones,
       grupo: grupo
         ? {
-          id_grup: grupo.id_grup,
-          nombre: grupo.nombre,
-          descripcion: grupo.descripcion,
-          activo: grupo.activo,
-        }
+            id_grup: grupo.id_grup,
+            nombre: grupo.nombre,
+            descripcion: grupo.descripcion,
+            activo: grupo.activo,
+          }
         : undefined,
     };
   }

@@ -13,7 +13,6 @@ import * as bcrypt from 'bcrypt';
 // Seed para la entidad Trabajador, lo que hace es poblar la tabla Trabajador con datos iniciales definidos en el archivo data/trabajador.ts
 export class TrabajadorSeeder implements Seeder {
   public async run(dataSource: DataSource) {
-    const trabajadorRepo = dataSource.getRepository(Trabajador);
     const supervisorRepo = dataSource.getRepository(Supervisor);
     const teleoperadorRepo = dataSource.getRepository(Teleoperador);
     const grupoRepo = dataSource.getRepository(Grupo);

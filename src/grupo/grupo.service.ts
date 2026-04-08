@@ -10,15 +10,16 @@ export class GrupoService {
   constructor(
     @InjectRepository(Grupo)
     private readonly grupoRepository: Repository<Grupo>,
-  ) { }
+  ) {}
 
   // Crear un nuevo Grupo
   async create(dto: CreateGrupoDTO): Promise<Grupo> {
-    const existingGrupo = await this.grupoRepository.findOne({ where: { nombre: dto.nombre } });
+    const existingGrupo = await this.grupoRepository.findOne({
+      where: { nombre: dto.nombre },
+    });
     if (existingGrupo) {
       throw new ConflictException('El grupo con este nombre ya existe');
     }
-
 
     const grupo = this.grupoRepository.create({
       nombre: dto.nombre,

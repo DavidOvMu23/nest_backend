@@ -13,8 +13,10 @@ export class AuthGuard implements CanActivate {
   constructor(private readonly jwtService: JwtService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const token = this.extractTokenFromHeader(request as unknown as any);
 
     if (!token) {
       throw new UnauthorizedException('Token no proporcionado');
@@ -24,8 +26,9 @@ export class AuthGuard implements CanActivate {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: jwtConstants.secret,
       });
-      request.user = payload;
-    } catch (error) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+      (request as unknown as any).user = payload;
+    } catch {
       throw new UnauthorizedException('Token inválido o expirado');
     }
 

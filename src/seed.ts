@@ -1,10 +1,5 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
-import {
-  runSeeder,
-  runSeeders,
-  Seeder,
-  SeederOptions,
-} from 'typeorm-extension';
+import { runSeeders, SeederOptions } from 'typeorm-extension';
 //Comunicación
 import { Comunicacion } from './comunicacion/comunicacion.entity';
 import { ComunicacionSeed } from './database/seeds/comunicacion.seed';

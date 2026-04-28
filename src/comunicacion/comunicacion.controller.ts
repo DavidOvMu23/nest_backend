@@ -30,7 +30,7 @@ import { AuthGuard } from '../auth/guard/auth.guard';
 @UseGuards(AuthGuard, RolesGuard)
 export class ComunicacionController {
   // Nest crea el servicio y nos lo entrega por el constructor.
-  constructor(private readonly comunicationsService: ComunicacionService) { }
+  constructor(private readonly comunicationsService: ComunicacionService) {}
 
   // ====== CREAR ======
   @Post()
@@ -145,18 +145,18 @@ export class ComunicacionController {
       observaciones,
       grupo: grupo
         ? {
-          id_grup: grupo.id_grup,
-          nombre: grupo.nombre,
-          descripcion: grupo.descripcion,
-          activo: grupo.activo,
-        }
+            id_grup: grupo.id_grup,
+            nombre: grupo.nombre,
+            descripcion: grupo.descripcion,
+            activo: grupo.activo,
+          }
         : undefined,
       usuario: usuario
         ? {
-          id_usu: usuario.dni,
-          nombre: usuario.nombre,
-          apellidos: usuario.apellidos,
-        }
+            id_usu: usuario.dni,
+            nombre: usuario.nombre,
+            apellidos: usuario.apellidos,
+          }
         : undefined,
     };
   }

@@ -22,7 +22,7 @@ export class AuthService {
     private readonly supervisorRepository: Repository<Supervisor>,
     @InjectRepository(Teleoperador)
     private readonly teleoperadorRepository: Repository<Teleoperador>,
-  ) {}
+  ) { }
 
   async login(loginDto: LoginDto) {
     const { correo, contrasena } = loginDto;
@@ -47,7 +47,7 @@ export class AuthService {
     }
 
     // Obtener datos adicionales según el tipo de trabajador
-    const datosAdicionales: Record<string, string | number> = {};
+    let datosAdicionales: Record<string, string | number> = {};
 
     if (trabajador.rol === TipoTrabajador.SUPERVISOR) {
       const supervisor = await this.supervisorRepository.findOne({
@@ -64,7 +64,7 @@ export class AuthService {
       if (teleoperador) {
         datosAdicionales = {
           nia: teleoperador.nia,
-          grupoId: teleoperador.grupo?.id_grup,
+          grupoId: teleoperador.grupo?.id_grup ?? 0,
         };
       }
     }

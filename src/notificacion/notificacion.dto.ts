@@ -1,7 +1,8 @@
-import { IsOptional, IsString, Length } from 'class-validator';
+import { IsOptional, IsString, Length, IsEnum, IsObject } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { EstadoNotificacion, TipoNotificacion } from './notificacion.entity';
 
-// DTO para crear una notificación.
+// DTO para crear una notificación
 export class CreateNotificacionDTO {
   @IsString()
   @Length(1, 500)
@@ -11,16 +12,32 @@ export class CreateNotificacionDTO {
   })
   contenido: string;
 
-  @IsString()
-  @Length(1, 500)
-  @ApiProperty({
+  @IsEnum(EstadoNotificacion)
+  @ApiPropertyOptional({
     description: 'Estado de la notificación',
-    example: 'sin_leer',
+    enum: EstadoNotificacion,
+    example: EstadoNotificacion.SIN_LEER,
   })
-  estado: string;
+  estado?: EstadoNotificacion = EstadoNotificacion.SIN_LEER;
+
+  @IsEnum(TipoNotificacion)
+  @ApiPropertyOptional({
+    description: 'Tipo de notificación',
+    enum: TipoNotificacion,
+    example: TipoNotificacion.OTRO,
+  })
+  tipo?: TipoNotificacion = TipoNotificacion.OTRO;
+
+  @IsObject()
+  @IsOptional()
+  @ApiPropertyOptional({
+    description: 'Metadata opcional para acciones contextuales',
+    example: { usuarioId: 1, accion: 'view' },
+  })
+  metadata?: Record<string, any>;
 }
 
-// DTO para actualizar una notificación (parcial).
+// DTO para actualizar una notificación
 export class UpdateNotificacionDTO {
   @IsOptional()
   @IsString()
@@ -32,29 +49,71 @@ export class UpdateNotificacionDTO {
   contenido?: string;
 
   @IsOptional()
-  @IsString()
-  @Length(1, 500)
+  @IsEnum(EstadoNotificacion)
   @ApiPropertyOptional({
     description: 'Estado de la notificación',
-    example: 'sin_leer',
+    enum: EstadoNotificacion,
+    example: EstadoNotificacion.LEIDA,
   })
-  estado?: string;
+  estado?: EstadoNotificacion;
+
+  @IsOptional()
+  @IsEnum(TipoNotificacion)
+  @ApiPropertyOptional({
+    description: 'Tipo de notificación',
+    enum: TipoNotificacion,
+  })
+  tipo?: TipoNotificacion;
+
+  @IsOptional()
+  @IsObject()
+  @ApiPropertyOptional({
+    description: 'Metadata opcional',
+    example: { usuarioId: 1 },
+  })
+  metadata?: Record<string, any>;
 }
 
-// DTO para la respuesta de una notificación.
+// DTO para respuesta de notificación (con timestamps)
 export class NotificacionResponseDTO {
   @ApiProperty({ description: 'Identificador único', example: 1 })
   id_not: number;
 
   @ApiProperty({
     description: 'Contenido de la notificación',
-    example: 'Tienes 3 llamadas programadas para hoy a partir de las 10:00.',
+    example: 'Tienes 3 llamadas programadas para hoy.',
   })
   contenido: string;
 
   @ApiProperty({
     description: 'Estado de la notificación',
-    example: 'sin_leer',
+    enum: EstadoNotificacion,
+    example: EstadoNotificacion.SIN_LEER,
   })
-  estado: string;
+  estado: EstadoNotificacion;
+
+  @ApiProperty({
+    description: 'Tipo de notificación',
+    enum: TipoNotificacion,
+    example: TipoNotificacion.USUARIO_NUEVO,
+  })
+  tipo: TipoNotificacion;
+
+  @ApiPropertyOptional({
+    description: 'Metadata adicional',
+    example: { usuarioId: 1 },
+  })
+  metadata?: Record<string, any>;
+
+  @ApiProperty({
+    description: 'Fecha de creación',
+    example: '2026-04-28T10:00:00.000Z',
+  })
+  createdAt: Date;
+
+  @ApiProperty({
+    description: 'Fecha de última actualización',
+    example: '2026-04-28T10:05:00.000Z',
+  })
+  updatedAt: Date;
 }

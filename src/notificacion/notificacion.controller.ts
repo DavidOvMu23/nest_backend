@@ -6,25 +6,26 @@ import {
   Delete,
   Body,
   Param,
+  Query,
   ParseIntPipe,
   HttpCode,
   HttpStatus,
   NotFoundException,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiQuery } from '@nestjs/swagger';
 import {
   CreateNotificacionDTO,
   UpdateNotificacionDTO,
   NotificacionResponseDTO,
 } from './notificacion.dto';
 import { NotificacionService } from './notificacion.service';
-import { Notificacion } from './notificacion.entity';
+import { Notificacion, EstadoNotificacion, TipoNotificacion } from './notificacion.entity';
 
 @ApiTags('notificacion') // Etiqueta bonita para Swagger.
 @Controller('notificacion')
 export class NotificacionController {
   // Nest crea el servicio y nos lo entrega por el constructor.
-  constructor(private readonly notificacionService: NotificacionService) {}
+  constructor(private readonly notificacionService: NotificacionService) { }
 
   // ====== CREAR ======
   @Post()
@@ -40,45 +41,100 @@ export class NotificacionController {
     return this.toResponse(created);
   }
 
-  // ====== OBTENER UNO ======
+  // ====== OBTENER UNA NOTIFICACIÓN ======
   @Get(':id')
-  @ApiOperation({ summary: 'Obtener notificacion por id' })
+  @ApiOperation({ summary: 'Obtener notificación por ID' })
   @ApiResponse({
     status: 200,
-    description: 'Notificacion encontrada',
+    description: 'Notificación encontrada',
     type: NotificacionResponseDTO,
   })
   @ApiResponse({ status: 404, description: 'No encontrada' })
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Notificacion> {
-    // ParseIntPipe convierte el parámetro a number y lanza 400 si no puede.
+  async findOne(@Param('id', ParseIntPipe) id: number) {
     const found = await this.notificacionService.findOne(id);
     if (!found) {
-      // Lanzamos 404 si el registro no existe.
-      throw new NotFoundException(`Notificacion con id ${id} no encontrada`);
+      throw new NotFoundException(`Notificación con id ${id} no encontrada`);
     }
-    return found;
+    return this.toResponse(found);
   }
 
-  // ====== LISTAR TODOS ======
+  // ====== LISTAR NOTIFICACIONES CON FILTROS ======
   @Get()
-  @ApiOperation({ summary: 'Listar todas las notificaciones' })
+  @ApiOperation({ summary: 'Listar notificaciones con filtros opcionales' })
+  @ApiQuery({
+    name: 'teleoperadorId',
+    required: false,
+    type: Number,
+    description: 'Filtrar por ID del teleoperador',
+  })
+  @ApiQuery({
+    name: 'estado',
+    required: false,
+    enum: EstadoNotificacion,
+    description: 'Filtrar por estado',
+  })
+  @ApiQuery({
+    name: 'tipo',
+    required: false,
+    enum: TipoNotificacion,
+    description: 'Filtrar por tipo',
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    type: String,
+    description: 'Buscar en contenido',
+  })
+  @ApiQuery({
+    name: 'skip',
+    required: false,
+    type: Number,
+    description: 'Saltar N notificaciones',
+  })
+  @ApiQuery({
+    name: 'take',
+    required: false,
+    type: Number,
+    description: 'Tomar N notificaciones',
+  })
   @ApiResponse({
     status: 200,
     description: 'Lista de notificaciones',
-    type: NotificacionResponseDTO,
-    isArray: true,
+    schema: {
+      properties: {
+        data: {
+          type: 'array',
+          items: { $ref: '#/components/schemas/NotificacionResponseDTO' },
+        },
+        total: { type: 'number' },
+      },
+    },
   })
-  async findAll() {
-    return await this.notificacionService.findAll();
+  async findAll(
+    @Query('teleoperadorId', new ParseIntPipe({ optional: true })) teleoperadorId?: number,
+    @Query('estado') estado?: EstadoNotificacion,
+    @Query('tipo') tipo?: TipoNotificacion,
+    @Query('search') search?: string,
+    @Query('skip', new ParseIntPipe({ optional: true })) skip?: number,
+    @Query('take', new ParseIntPipe({ optional: true })) take?: number,
+  ) {
+    return await this.notificacionService.findAll(
+      teleoperadorId,
+      estado,
+      tipo,
+      search,
+      skip ?? 0,
+      take ?? 20,
+    );
   }
 
-  // ====== ACTUALIZAR ======
+  // ====== ACTUALIZAR NOTIFICACIÓN ======
   @Patch(':id')
-  @ApiOperation({ summary: 'Actualizar notificacion' })
+  @ApiOperation({ summary: 'Actualizar notificación' })
   @ApiBody({ type: UpdateNotificacionDTO })
   @ApiResponse({
     status: 200,
-    description: 'Notificacion actualizada',
+    description: 'Notificación actualizada',
     type: NotificacionResponseDTO,
   })
   @ApiResponse({ status: 404, description: 'No encontrada' })
@@ -88,40 +144,82 @@ export class NotificacionController {
   ) {
     const updated = await this.notificacionService.update(id, updateDto);
     if (!updated) {
-      throw new NotFoundException(`Notificacion con id ${id} no encontrada`);
+      throw new NotFoundException(`Notificación con id ${id} no encontrada`);
     }
     return this.toResponse(updated);
   }
 
-  // ====== MARCAR LEÍDA ======
+  // ====== MARCAR COMO LEÍDA ======
   @Patch(':id/mark-read')
-  @ApiOperation({ summary: 'Marcar notificacion como leída' })
+  @ApiOperation({ summary: 'Marcar notificación como leída' })
   @ApiResponse({
     status: 200,
-    description: 'Notificacion marcada como leída',
+    description: 'Notificación marcada como leída',
     type: NotificacionResponseDTO,
   })
   @ApiResponse({ status: 404, description: 'No encontrada' })
   async markAsRead(@Param('id', ParseIntPipe) id: number) {
     const updated = await this.notificacionService.markAsRead(id);
     if (!updated) {
-      throw new NotFoundException(`Notificacion con id ${id} no encontrada`);
+      throw new NotFoundException(`Notificación con id ${id} no encontrada`);
     }
     return this.toResponse(updated);
   }
 
-  // ====== ELIMINAR ======
+  // ====== ARCHIVAR NOTIFICACIÓN ======
+  @Patch(':id/archive')
+  @ApiOperation({ summary: 'Archivar notificación' })
+  @ApiResponse({
+    status: 200,
+    description: 'Notificación archivada',
+    type: NotificacionResponseDTO,
+  })
+  @ApiResponse({ status: 404, description: 'No encontrada' })
+  async archive(@Param('id', ParseIntPipe) id: number) {
+    const updated = await this.notificacionService.archive(id);
+    if (!updated) {
+      throw new NotFoundException(`Notificación con id ${id} no encontrada`);
+    }
+    return this.toResponse(updated);
+  }
+
+  // ====== MARCAR TODAS COMO LEÍDAS ======
+  @Patch('user/:teleoperadorId/mark-all-read')
+  @ApiOperation({ summary: 'Marcar todas las notificaciones como leídas para un usuario' })
+  @ApiResponse({
+    status: 200,
+    description: 'Notificaciones marcadas como leídas',
+    schema: { properties: { affected: { type: 'number' } } },
+  })
+  async markAllAsRead(@Param('teleoperadorId', ParseIntPipe) teleoperadorId: number) {
+    const affected = await this.notificacionService.markAllAsRead(teleoperadorId);
+    return { affected };
+  }
+
+  // ====== ELIMINAR NOTIFICACIÓN ======
   @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT) // HTTP 204 = se borró, no hace falta cuerpo de respuesta.
-  @ApiOperation({ summary: 'Eliminar notificacion' })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Eliminar notificación' })
   @ApiResponse({ status: 204, description: 'Eliminada correctamente' })
-  @ApiResponse({ status: 404, description: 'No encontrado' })
+  @ApiResponse({ status: 404, description: 'No encontrada' })
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     const removed = await this.notificacionService.remove(id);
     if (!removed) {
-      throw new NotFoundException(`Notificacion con id ${id} no encontrada`);
+      throw new NotFoundException(`Notificación con id ${id} no encontrada`);
     }
-    // No devolvemos nada porque el 204 indica “todo bien, sin contenido”.
+  }
+
+  // ====== LIMPIAR NOTIFICACIONES ARCHIVADAS ======
+  @Delete('user/:teleoperadorId/archived')
+  @ApiOperation({ summary: 'Eliminar todas las notificaciones archivadas de un usuario' })
+  @ApiResponse({
+    status: 200,
+    description: 'Notificaciones archivadas eliminadas',
+    schema: { properties: { affected: { type: 'number' } } },
+  })
+  async removeArchived(@Param('teleoperadorId', ParseIntPipe) teleoperadorId: number) {
+    const affected = await this.notificacionService.removeArchived(teleoperadorId);
+    return { affected };
   }
 
   /**
@@ -129,11 +227,14 @@ export class NotificacionController {
    * Así evitamos repetir lógica en cada método.
    */
   private toResponse(notificacion: Notificacion): NotificacionResponseDTO {
-    const { id_not, contenido, estado } = notificacion;
     return {
-      id_not,
-      contenido,
-      estado,
+      id_not: notificacion.id_not,
+      contenido: notificacion.contenido,
+      estado: notificacion.estado,
+      tipo: notificacion.tipo,
+      metadata: notificacion.metadata,
+      createdAt: notificacion.createdAt,
+      updatedAt: notificacion.updatedAt,
     };
   }
 }

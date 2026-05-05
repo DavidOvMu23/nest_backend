@@ -11,7 +11,12 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import {
   CreateUsuarioDTO,
   UpdateUsuarioDTO,
@@ -25,10 +30,11 @@ import { AuthGuard } from '../auth/guard/auth.guard';
 
 // Controlador de Usuario que maneja las rutas y las solicitudes HTTP.
 @ApiTags('usuario')
+@ApiBearerAuth('access-token') // Requiere Bearer token en TODOS los endpoints
 @Controller('usuario')
 @UseGuards(AuthGuard, RolesGuard)
 export class UsuarioController {
-  constructor(private readonly usuarioService: UsuarioService) {}
+  constructor(private readonly usuarioService: UsuarioService) { }
 
   // ====== CREAR ======
   @Post()

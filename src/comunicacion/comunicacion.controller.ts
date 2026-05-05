@@ -12,7 +12,13 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import {
   CreateComunicacionDTO,
   UpdateComunicacionDTO,
@@ -26,11 +32,12 @@ import { AuthGuard } from '../auth/guard/auth.guard';
 
 // Controlador para gestionar las comunicaciones (es lo que engloba llamadas, mensajes, etc.).
 @ApiTags('comunicacion') // Etiqueta bonita para Swagger.
+@ApiBearerAuth('access-token') // Requiere Bearer token en TODOS los endpoints
 @Controller('comunicacion')
 @UseGuards(AuthGuard, RolesGuard)
 export class ComunicacionController {
   // Nest crea el servicio y nos lo entrega por el constructor.
-  constructor(private readonly comunicationsService: ComunicacionService) {}
+  constructor(private readonly comunicationsService: ComunicacionService) { }
 
   // ====== CREAR ======
   @Post()
@@ -145,18 +152,18 @@ export class ComunicacionController {
       observaciones,
       grupo: grupo
         ? {
-            id_grup: grupo.id_grup,
-            nombre: grupo.nombre,
-            descripcion: grupo.descripcion,
-            activo: grupo.activo,
-          }
+          id_grup: grupo.id_grup,
+          nombre: grupo.nombre,
+          descripcion: grupo.descripcion,
+          activo: grupo.activo,
+        }
         : undefined,
       usuario: usuario
         ? {
-            id_usu: usuario.dni,
-            nombre: usuario.nombre,
-            apellidos: usuario.apellidos,
-          }
+          id_usu: usuario.dni,
+          nombre: usuario.nombre,
+          apellidos: usuario.apellidos,
+        }
         : undefined,
     };
   }

@@ -12,7 +12,13 @@ import {
   NotFoundException,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import {
   CreateContactoEmergenciaDTO,
   UpdateContactoEmergenciaDTO,
@@ -26,13 +32,14 @@ import { AuthGuard } from '../auth/guard/auth.guard';
 
 // Controlador de Contacto de Emergencia.
 @ApiTags('contacto_emergencia') // Etiqueta bonita para Swagger.
+@ApiBearerAuth('access-token') // Requiere Bearer token en TODOS los endpoints
 @Controller('contacto_emergencia')
 @UseGuards(AuthGuard, RolesGuard)
 export class ContactoEmergenciaController {
   // Nest crea el servicio y nos lo entrega por el constructor.
   constructor(
     private readonly contacto_emergenciaService: ContactoEmergenciaService,
-  ) {}
+  ) { }
 
   // ====== CREAR ======
   @Post()

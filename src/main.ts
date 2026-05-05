@@ -19,12 +19,19 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
   const config = new DocumentBuilder()
     .setTitle('CuidemJunts API')
     .setDescription('API del backend de CuidemJunts')
     .setVersion('1.0')
+    // Agregar soporte para Bearer token
+    .addBearerAuth(
+      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+      'access-token',
+    )
     .addTag('supervisors')
     .build();
+
   // Creamos el documento una vez y lo pasamos a setup para que Swagger UI funcione.
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

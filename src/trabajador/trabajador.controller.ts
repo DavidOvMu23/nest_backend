@@ -13,7 +13,13 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import {
   CreateTrabajadorDTO,
   UpdateTrabajadorDTO,
@@ -31,10 +37,11 @@ import { AuthGuard } from '../auth/guard/auth.guard';
 
 // Controlador de Trabajador que maneja las rutas y las solicitudes HTTP.
 @ApiTags('trabajador')
+@ApiBearerAuth('access-token') // Requiere Bearer token en TODOS los endpoints
 @Controller('trabajador')
 @UseGuards(AuthGuard, RolesGuard)
 export class TrabajadorController {
-  constructor(private readonly trabajadorService: TrabajadorService) {}
+  constructor(private readonly trabajadorService: TrabajadorService) { }
 
   // ======= Crear ========
   @Post()

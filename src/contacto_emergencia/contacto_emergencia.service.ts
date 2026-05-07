@@ -47,9 +47,10 @@ export class ContactoEmergenciaService {
       : (savedRaw as ContactoEmergencia);
 
     // sincronizar asociaciones many-to-many usando lista de DNIs si se proporcionó
-    const usuariosDnis =
+    const usuariosDnis = (
       dto.usuariosDnis ??
-      (usuarioReferenciado ? [usuarioReferenciado.dni] : []);
+      (usuarioReferenciado ? [usuarioReferenciado.dni] : [])
+    ).filter((d) => d.toUpperCase() !== (dto.dniUsuarioRef ?? '').toUpperCase());
     await this.sincronizarUsuarioContactoBulk(saved.id_cont, usuariosDnis);
 
     return this.contacto_emergenciaRepository.findOne({
@@ -95,18 +96,9 @@ export class ContactoEmergenciaService {
       return null;
     }
 
-    // Si este contacto está vinculado a un usuario real, no permitimos editarlo
-    // desde el servicio de contactos; debe editarse desde el perfil del cliente.
-    if (contacto_emergencia.usuarioReferenciado) {
-      throw new BadRequestException(
-        'Este contacto está vinculado a un usuario. Edita sus datos desde el perfil del cliente.',
-      );
-    }
-
-    // Si el contacto fue generado automáticamente al crear un usuario, solo
-    // permitimos modificar la lista `usuariosDnis` (asociaciones). No se permite
-    // cambiar nombre/apellidos/telefono o dniUsuarioRef desde aquí.
-    if (contacto_emergencia.creado_desde_usuario) {
+    // Si es un contacto de sistema (vinculado a un usuario o creado automáticamente),
+    // solo permitimos actualizar las asociaciones (usuariosDnis).
+    if (contacto_emergencia.usuarioReferenciado || contacto_emergencia.creado_desde_usuario) {
       if (
         dto.nombre !== undefined ||
         dto.apellidos !== undefined ||
@@ -114,7 +106,7 @@ export class ContactoEmergenciaService {
         dto.dniUsuarioRef !== undefined
       ) {
         throw new BadRequestException(
-          'Este contacto fue generado automáticamente al crear un cliente. No se permite editar su información básica desde aquí; solo puedes asociarlo a más usuarios mediante `usuariosDnis`.',
+          'Este contacto está vinculado a un usuario del sistema. Solo puedes modificar los usuarios asignados.',
         );
       }
     } else {
@@ -149,10 +141,11 @@ export class ContactoEmergenciaService {
 
     // Si se proporcionó lista de DNIs, sincronizamos asociaciones many-to-many
     if (dto.usuariosDnis !== undefined) {
-      await this.sincronizarUsuarioContactoBulk(
-        saved.id_cont,
-        dto.usuariosDnis ?? [],
+      const selfDni = (contacto_emergencia.usuarioReferenciado?.dni ?? '').toUpperCase();
+      const dnisSinSiMismo = (dto.usuariosDnis ?? []).filter(
+        (d) => d.toUpperCase() !== selfDni,
       );
+      await this.sincronizarUsuarioContactoBulk(saved.id_cont, dnisSinSiMismo);
     } else {
       // mantener comportamiento previo: sincronizar con usuarioReferenciado
       await this.sincronizarUsuarioContacto(

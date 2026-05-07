@@ -51,8 +51,7 @@ export class UsuarioService {
 
     try {
       const existingContact = await this.contactoRepository.findOne({
-        where: { usuarios: { dni: savedUsuario.dni } },
-        relations: ['usuarios'],
+        where: { usuarioReferenciado: { dni: savedUsuario.dni } },
       });
 
       if (!existingContact) {
@@ -60,8 +59,7 @@ export class UsuarioService {
           nombre: savedUsuario.nombre,
           apellidos: savedUsuario.apellidos,
           telefono: savedUsuario.telefono || '',
-          // No referenciar al usuario para evitar que el contacto apunte a sí mismo
-          usuarioReferenciado: null,
+          usuarioReferenciado: savedUsuario,
           creado_desde_usuario: true,
         } as any);
         await this.contactoRepository.save(contacto);
@@ -159,6 +157,18 @@ export class UsuarioService {
       throw new BadRequestException(
         'Este usuario fue creado desde la app cliente. Elimínalo desde la app cliente.',
       );
+    }
+
+    // Eliminar el contacto de emergencia auto-creado vinculado a este usuario
+    const contactoPropio = await this.contactoRepository.findOne({
+      where: { usuarioReferenciado: { dni }, creado_desde_usuario: true },
+      relations: { usuarios: true },
+    });
+    if (contactoPropio) {
+      // Limpiar filas de la tabla junction antes de borrar el contacto
+      contactoPropio.usuarios = [];
+      await this.contactoRepository.save(contactoPropio);
+      await this.contactoRepository.delete({ id_cont: contactoPropio.id_cont });
     }
 
     usuario.estado_cuenta = EstadoCuenta.SUSPENDIDO;

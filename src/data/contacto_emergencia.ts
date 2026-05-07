@@ -1,38 +1,35 @@
+// Contactos externos: personas que NO son usuarios del sistema (familiares, vecinos, médicos...)
+// Los contactos de usuarios internos los crea automáticamente el UsuarioSeed.
+// IDs resultantes: 1-5
 export default [
   {
-    nombre: 'Laura',
-    apellidos: 'Rodríguez Pérez',
-    telefono: '645678901',
-    dni_usuario_ref: '88888888H',
-  },
-  {
-    nombre: 'Antonio',
-    apellidos: 'López García',
-    telefono: '678112233',
-    dni_usuario_ref: '77777777G',
-  },
-  {
-    nombre: 'Pedro',
-    apellidos: 'Martínez Gómez',
-    telefono: '698765432',
-    dni_usuario_ref: '99999999J',
-  },
-  {
+    // ID 1 — hija de José Martínez Ruiz
     nombre: 'Marta',
-    apellidos: 'Vega Ríos',
-    telefono: '600400400',
-    dni_usuario_ref: '22222222B',
+    apellidos: 'Ruiz García',
+    telefono: '611000001',
   },
   {
-    nombre: 'Carmen',
-    apellidos: 'Ruiz Díaz',
-    telefono: '612398765',
-    dni_usuario_ref: '33333333C',
+    // ID 2 — hijo de María González López
+    nombre: 'Carlos',
+    apellidos: 'González Pérez',
+    telefono: '611000002',
   },
   {
-    nombre: 'Carmen',
-    apellidos: 'Rodríguez Sanz',
-    telefono: '634567890',
-    dni_usuario_ref: '11111111A',
+    // ID 3 — hija de Dolores Quintana Lara
+    nombre: 'Sofía',
+    apellidos: 'Quintana Torres',
+    telefono: '611000003',
+  },
+  {
+    // ID 4 — vecino de Eduardo Iglesias Vela
+    nombre: 'Ramón',
+    apellidos: 'Vega Llopis',
+    telefono: '611000004',
+  },
+  {
+    // ID 5 — médica de cabecera de Antonio López García
+    nombre: 'Isabel',
+    apellidos: 'López Herrera',
+    telefono: '611000005',
   },
 ];

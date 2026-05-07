@@ -1,6 +1,7 @@
 import {
   IsOptional,
   IsString,
+  IsBoolean,
   Length,
   Matches,
   IsArray,
@@ -55,6 +56,8 @@ export class CreateContactoEmergenciaDTO {
   })
   usuariosDnis?: string[];
 
+  @IsOptional()
+  @IsBoolean()
   @ApiPropertyOptional({
     description:
       'Indica si el contacto fue generado automáticamente al crear un usuario',
@@ -112,6 +115,8 @@ export class UpdateContactoEmergenciaDTO {
   })
   usuariosDnis?: string[];
 
+  @IsOptional()
+  @IsBoolean()
   @ApiPropertyOptional({
     description:
       'Indica si el contacto fue generado automáticamente al crear un usuario',

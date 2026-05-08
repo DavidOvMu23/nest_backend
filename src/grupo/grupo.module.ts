@@ -3,10 +3,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { GrupoService } from './grupo.service';
 import { GrupoController } from './grupo.controller';
 import { Grupo } from './grupo.entity';
+import { Teleoperador } from '../teleoperador/teleoperador.entity';
 
-// Módulo de Grupo que importa la entidad Grupo, el servicio y el controlador.
 @Module({
-  imports: [TypeOrmModule.forFeature([Grupo])],
+  imports: [TypeOrmModule.forFeature([Grupo, Teleoperador])],
   providers: [GrupoService],
   controllers: [GrupoController],
 })

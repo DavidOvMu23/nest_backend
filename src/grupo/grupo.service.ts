@@ -3,16 +3,17 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateGrupoDTO, UpdateGrupoDTO } from './grupo.dto';
 import { Grupo } from './grupo.entity';
+import { Teleoperador } from '../teleoperador/teleoperador.entity';
 
-// Servicio para la entidad Grupo que maneja la lógica de negocio.
 @Injectable()
 export class GrupoService {
   constructor(
     @InjectRepository(Grupo)
     private readonly grupoRepository: Repository<Grupo>,
+    @InjectRepository(Teleoperador)
+    private readonly teleoperadorRepository: Repository<Teleoperador>,
   ) {}
 
-  // Crear un nuevo Grupo
   async create(dto: CreateGrupoDTO): Promise<Grupo> {
     const existingGrupo = await this.grupoRepository.findOne({
       where: { nombre: dto.nombre },
@@ -30,17 +31,17 @@ export class GrupoService {
     return this.grupoRepository.save(grupo);
   }
 
-  // Listar todos los Grupos activos
   async findAll(): Promise<Grupo[]> {
-    return this.grupoRepository.find({ where: { activo: true } });
+    return this.grupoRepository.find({ relations: ['teleoperadores'] });
   }
 
-  // Obtener un Grupo por su ID
   async findOne(id: number): Promise<Grupo | null> {
-    return this.grupoRepository.findOne({ where: { id_grup: id } });
+    return this.grupoRepository.findOne({
+      where: { id_grup: id },
+      relations: ['teleoperadores'],
+    });
   }
 
-  // Actualizar un Grupo existente
   async update(id: number, dto: UpdateGrupoDTO): Promise<Grupo | null> {
     const grupo = await this.grupoRepository.findOne({
       where: { id_grup: id },
@@ -49,14 +50,25 @@ export class GrupoService {
       return null;
     }
 
+    const estabaActivo = grupo.activo;
+
     if (dto.nombre !== undefined) grupo.nombre = dto.nombre;
     if (dto.descripcion !== undefined) grupo.descripcion = dto.descripcion;
     if (dto.activo !== undefined) grupo.activo = dto.activo;
 
-    return this.grupoRepository.save(grupo);
+    await this.grupoRepository.save(grupo);
+
+    // Si se acaba de desactivar el grupo, desactivar también sus teleoperadores
+    if (dto.activo === false && estabaActivo) {
+      await this._desactivarTeleoperadoresDelGrupo(id);
+    }
+
+    return this.grupoRepository.findOne({
+      where: { id_grup: id },
+      relations: ['teleoperadores'],
+    });
   }
 
-  // Eliminar (desactivar) un Grupo por su ID
   async remove(id: number): Promise<boolean> {
     const grupo = await this.grupoRepository.findOne({
       where: { id_grup: id },
@@ -65,9 +77,23 @@ export class GrupoService {
       return false;
     }
 
-    // Soft delete: marcamos el registro como inactivo en lugar de borrarlo.
+    await this._desactivarTeleoperadoresDelGrupo(id);
+
     grupo.activo = false;
     await this.grupoRepository.save(grupo);
     return true;
+  }
+
+  private async _desactivarTeleoperadoresDelGrupo(grupoId: number): Promise<void> {
+    const teleoperadores = await this.teleoperadorRepository.find({
+      where: { grupo: { id_grup: grupoId } },
+    });
+
+    if (teleoperadores.length === 0) return;
+
+    for (const tele of teleoperadores) {
+      tele.activo = false;
+    }
+    await this.teleoperadorRepository.save(teleoperadores);
   }
 }

@@ -77,4 +77,7 @@ export class GrupoResponseDTO {
     example: true,
   })
   activo: boolean;
+
+  @ApiPropertyOptional({ description: 'Número de teleoperadores en el grupo', example: 3 })
+  teleoperadoresCount?: number;
 }

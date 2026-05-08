@@ -194,6 +194,7 @@ export class TrabajadorService {
     if (dto.apellidos !== undefined) trabajador.apellidos = dto.apellidos;
     if (dto.correo !== undefined) trabajador.correo = dto.correo;
     if (dto.contrasena !== undefined) trabajador.contrasena = dto.contrasena;
+    if (dto.activo !== undefined) trabajador.activo = dto.activo;
 
     // Actualizar campos específicos si están definidos
     if (trabajador instanceof Teleoperador) {

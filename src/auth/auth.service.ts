@@ -1,6 +1,7 @@
 import {
   Injectable,
   UnauthorizedException,
+  ForbiddenException,
   NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -34,6 +35,10 @@ export class AuthService {
 
     if (!trabajador) {
       throw new NotFoundException('Correo o contraseña incorrectos');
+    }
+
+    if (!trabajador.activo) {
+      throw new ForbiddenException('Cuenta desactivada');
     }
 
     // Validar contraseña

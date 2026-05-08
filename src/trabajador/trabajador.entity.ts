@@ -37,4 +37,7 @@ export class Trabajador extends BaseEntity {
     name: 'rol',
   })
   rol: TipoTrabajador;
+
+  @Column({ default: true })
+  activo: boolean;
 }

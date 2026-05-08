@@ -110,12 +110,13 @@ export class GrupoController {
    * Así evitamos repetir lógica en cada método.
    */
   private toResponse(grupo: Grupo): GrupoResponseDTO {
-    const { id_grup, nombre, descripcion, activo } = grupo;
+    const { id_grup, nombre, descripcion, activo, teleoperadores } = grupo;
     return {
       id_grup,
       nombre,
       descripcion,
       activo,
+      teleoperadoresCount: teleoperadores?.length ?? 0,
     };
   }
 }

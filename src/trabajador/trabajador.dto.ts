@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsEmail,
   IsEnum,
   IsNumber,
@@ -162,6 +163,14 @@ export class UpdateTrabajadorDTO {
     example: '12345678A',
   })
   dni?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  @ApiPropertyOptional({
+    description: 'Estado del trabajador (activo/inactivo)',
+    example: true,
+  })
+  activo?: boolean;
 }
 // DTO para la respuesta de un trabajador.
 export class TrabajadorReponseDTO {

@@ -10,6 +10,8 @@ import { Trabajador, TipoTrabajador } from './trabajador.entity';
 import { Teleoperador } from '../teleoperador/teleoperador.entity';
 import { Supervisor } from '../supervisor/supervisor.entity';
 import { Grupo } from 'src/grupo/grupo.entity';
+import { NotificacionService } from '../notificacion/notificacion.service';
+import { TipoNotificacion } from '../notificacion/notificacion.entity';
 import * as bcrypt from 'bcrypt';
 
 // Servicio de Trabajador que maneja la lógica de negocio.
@@ -24,10 +26,11 @@ export class TrabajadorService {
     private readonly supervisorRepository: Repository<Supervisor>,
     @InjectRepository(Grupo)
     private readonly grupoRepository: Repository<Grupo>,
+    private readonly notificacionService: NotificacionService,
   ) {}
 
   // Método para crear un nuevo trabajador.
-  async create(dto: CreateTrabajadorDTO): Promise<Trabajador> {
+  async create(dto: CreateTrabajadorDTO, actorId?: number): Promise<Trabajador> {
     const rol =
       typeof dto.rol === 'string'
         ? (dto.rol.toLowerCase() as TipoTrabajador)
@@ -95,9 +98,16 @@ export class TrabajadorService {
         relations: { grupo: true },
       });
 
-      if (!resultado) {
-        throw new Error('Error al recuperar el teleoperador creado');
-      }
+      if (!resultado) throw new Error('Error al recuperar el teleoperador creado');
+
+      const actorName = actorId ? await this.notificacionService.resolveActorName(actorId) : 'Un supervisor';
+      await this.notificacionService.notifyAllSupervisors(
+        'Nuevo teleoperador creado',
+        `${actorName} ha añadido el teleoperador: ${resultado.nombre} ${resultado.apellidos}`,
+        TipoNotificacion.SUPERVISION,
+        { eventType: 'TELEOPERADOR_NUEVO', operatorId: resultado.id_trab, operatorName: `${resultado.nombre} ${resultado.apellidos}`, actorId },
+        actorId,
+      );
 
       return resultado;
     }
@@ -127,8 +137,16 @@ export class TrabajadorService {
         dni: typeof dto.dni === 'string' ? dto.dni.toUpperCase() : dto.dni,
       });
 
-      // Guardar supervisor
-      return this.supervisorRepository.save(supervisor);
+      const savedSupervisor = await this.supervisorRepository.save(supervisor);
+      const actorName = actorId ? await this.notificacionService.resolveActorName(actorId) : 'Un supervisor';
+      await this.notificacionService.notifyAllSupervisors(
+        'Nuevo supervisor creado',
+        `${actorName} ha añadido el supervisor: ${savedSupervisor.nombre} ${savedSupervisor.apellidos}`,
+        TipoNotificacion.SUPERVISION,
+        { eventType: 'SUPERVISOR_NUEVO', operatorId: savedSupervisor.id_trab, operatorName: `${savedSupervisor.nombre} ${savedSupervisor.apellidos}`, actorId },
+        actorId,
+      );
+      return savedSupervisor;
     }
 
     // Crear trabajador genérico
@@ -162,6 +180,7 @@ export class TrabajadorService {
   async update(
     id: number,
     dto: UpdateTrabajadorDTO,
+    actorId?: number,
   ): Promise<Trabajador | null> {
     const trabajador = await this.trabajadorRepository.findOne({
       where: {
@@ -173,6 +192,8 @@ export class TrabajadorService {
     if (!trabajador) {
       return null;
     }
+
+    const activoAntes = trabajador.activo;
 
     // Procesar actualización del rol
     const rolUpdate =
@@ -197,33 +218,92 @@ export class TrabajadorService {
     if (dto.activo !== undefined) trabajador.activo = dto.activo;
 
     // Actualizar campos específicos si están definidos
+    let saved: Trabajador;
+
     if (trabajador instanceof Teleoperador) {
-      if (dto.nia !== undefined) {
-        trabajador.nia = dto.nia;
-      }
-      await this.teleoperadorRepository.save(trabajador);
-      return this.cargarGrupoSiTeleoperador(trabajador);
-    }
-
-    // Actualizar campos específicos si están definidos
-    if (trabajador instanceof Supervisor) {
+      if (dto.nia !== undefined) trabajador.nia = dto.nia;
+      saved = await this.teleoperadorRepository.save(trabajador);
+    } else if (trabajador instanceof Supervisor) {
       if (dto.dni !== undefined) {
-        trabajador.dni =
-          typeof dto.dni === 'string' ? dto.dni.toUpperCase() : dto.dni;
+        trabajador.dni = typeof dto.dni === 'string' ? dto.dni.toUpperCase() : dto.dni;
       }
-      return this.supervisorRepository.save(trabajador);
+      saved = await this.supervisorRepository.save(trabajador);
+    } else {
+      saved = await this.trabajadorRepository.save(trabajador);
     }
 
-    return this.trabajadorRepository.save(trabajador);
+    // Notificaciones por cambio de estado activo
+    if (dto.activo !== undefined && dto.activo !== activoAntes) {
+      const actorName = actorId ? await this.notificacionService.resolveActorName(actorId) : 'Un supervisor';
+      const operatorName = `${saved.nombre} ${saved.apellidos}`;
+
+      if (!dto.activo) {
+        await this.notificacionService.notifyAllSupervisors(
+          'Teleoperador desactivado',
+          `${actorName} ha desactivado al teleoperador: ${operatorName}`,
+          TipoNotificacion.SUPERVISION,
+          { eventType: 'TELEOPERADOR_DESACTIVADO', operatorId: id, operatorName, actorId },
+          actorId,
+        );
+        await this.notificacionService.createForUser(
+          id,
+          'Tu cuenta ha sido desactivada',
+          `Tu cuenta ha sido desactivada por ${actorName}`,
+          TipoNotificacion.SYSTEM,
+          { eventType: 'CUENTA_DESACTIVADA', actorId },
+        );
+      } else {
+        await this.notificacionService.notifyAllSupervisors(
+          'Teleoperador reactivado',
+          `${actorName} ha reactivado al teleoperador: ${operatorName}`,
+          TipoNotificacion.SUPERVISION,
+          { eventType: 'TELEOPERADOR_REACTIVADO', operatorId: id, operatorName, actorId },
+          actorId,
+        );
+        await this.notificacionService.createForUser(
+          id,
+          'Tu cuenta ha sido reactivada',
+          `Tu cuenta ha sido reactivada por ${actorName}`,
+          TipoNotificacion.SYSTEM,
+          { eventType: 'CUENTA_REACTIVADA', actorId },
+        );
+      }
+    }
+
+    return trabajador instanceof Teleoperador ? this.cargarGrupoSiTeleoperador(saved) : saved;
   }
 
   // Método para eliminar un trabajador por su ID.
-  async remove(id: number): Promise<boolean> {
-    const result = await this.trabajadorRepository.delete({
-      id_trab: id,
-    });
+  async remove(id: number, actorId?: number): Promise<boolean> {
+    const trabajador = await this.trabajadorRepository.findOne({ where: { id_trab: id } });
+    if (!trabajador) return false;
+
+    const operatorName = `${trabajador.nombre} ${trabajador.apellidos}`;
+    const actorName = actorId ? await this.notificacionService.resolveActorName(actorId) : 'Un supervisor';
+    const isTeleoperador = trabajador.rol === TipoTrabajador.TELEOPERADOR;
+
+    // Notificar al propio trabajador antes de eliminarlo
+    await this.notificacionService.createForUser(
+      id,
+      'Tu cuenta ha sido eliminada',
+      `Tu cuenta ha sido eliminada por ${actorName}`,
+      TipoNotificacion.SYSTEM,
+      { eventType: 'CUENTA_ELIMINADA', actorId },
+    );
+
+    const result = await this.trabajadorRepository.delete({ id_trab: id });
     const affected = result.affected ?? 0;
-    return affected > 0;
+    if (affected === 0) return false;
+
+    await this.notificacionService.notifyAllSupervisors(
+      isTeleoperador ? 'Teleoperador eliminado' : 'Supervisor eliminado',
+      `${actorName} ha eliminado al ${isTeleoperador ? 'teleoperador' : 'supervisor'}: ${operatorName}`,
+      TipoNotificacion.SUPERVISION,
+      { eventType: isTeleoperador ? 'TELEOPERADOR_ELIMINADO' : 'SUPERVISOR_ELIMINADO', operatorId: id, operatorName, actorId },
+      actorId,
+    );
+
+    return true;
   }
 
   // Método para encontrar un trabajador por su correo electrónico.

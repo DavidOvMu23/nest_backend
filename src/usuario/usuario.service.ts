@@ -8,6 +8,8 @@ import { Repository } from 'typeorm';
 import { CreateUsuarioDTO, UpdateUsuarioDTO } from './usuario.dto';
 import { EstadoCuenta, Usuario } from './usuario.entity';
 import { ContactoEmergencia } from '../contacto_emergencia/contacto_emergencia.entity';
+import { NotificacionService } from '../notificacion/notificacion.service';
+import { TipoNotificacion } from '../notificacion/notificacion.entity';
 
 @Injectable()
 export class UsuarioService {
@@ -16,9 +18,10 @@ export class UsuarioService {
     private readonly usuarioRepository: Repository<Usuario>,
     @InjectRepository(ContactoEmergencia)
     private readonly contactoRepository: Repository<ContactoEmergencia>,
+    private readonly notificacionService: NotificacionService,
   ) {}
 
-  async create(dto: CreateUsuarioDTO): Promise<Usuario> {
+  async create(dto: CreateUsuarioDTO, actorId?: number): Promise<Usuario> {
     // Campos opcionales: si llegan vacíos, los guardamos como null
     const informacionLimpia = dto.informacion?.trim() || null;
     const datosMedicosLimpia = dto.datos_medicos_dolencias?.trim() || null;
@@ -69,6 +72,15 @@ export class UsuarioService {
       // la creación del contacto falla. Loggear sería ideal; por ahora
       // dejamos que la creación del usuario proceda.
     }
+
+    const actorName = actorId ? await this.notificacionService.resolveActorName(actorId) : 'Un supervisor';
+    await this.notificacionService.notifyAllSupervisors(
+      'Nuevo usuario añadido',
+      `${actorName} ha añadido un nuevo usuario: ${savedUsuario.nombre} ${savedUsuario.apellidos}`,
+      TipoNotificacion.SUPERVISION,
+      { eventType: 'USUARIO_NUEVO', userId: savedUsuario.dni, userName: `${savedUsuario.nombre} ${savedUsuario.apellidos}`, actorId },
+      actorId,
+    );
 
     return savedUsuario;
   }
@@ -143,7 +155,7 @@ export class UsuarioService {
     return saved;
   }
 
-  async remove(dni: string): Promise<boolean> {
+  async remove(dni: string, actorId?: number): Promise<boolean> {
     const usuario = await this.usuarioRepository.findOne({
       where: { dni: dni },
     });
@@ -173,6 +185,16 @@ export class UsuarioService {
 
     usuario.estado_cuenta = EstadoCuenta.SUSPENDIDO;
     await this.usuarioRepository.save(usuario);
+
+    const actorName = actorId ? await this.notificacionService.resolveActorName(actorId) : 'Un supervisor';
+    await this.notificacionService.notifyAllSupervisors(
+      'Usuario eliminado',
+      `${actorName} ha eliminado al usuario: ${usuario.nombre} ${usuario.apellidos}`,
+      TipoNotificacion.SUPERVISION,
+      { eventType: 'USUARIO_ELIMINADO', userId: dni, userName: `${usuario.nombre} ${usuario.apellidos}`, userType: 'usuario', actorId },
+      actorId,
+    );
+
     return true;
   }
 }

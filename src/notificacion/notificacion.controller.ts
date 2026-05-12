@@ -229,6 +229,7 @@ export class NotificacionController {
   private toResponse(notificacion: Notificacion): NotificacionResponseDTO {
     return {
       id_not: notificacion.id_not,
+      titulo: notificacion.titulo,
       contenido: notificacion.contenido,
       estado: notificacion.estado,
       tipo: notificacion.tipo,

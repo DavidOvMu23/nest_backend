@@ -9,6 +9,8 @@ import { Comunicacion } from './comunicacion.entity';
 import { Grupo } from '../grupo/grupo.entity';
 import { Usuario } from '../usuario/usuario.entity';
 import { BadRequestException } from '@nestjs/common';
+import { NotificacionService } from '../notificacion/notificacion.service';
+import { TipoNotificacion } from '../notificacion/notificacion.entity';
 
 // Servicio para gestionar las comunicaciones
 @Injectable()
@@ -20,6 +22,7 @@ export class ComunicacionService {
     private readonly grupoRepository: Repository<Grupo>,
     @InjectRepository(Usuario)
     private readonly usuarioRepository: Repository<Usuario>,
+    private readonly notificacionService: NotificacionService,
   ) {}
 
   // ====== MÉTODOS CRUD ======
@@ -58,7 +61,49 @@ export class ComunicacionService {
       comunicacion.usuario = usuario as any;
     }
 
-    return this.comunicacionRepository.save(comunicacion);
+    const saved = await this.comunicacionRepository.save(comunicacion);
+
+    // Notificaciones de llamada
+    const grupo = saved.grupo as Grupo | undefined;
+    const usuario = saved.usuario as Usuario | undefined;
+    const grupoNombre = grupo?.nombre ?? 'desconocido';
+    const usuarioNombre = usuario ? `${usuario.nombre} ${usuario.apellidos}` : 'desconocido';
+    const estado = (saved.estado ?? '').toUpperCase();
+
+    const titulo = estado === 'CANCELADA' ? 'Llamada cancelada' : 'Nueva llamada registrada';
+    const contenidoSuper =
+      estado === 'CANCELADA'
+        ? `El grupo ${grupoNombre} tiene una llamada cancelada asignada al usuario ${usuarioNombre}`
+        : `El grupo ${grupoNombre} ha gestionado una llamada para el usuario ${usuarioNombre}`;
+
+    await this.notificacionService.notifyAllSupervisors(
+      titulo,
+      contenidoSuper,
+      TipoNotificacion.CALL,
+      { eventType: 'LLAMADA_REGISTRADA', callId: saved.id_com, grupoNombre, usuarioNombre, estado },
+    );
+
+    // Solo notificar a los teleoperadores del grupo si la llamada es de hoy
+    if (grupo) {
+      const today = new Date();
+      const fechaLlamada = saved.fecha instanceof Date ? saved.fecha : new Date(saved.fecha);
+      const esHoy =
+        fechaLlamada.getFullYear() === today.getFullYear() &&
+        fechaLlamada.getMonth() === today.getMonth() &&
+        fechaLlamada.getDate() === today.getDate();
+
+      if (esHoy) {
+        await this.notificacionService.notifyTeleoperadoresInGroup(
+          grupo.id_grup,
+          'Nueva llamada hoy en tu grupo',
+          `Nueva llamada hoy para tu grupo ${grupoNombre}: usuario ${usuarioNombre} a las ${saved.hora ?? ''}`,
+          TipoNotificacion.CALL,
+          { eventType: 'LLAMADA_HOY', callId: saved.id_com, grupoNombre, usuarioNombre },
+        );
+      }
+    }
+
+    return saved;
   }
 
   // Obtener todas las comunicaciones

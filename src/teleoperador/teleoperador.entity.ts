@@ -15,6 +15,6 @@ export class Teleoperador extends Trabajador {
   })
   grupo: Grupo | null;
 
-  @OneToMany(() => Notificacion, (noti) => noti.teleoperador)
+  @OneToMany(() => Notificacion, (noti) => noti.teleoperador, { cascade: false })
   notificaciones: Notificacion[];
 }

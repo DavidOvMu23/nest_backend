@@ -1,18 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
-import { Teleoperador } from '../teleoperador/teleoperador.entity';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
+import { Trabajador } from '../trabajador/trabajador.entity';
 
-// Enum para tipos de notificación
 export enum TipoNotificacion {
-  USUARIO_NUEVO = 'usuario_nuevo',
-  LLAMADA_PENDING = 'llamada_pending',
-  CONTACTO_ASIGNADO = 'contacto_asignado',
-  SUPERVISOR_ASIGNADO = 'supervisor_asignado',
-  MENSAJE = 'mensaje',
-  ALERTA = 'alerta',
-  OTRO = 'otro',
+  CALL = 'call',
+  SYSTEM = 'system',
+  SUPERVISION = 'supervision',
 }
 
-// Enum para estados
 export enum EstadoNotificacion {
   SIN_LEER = 'sin_leer',
   LEIDA = 'leida',
@@ -20,13 +14,15 @@ export enum EstadoNotificacion {
   CANCELADA = 'cancelada',
 }
 
-// Entidad Notificacion mapeada a la tabla 'notificacion'.
 @Entity('notificacion')
-@Index(['teleoperador', 'estado']) // Para búsquedas rápidas por usuario y estado
-@Index(['createdAt']) // Para ordenar por fecha
+@Index(['teleoperador', 'estado'])
+@Index(['createdAt'])
 export class Notificacion {
   @PrimaryGeneratedColumn()
   id_not: number;
+
+  @Column({ nullable: true })
+  titulo?: string;
 
   @Column()
   contenido: string;
@@ -34,15 +30,16 @@ export class Notificacion {
   @Column({ type: 'enum', enum: EstadoNotificacion, default: EstadoNotificacion.SIN_LEER })
   estado: EstadoNotificacion;
 
-  @Column({ type: 'enum', enum: TipoNotificacion, default: TipoNotificacion.OTRO })
+  @Column({ type: 'enum', enum: TipoNotificacion, default: TipoNotificacion.SUPERVISION })
   tipo: TipoNotificacion;
 
-  // Metadata opcional para acciones contextuales (ej: id del usuario relacionado)
   @Column({ nullable: true, type: 'json' })
   metadata?: Record<string, any>;
 
-  @ManyToOne(() => Teleoperador, (tel) => tel.notificaciones, { eager: true })
-  teleoperador: Teleoperador;
+  // Destinatario: puede ser Supervisor o Teleoperador (ambos en tabla 'trabajador')
+  @ManyToOne(() => Trabajador, { eager: true, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'teleoperadorId' })
+  teleoperador: Trabajador;
 
   @CreateDateColumn()
   createdAt: Date;

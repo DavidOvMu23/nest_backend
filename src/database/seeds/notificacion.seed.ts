@@ -14,7 +14,7 @@ export class NotificacionSeed implements Seeder {
         const notificacionEntry = new Notificacion();
         notificacionEntry.contenido = notificacion.contenido;
         notificacionEntry.estado = notificacion.estado as EstadoNotificacion;
-        notificacionEntry.tipo = notificacion.tipo as TipoNotificacion || TipoNotificacion.OTRO;
+        notificacionEntry.tipo = notificacion.tipo as TipoNotificacion || TipoNotificacion.SUPERVISION;
 
         const tele = await teleoperadorRepository.findOneBy({
           correo: notificacion.teleoperador,

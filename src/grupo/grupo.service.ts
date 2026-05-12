@@ -100,8 +100,17 @@ export class GrupoService {
   }
 
   async remove(id: number, actorId?: number): Promise<boolean> {
-    const grupo = await this.grupoRepository.findOne({ where: { id_grup: id } });
+    const grupo = await this.grupoRepository.findOne({
+      where: { id_grup: id },
+      relations: ['teleoperadores'],
+    });
     if (!grupo) return false;
+
+    if (grupo.teleoperadores && grupo.teleoperadores.length > 0) {
+      throw new ConflictException(
+        `No se puede eliminar el grupo porque tiene ${grupo.teleoperadores.length} teleoperador(es) asignado(s). Reasígnalos antes de eliminarlo.`,
+      );
+    }
 
     const actorName = actorId ? await this.notificacionService.resolveActorName(actorId) : 'Un supervisor';
 
@@ -116,8 +125,7 @@ export class GrupoService {
 
     await this._desactivarTeleoperadoresDelGrupo(id);
 
-    grupo.activo = false;
-    await this.grupoRepository.save(grupo);
+    await this.grupoRepository.delete({ id_grup: id });
 
     await this.notificacionService.notifyAllSupervisors(
       'Grupo eliminado',

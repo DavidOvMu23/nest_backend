@@ -90,6 +90,7 @@ export class TrabajadorService {
         rol: TipoTrabajador.TELEOPERADOR,
         nia: dto.nia,
         grupo: grupo,
+        telefono: dto.telefono ?? null,
       });
 
       await this.teleoperadorRepository.save(teleoperador);
@@ -135,6 +136,7 @@ export class TrabajadorService {
         contrasena: hashedPassword,
         rol: TipoTrabajador.SUPERVISOR,
         dni: typeof dto.dni === 'string' ? dto.dni.toUpperCase() : dto.dni,
+        telefono: dto.telefono ?? null,
       });
 
       const savedSupervisor = await this.supervisorRepository.save(supervisor);
@@ -215,6 +217,7 @@ export class TrabajadorService {
     if (dto.apellidos !== undefined) trabajador.apellidos = dto.apellidos;
     if (dto.correo !== undefined) trabajador.correo = dto.correo;
     if (dto.contrasena !== undefined) trabajador.contrasena = dto.contrasena;
+    if (dto.telefono !== undefined) trabajador.telefono = dto.telefono;
     if (dto.activo !== undefined) trabajador.activo = dto.activo;
 
     // Actualizar campos específicos si están definidos
@@ -222,6 +225,11 @@ export class TrabajadorService {
 
     if (trabajador instanceof Teleoperador) {
       if (dto.nia !== undefined) trabajador.nia = dto.nia;
+      if (dto.grupoId !== undefined) {
+        const grupo = await this.grupoRepository.findOneBy({ id_grup: dto.grupoId });
+        if (!grupo) throw new BadRequestException(`El grupo con ID ${dto.grupoId} no existe`);
+        trabajador.grupo = grupo;
+      }
       saved = await this.teleoperadorRepository.save(trabajador);
     } else if (trabajador instanceof Supervisor) {
       if (dto.dni !== undefined) {

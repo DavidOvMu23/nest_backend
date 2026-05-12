@@ -154,13 +154,15 @@ export class TrabajadorController {
   }
 
   private toResponse(trabajador: Trabajador): TrabajadorReponseDTO {
-    const { id_trab, nombre, apellidos, correo, rol } = trabajador;
+    const { id_trab, nombre, apellidos, correo, rol, telefono, activo } = trabajador;
     const response: TrabajadorReponseDTO = {
       id_trab,
       nombre,
       apellidos,
       correo,
       rol,
+      telefono,
+      activo,
     };
     if (trabajador instanceof Teleoperador) {
       response.nia = trabajador.nia;

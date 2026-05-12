@@ -2,6 +2,7 @@ import {
   IsBoolean,
   IsEmail,
   IsEnum,
+  IsInt,
   IsNumber,
   IsOptional,
   IsString,
@@ -43,6 +44,11 @@ export class CreateTrabajadorDTO {
     example: 'temporal123',
   })
   contrasena: string;
+
+  @IsOptional()
+  @IsString()
+  @ApiPropertyOptional({ description: 'Teléfono del trabajador', example: '612345678' })
+  telefono?: string;
 
   @IsEnum(TipoTrabajador)
   @Transform(
@@ -165,6 +171,19 @@ export class UpdateTrabajadorDTO {
   dni?: string;
 
   @IsOptional()
+  @IsString()
+  @ApiPropertyOptional({ description: 'Teléfono del trabajador', example: '612345678' })
+  telefono?: string;
+
+  @IsOptional()
+  @IsInt()
+  @ApiPropertyOptional({
+    description: 'ID del grupo (solo para teleoperadores)',
+    example: 1,
+  })
+  grupoId?: number;
+
+  @IsOptional()
   @IsBoolean()
   @ApiPropertyOptional({
     description: 'Estado del trabajador (activo/inactivo)',
@@ -216,6 +235,12 @@ export class TrabajadorReponseDTO {
     example: 2,
   })
   grupoId?: number;
+
+  @ApiPropertyOptional({ description: 'Teléfono del trabajador', example: '612345678' })
+  telefono?: string | null;
+
+  @ApiPropertyOptional({ description: 'Estado del trabajador', example: true })
+  activo?: boolean;
 }
 export class LoginDTO {
   @IsEmail()

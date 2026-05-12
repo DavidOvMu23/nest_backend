@@ -38,6 +38,9 @@ export class Trabajador extends BaseEntity {
   })
   rol: TipoTrabajador;
 
+  @Column({ type: 'varchar', nullable: true, default: null })
+  telefono: string | null;
+
   @Column({ default: true })
   activo: boolean;
 }

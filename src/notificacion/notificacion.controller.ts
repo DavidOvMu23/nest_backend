@@ -11,8 +11,9 @@ import {
   HttpCode,
   HttpStatus,
   NotFoundException,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import {
   CreateNotificacionDTO,
   UpdateNotificacionDTO,
@@ -20,15 +21,21 @@ import {
 } from './notificacion.dto';
 import { NotificacionService } from './notificacion.service';
 import { Notificacion, EstadoNotificacion, TipoNotificacion } from './notificacion.entity';
+import { AuthGuard } from '../auth/guard/auth.guard';
+import { RolesGuard } from '../auth/guard/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
 
-@ApiTags('notificacion') // Etiqueta bonita para Swagger.
+@ApiTags('notificacion')
+@ApiBearerAuth('access-token')
 @Controller('notificacion')
+@UseGuards(AuthGuard, RolesGuard)
 export class NotificacionController {
   // Nest crea el servicio y nos lo entrega por el constructor.
   constructor(private readonly notificacionService: NotificacionService) { }
 
   // ====== CREAR ======
   @Post()
+  @Roles('supervisor', 'teleoperador')
   @ApiOperation({ summary: 'Crear una notificacion' })
   @ApiBody({ type: CreateNotificacionDTO })
   @ApiResponse({
@@ -43,6 +50,7 @@ export class NotificacionController {
 
   // ====== OBTENER UNA NOTIFICACIÓN ======
   @Get(':id')
+  @Roles('supervisor', 'teleoperador')
   @ApiOperation({ summary: 'Obtener notificación por ID' })
   @ApiResponse({
     status: 200,
@@ -60,6 +68,7 @@ export class NotificacionController {
 
   // ====== LISTAR NOTIFICACIONES CON FILTROS ======
   @Get()
+  @Roles('supervisor', 'teleoperador')
   @ApiOperation({ summary: 'Listar notificaciones con filtros opcionales' })
   @ApiQuery({
     name: 'teleoperadorId',
@@ -130,6 +139,7 @@ export class NotificacionController {
 
   // ====== ACTUALIZAR NOTIFICACIÓN ======
   @Patch(':id')
+  @Roles('supervisor', 'teleoperador')
   @ApiOperation({ summary: 'Actualizar notificación' })
   @ApiBody({ type: UpdateNotificacionDTO })
   @ApiResponse({
@@ -151,6 +161,7 @@ export class NotificacionController {
 
   // ====== MARCAR COMO LEÍDA ======
   @Patch(':id/mark-read')
+  @Roles('supervisor', 'teleoperador')
   @ApiOperation({ summary: 'Marcar notificación como leída' })
   @ApiResponse({
     status: 200,
@@ -168,6 +179,7 @@ export class NotificacionController {
 
   // ====== ARCHIVAR NOTIFICACIÓN ======
   @Patch(':id/archive')
+  @Roles('supervisor', 'teleoperador')
   @ApiOperation({ summary: 'Archivar notificación' })
   @ApiResponse({
     status: 200,
@@ -185,6 +197,7 @@ export class NotificacionController {
 
   // ====== MARCAR TODAS COMO LEÍDAS ======
   @Patch('user/:teleoperadorId/mark-all-read')
+  @Roles('supervisor', 'teleoperador')
   @ApiOperation({ summary: 'Marcar todas las notificaciones como leídas para un usuario' })
   @ApiResponse({
     status: 200,
@@ -198,6 +211,7 @@ export class NotificacionController {
 
   // ====== ELIMINAR NOTIFICACIÓN ======
   @Delete(':id')
+  @Roles('supervisor', 'teleoperador')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Eliminar notificación' })
   @ApiResponse({ status: 204, description: 'Eliminada correctamente' })
@@ -211,6 +225,7 @@ export class NotificacionController {
 
   // ====== LIMPIAR NOTIFICACIONES ARCHIVADAS ======
   @Delete('user/:teleoperadorId/archived')
+  @Roles('supervisor', 'teleoperador')
   @ApiOperation({ summary: 'Eliminar todas las notificaciones archivadas de un usuario' })
   @ApiResponse({
     status: 200,

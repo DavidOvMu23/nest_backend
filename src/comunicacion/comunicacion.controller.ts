@@ -23,6 +23,7 @@ import {
   CreateComunicacionDTO,
   UpdateComunicacionDTO,
   ComunicacionResponseDTO,
+  TeleoperadorComunicacionResponseDTO,
 } from './comunicacion.dto';
 import { ComunicacionService } from './comunicacion.service';
 import { Comunicacion } from './comunicacion.entity';
@@ -140,6 +141,7 @@ export class ComunicacionController {
       observaciones,
       grupo,
       usuario,
+      teleoperador,
     } = comunicacion;
 
     return {
@@ -163,6 +165,13 @@ export class ComunicacionController {
           id_usu: usuario.dni,
           nombre: usuario.nombre,
           apellidos: usuario.apellidos,
+        }
+        : undefined,
+      teleoperador: teleoperador
+        ? {
+          id_trab: teleoperador.id_trab,
+          nombre: teleoperador.nombre,
+          apellidos: teleoperador.apellidos,
         }
         : undefined,
     };

@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Grupo } from '../grupo/grupo.entity';
 import { Usuario } from '../usuario/usuario.entity';
+import { Teleoperador } from '../teleoperador/teleoperador.entity';
 
 // Entidad que representa una comunicación en la base de datos
 @Entity('comunicacion')
@@ -36,4 +37,8 @@ export class Comunicacion {
   // Relación Many-to-One con la entidad Usuario
   @ManyToOne(() => Usuario, (usuario) => usuario.comunicaciones)
   usuario: Usuario;
+
+  // Relación Many-to-One con el teleoperador que realizó la comunicación
+  @ManyToOne(() => Teleoperador, { nullable: true, onDelete: 'SET NULL' })
+  teleoperador: Teleoperador | null;
 }

@@ -72,6 +72,14 @@ export class CreateComunicacionDTO {
     example: 1,
   })
   grupoId?: number;
+
+  @IsOptional()
+  @IsInt()
+  @ApiPropertyOptional({
+    description: 'ID del teleoperador que realizó la llamada',
+    example: 1,
+  })
+  teleoperadorId?: number;
 }
 
 export class UpdateComunicacionDTO {
@@ -143,6 +151,14 @@ export class UpdateComunicacionDTO {
     example: 1,
   })
   grupoId?: number;
+
+  @IsOptional()
+  @IsInt()
+  @ApiPropertyOptional({
+    description: 'ID del teleoperador que realizó la llamada',
+    example: 1,
+  })
+  teleoperadorId?: number;
 }
 
 // DTO para la respuesta de una comunicación
@@ -152,6 +168,15 @@ export class UsuarioComunicacionResponseDTO {
   @ApiProperty({ description: 'Nombre', example: 'Beatriz' })
   nombre: string;
   @ApiProperty({ description: 'Apellidos', example: 'Fernández Luna' })
+  apellidos: string;
+}
+
+export class TeleoperadorComunicacionResponseDTO {
+  @ApiProperty({ description: 'ID teleoperador', example: 1 })
+  id_trab: number;
+  @ApiProperty({ description: 'Nombre', example: 'Laura' })
+  nombre: string;
+  @ApiProperty({ description: 'Apellidos', example: 'Gómez Pons' })
   apellidos: string;
 }
 
@@ -206,4 +231,10 @@ export class ComunicacionResponseDTO {
     type: () => UsuarioComunicacionResponseDTO,
   })
   usuario?: UsuarioComunicacionResponseDTO;
+
+  @ApiPropertyOptional({
+    description: 'Teleoperador que realizó la llamada',
+    type: () => TeleoperadorComunicacionResponseDTO,
+  })
+  teleoperador?: TeleoperadorComunicacionResponseDTO;
 }

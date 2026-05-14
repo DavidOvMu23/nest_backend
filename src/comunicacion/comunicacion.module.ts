@@ -5,10 +5,11 @@ import { ComunicacionController } from './comunicacion.controller';
 import { Comunicacion } from './comunicacion.entity';
 import { Grupo } from '../grupo/grupo.entity';
 import { Usuario } from '../usuario/usuario.entity';
+import { Teleoperador } from '../teleoperador/teleoperador.entity';
 import { NotificacionModule } from '../notificacion/notificacion.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Comunicacion, Grupo, Usuario]), NotificacionModule],
+  imports: [TypeOrmModule.forFeature([Comunicacion, Grupo, Usuario, Teleoperador]), NotificacionModule],
   providers: [ComunicacionService],
   controllers: [ComunicacionController],
 })

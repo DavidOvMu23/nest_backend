@@ -8,6 +8,7 @@ import {
 import { Comunicacion } from './comunicacion.entity';
 import { Grupo } from '../grupo/grupo.entity';
 import { Usuario } from '../usuario/usuario.entity';
+import { Teleoperador } from '../teleoperador/teleoperador.entity';
 import { BadRequestException } from '@nestjs/common';
 import { NotificacionService } from '../notificacion/notificacion.service';
 import { TipoNotificacion } from '../notificacion/notificacion.entity';
@@ -22,6 +23,8 @@ export class ComunicacionService {
     private readonly grupoRepository: Repository<Grupo>,
     @InjectRepository(Usuario)
     private readonly usuarioRepository: Repository<Usuario>,
+    @InjectRepository(Teleoperador)
+    private readonly teleoperadorRepository: Repository<Teleoperador>,
     private readonly notificacionService: NotificacionService,
   ) {}
 
@@ -59,6 +62,18 @@ export class ComunicacionService {
           `El usuario con DNI ${dto.usuarioId} no existe`,
         );
       comunicacion.usuario = usuario as any;
+    }
+
+    // Asociar teleoperador si se proporciona
+    if (dto.teleoperadorId !== undefined && dto.teleoperadorId !== null) {
+      const teleoperador = await this.teleoperadorRepository.findOne({
+        where: { id_trab: dto.teleoperadorId },
+      });
+      if (!teleoperador)
+        throw new BadRequestException(
+          `El teleoperador con ID ${dto.teleoperadorId} no existe`,
+        );
+      comunicacion.teleoperador = teleoperador;
     }
 
     const saved = await this.comunicacionRepository.save(comunicacion);
@@ -108,11 +123,11 @@ export class ComunicacionService {
 
   // Obtener todas las comunicaciones
   async findAll(): Promise<Comunicacion[]> {
-    // Cargamos las relaciones 'grupo' y 'usuario' para que las llamadas incluyan el grupo y el usuario.
     return this.comunicacionRepository.find({
       relations: {
         grupo: true,
         usuario: true,
+        teleoperador: true,
       },
     });
   }
@@ -121,7 +136,7 @@ export class ComunicacionService {
   async findOne(id: number): Promise<Comunicacion | null> {
     return this.comunicacionRepository.findOne({
       where: { id_com: id },
-      relations: { grupo: true, usuario: true },
+      relations: { grupo: true, usuario: true, teleoperador: true },
     });
   }
 
@@ -171,6 +186,20 @@ export class ComunicacionService {
         if (!usuario)
           throw new BadRequestException(`El usuario con DNI ${uid} no existe`);
         comunicacion.usuario = usuario as any;
+      }
+    }
+
+    if ((dto as any).teleoperadorId !== undefined) {
+      const tid = (dto as any).teleoperadorId;
+      if (tid === null) {
+        comunicacion.teleoperador = null;
+      } else {
+        const teleoperador = await this.teleoperadorRepository.findOne({
+          where: { id_trab: tid },
+        });
+        if (!teleoperador)
+          throw new BadRequestException(`El teleoperador con ID ${tid} no existe`);
+        comunicacion.teleoperador = teleoperador;
       }
     }
 

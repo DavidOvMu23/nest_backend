@@ -10,21 +10,28 @@ import {
   HttpCode,
   HttpStatus,
   NotFoundException,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateGrupoDTO, UpdateGrupoDTO, GrupoResponseDTO } from './grupo.dto';
 import { GrupoService } from './grupo.service';
 import { Grupo } from './grupo.entity';
+import { AuthGuard } from '../auth/guard/auth.guard';
+import { RolesGuard } from '../auth/guard/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
 
 // Controlador REST para la entidad Grupo.
 @ApiTags('grupo') // Etiqueta bonita para Swagger.
+@ApiBearerAuth('access-token')
 @Controller('grupo')
+@UseGuards(AuthGuard, RolesGuard)
 export class GrupoController {
   // Nest crea el servicio y nos lo entrega por el constructor.
   constructor(private readonly gruposService: GrupoService) {}
 
   // ====== CREAR ======
   @Post()
+  @Roles('supervisor')
   @ApiOperation({ summary: 'Crear un grupo' })
   @ApiBody({ type: CreateGrupoDTO })
   @ApiResponse({
@@ -39,6 +46,7 @@ export class GrupoController {
 
   // ====== OBTENER UNO ======
   @Get(':id')
+  @Roles('supervisor', 'teleoperador')
   @ApiOperation({ summary: 'Obtener grupo por id' })
   @ApiResponse({
     status: 200,
@@ -58,6 +66,7 @@ export class GrupoController {
 
   // ====== LISTAR TODOS ======
   @Get()
+  @Roles('supervisor', 'teleoperador')
   @ApiOperation({ summary: 'Listar todos los grupos' })
   @ApiResponse({
     status: 200,
@@ -72,6 +81,7 @@ export class GrupoController {
 
   // ====== ACTUALIZAR PARCIAL (PATCH) ======
   @Patch(':id')
+  @Roles('supervisor')
   @ApiOperation({ summary: 'Actualizar grupo (parcial)' })
   @ApiBody({ type: UpdateGrupoDTO })
   @ApiResponse({
@@ -93,6 +103,7 @@ export class GrupoController {
 
   // ====== ELIMINAR ======
   @Delete(':id')
+  @Roles('supervisor')
   @HttpCode(HttpStatus.NO_CONTENT) // HTTP 204 = se borró, no hace falta cuerpo de respuesta.
   @ApiOperation({ summary: 'Eliminar grupo' })
   @ApiResponse({ status: 204, description: 'Eliminado correctamente' })

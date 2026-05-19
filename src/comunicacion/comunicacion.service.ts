@@ -78,25 +78,27 @@ export class ComunicacionService {
 
     const saved = await this.comunicacionRepository.save(comunicacion);
 
-    // Notificaciones de llamada
+    // Notificar a supervisores solo cuando el resultado es completada o no_contesto
     const grupo = saved.grupo as Grupo | undefined;
     const usuario = saved.usuario as Usuario | undefined;
     const grupoNombre = grupo?.nombre ?? 'desconocido';
     const usuarioNombre = usuario ? `${usuario.nombre} ${usuario.apellidos}` : 'desconocido';
-    const estado = (saved.estado ?? '').toUpperCase();
+    const estadoNorm = (saved.estado ?? '').toLowerCase();
 
-    const titulo = estado === 'CANCELADA' ? 'Llamada cancelada' : 'Nueva llamada registrada';
-    const contenidoSuper =
-      estado === 'CANCELADA'
-        ? `El grupo ${grupoNombre} tiene una llamada cancelada asignada al usuario ${usuarioNombre}`
-        : `El grupo ${grupoNombre} ha gestionado una llamada para el usuario ${usuarioNombre}`;
+    if (['completada', 'no_contesto'].includes(estadoNorm)) {
+      const titulo = estadoNorm === 'completada' ? 'Llamada completada' : 'Llamada sin respuesta';
+      const contenidoSuper =
+        estadoNorm === 'completada'
+          ? `El grupo ${grupoNombre} ha realizado una llamada con el usuario ${usuarioNombre}`
+          : `El grupo ${grupoNombre} no ha podido contactar con el usuario ${usuarioNombre}`;
 
-    await this.notificacionService.notifyAllSupervisors(
-      titulo,
-      contenidoSuper,
-      TipoNotificacion.CALL,
-      { eventType: 'LLAMADA_REGISTRADA', callId: saved.id_com, grupoNombre, usuarioNombre, estado },
-    );
+      await this.notificacionService.notifyAllSupervisors(
+        titulo,
+        contenidoSuper,
+        TipoNotificacion.CALL,
+        { eventType: 'LLAMADA_REGISTRADA', callId: saved.id_com, grupoNombre, usuarioNombre, estado: estadoNorm },
+      );
+    }
 
     // Solo notificar a los teleoperadores del grupo si la llamada es de hoy
     if (grupo) {
@@ -203,7 +205,34 @@ export class ComunicacionService {
       }
     }
 
-    return this.comunicacionRepository.save(comunicacion);
+    const saved = await this.comunicacionRepository.save(comunicacion);
+
+    // Notificar a supervisores cuando el resultado editado es completada o no_contesto
+    const estadoNorm = (saved.estado ?? '').toLowerCase();
+    if (['completada', 'no_contesto'].includes(estadoNorm)) {
+      const full = await this.comunicacionRepository.findOne({
+        where: { id_com: saved.id_com },
+        relations: { grupo: true, usuario: true },
+      });
+      const grupoNombre = (full?.grupo as Grupo | undefined)?.nombre ?? 'desconocido';
+      const u = full?.usuario as Usuario | undefined;
+      const usuarioNombre = u ? `${u.nombre} ${u.apellidos}` : 'desconocido';
+
+      const titulo = estadoNorm === 'completada' ? 'Llamada completada' : 'Llamada sin respuesta';
+      const contenidoSuper =
+        estadoNorm === 'completada'
+          ? `El grupo ${grupoNombre} ha realizado una llamada con el usuario ${usuarioNombre}`
+          : `El grupo ${grupoNombre} no ha podido contactar con el usuario ${usuarioNombre}`;
+
+      await this.notificacionService.notifyAllSupervisors(
+        titulo,
+        contenidoSuper,
+        TipoNotificacion.CALL,
+        { eventType: 'LLAMADA_EDITADA', callId: saved.id_com, grupoNombre, usuarioNombre, estado: estadoNorm },
+      );
+    }
+
+    return saved;
   }
 
   // Eliminar una comunicación por su ID

@@ -183,6 +183,38 @@ export class UsuarioService {
       await this.contactoRepository.delete({ id_cont: contactoPropio.id_cont });
     }
 
+    // Desvincular este usuario de cualquier contacto manual restante para que
+    // esos contactos puedan eliminarse después si el supervisor lo decide.
+    const contactosManualesRef = await this.contactoRepository.find({
+      where: { usuarioReferenciado: { dni }, creado_desde_usuario: false },
+      relations: { usuarioReferenciado: true },
+    });
+    for (const contacto of contactosManualesRef) {
+      contacto.usuarioReferenciado = null;
+      await this.contactoRepository.save(contacto);
+    }
+
+    const contactosConUsuarioEnMtm = await this.contactoRepository
+      .createQueryBuilder('contacto')
+      .leftJoinAndSelect('contacto.usuarios', 'u')
+      .where((qb) => {
+        const sub = qb
+          .subQuery()
+          .select('c.id_cont')
+          .from(ContactoEmergencia, 'c')
+          .leftJoin('c.usuarios', 'uu')
+          .where('uu.dni = :dni', { dni })
+          .getQuery();
+        return 'contacto.id_cont IN ' + sub;
+      })
+      .getMany();
+    for (const contacto of contactosConUsuarioEnMtm) {
+      contacto.usuarios = (contacto.usuarios ?? []).filter(
+        (u) => u.dni !== dni,
+      );
+      await this.contactoRepository.save(contacto);
+    }
+
     usuario.estado_cuenta = EstadoCuenta.SUSPENDIDO;
     await this.usuarioRepository.save(usuario);
 

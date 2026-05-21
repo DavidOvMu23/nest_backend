@@ -7,7 +7,7 @@ import {
   UpdateContactoEmergenciaDTO,
 } from './contacto_emergencia.dto';
 import { ContactoEmergencia } from './contacto_emergencia.entity';
-import { Usuario } from '../usuario/usuario.entity';
+import { EstadoCuenta, Usuario } from '../usuario/usuario.entity';
 
 // Servicio para gestionar contactos de emergencia
 @Injectable()
@@ -178,15 +178,26 @@ export class ContactoEmergenciaService {
       );
     }
 
-    // Si está vinculado a un usuario (como referencia directa) o está en la lista
-    // many-to-many de usuarios, impedimos la eliminación directa.
-    if (
-      contacto.usuarioReferenciado ||
-      (contacto.usuarios && contacto.usuarios.length > 0)
-    ) {
+    // Si está vinculado a un usuario activo (referencia directa o many-to-many),
+    // impedimos la eliminación directa. Los usuarios suspendidos no cuentan: si
+    // solo quedan asociaciones a suspendidos, las limpiamos antes de borrar.
+    const refActivo =
+      !!contacto.usuarioReferenciado &&
+      contacto.usuarioReferenciado.estado_cuenta === EstadoCuenta.ACTIVO;
+    const usuariosActivos = (contacto.usuarios ?? []).filter(
+      (u) => u.estado_cuenta === EstadoCuenta.ACTIVO,
+    );
+
+    if (refActivo || usuariosActivos.length > 0) {
       throw new BadRequestException(
         'Este contacto está asociado a uno o varios usuarios. Primero desvincula las asociaciones o elimina la referencia desde el perfil del cliente.',
       );
+    }
+
+    if (contacto.usuarioReferenciado || (contacto.usuarios?.length ?? 0) > 0) {
+      contacto.usuarioReferenciado = null;
+      contacto.usuarios = [];
+      await this.contacto_emergenciaRepository.save(contacto);
     }
 
     const result = await this.contacto_emergenciaRepository.delete({

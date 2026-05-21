@@ -17,6 +17,10 @@ import * as bcrypt from 'bcrypt';
 // Servicio de Trabajador que maneja la lógica de negocio.
 @Injectable()
 export class TrabajadorService {
+  // Tope de teleoperadores activos por grupo. Contamos solo los activos para
+  // que suspender a alguien libere automáticamente un hueco para un reemplazo.
+  private static readonly MAX_TELEOPERADORES_POR_GRUPO = 2;
+
   constructor(
     @InjectRepository(Trabajador)
     private readonly trabajadorRepository: Repository<Trabajador>,
@@ -28,6 +32,29 @@ export class TrabajadorService {
     private readonly grupoRepository: Repository<Grupo>,
     private readonly notificacionService: NotificacionService,
   ) {}
+
+  // Lanza BadRequestException si el grupo ya tiene el máximo de teleoperadores
+  // activos. `excludingTeleoperadorId` permite ignorar a un teleoperador
+  // concreto (caso típico: al moverlo al mismo grupo en update()).
+  private async assertHayHuecoEnGrupo(
+    grupoId: number,
+    excludingTeleoperadorId?: number,
+  ): Promise<void> {
+    const qb = this.teleoperadorRepository
+      .createQueryBuilder('tele')
+      .leftJoin('tele.grupo', 'g')
+      .where('g.id_grup = :grupoId', { grupoId })
+      .andWhere('tele.activo = :activo', { activo: true });
+    if (excludingTeleoperadorId !== undefined) {
+      qb.andWhere('tele.id_trab != :exId', { exId: excludingTeleoperadorId });
+    }
+    const count = await qb.getCount();
+    if (count >= TrabajadorService.MAX_TELEOPERADORES_POR_GRUPO) {
+      throw new BadRequestException(
+        `Este grupo ya tiene el máximo de ${TrabajadorService.MAX_TELEOPERADORES_POR_GRUPO} teleoperadores. Elige otro grupo o reasigna alguno de los existentes.`,
+      );
+    }
+  }
 
   // Método para crear un nuevo trabajador.
   async create(dto: CreateTrabajadorDTO, actorId?: number): Promise<Trabajador> {
@@ -81,6 +108,7 @@ export class TrabajadorService {
           `El grupo con ID ${dto.grupoId} no existe`,
         );
       }
+      await this.assertHayHuecoEnGrupo(dto.grupoId);
       // Crear teleoperador
       const teleoperador = this.teleoperadorRepository.create({
         nombre: dto.nombre,
@@ -229,6 +257,20 @@ export class TrabajadorService {
         const grupo = await this.grupoRepository.findOneBy({ id_grup: dto.grupoId });
         if (!grupo) throw new BadRequestException(`El grupo con ID ${dto.grupoId} no existe`);
         trabajador.grupo = grupo;
+      }
+      // Si el teleoperador queda activo y asociado a un grupo, comprobamos que
+      // ese grupo aún tenga hueco. Solo lo hacemos cuando hay cambio relevante
+      // (cambio de grupo o reactivación) para no añadir consultas innecesarias.
+      const reactivando = dto.activo === true && activoAntes === false;
+      if (
+        trabajador.activo &&
+        trabajador.grupo &&
+        (dto.grupoId !== undefined || reactivando)
+      ) {
+        await this.assertHayHuecoEnGrupo(
+          trabajador.grupo.id_grup,
+          trabajador.id_trab,
+        );
       }
       saved = await this.teleoperadorRepository.save(trabajador);
     } else if (trabajador instanceof Supervisor) {

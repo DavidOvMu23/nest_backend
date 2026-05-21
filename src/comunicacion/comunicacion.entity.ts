@@ -24,8 +24,8 @@ export class Comunicacion {
   @Column()
   estado: string;
 
-  @Column()
-  observaciones: string;
+  @Column({ nullable: true })
+  observaciones?: string;
 
   // Relación Many-to-One con la entidad Grupo
   @ManyToOne(() => Grupo, (grupo) => grupo.comunicaciones, {

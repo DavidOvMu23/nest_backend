@@ -1,13 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, FindOptionsWhere } from 'typeorm';
 import { CreateNotificacionDTO, UpdateNotificacionDTO } from './notificacion.dto';
 import { Notificacion, EstadoNotificacion, TipoNotificacion } from './notificacion.entity';
-import { Trabajador, TipoTrabajador } from '../trabajador/trabajador.entity';
+import { Trabajador } from '../trabajador/trabajador.entity';
 import { Teleoperador } from '../teleoperador/teleoperador.entity';
+import { Supervisor } from '../supervisor/supervisor.entity';
 
 @Injectable()
 export class NotificacionService {
+  private readonly logger = new Logger(NotificacionService.name);
+
   constructor(
     @InjectRepository(Notificacion)
     private readonly notificacionRepository: Repository<Notificacion>,
@@ -15,6 +18,8 @@ export class NotificacionService {
     private readonly trabajadorRepository: Repository<Trabajador>,
     @InjectRepository(Teleoperador)
     private readonly teleoperadorRepository: Repository<Teleoperador>,
+    @InjectRepository(Supervisor)
+    private readonly supervisorRepository: Repository<Supervisor>,
   ) {}
 
   // ── CRUD básico ───────────────────────────────────────────────────────────────
@@ -142,9 +147,11 @@ export class NotificacionService {
     metadata?: Record<string, any>,
     excludeActorId?: number,
   ): Promise<void> {
-    const supervisors = await this.trabajadorRepository.find({
-      where: { rol: TipoTrabajador.SUPERVISOR, activo: true },
+    const supervisors = await this.supervisorRepository.find({
+      where: { activo: true },
     });
+
+    this.logger.log(`[notifyAllSupervisors] "${titulo}" — ${supervisors.length} supervisor(es) activo(s)`);
 
     const recipients = supervisors.filter(s => s.id_trab !== excludeActorId);
     if (recipients.length === 0) return;

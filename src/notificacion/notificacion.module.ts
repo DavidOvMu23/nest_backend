@@ -5,9 +5,10 @@ import { NotificacionController } from './notificacion.controller';
 import { Notificacion } from './notificacion.entity';
 import { Trabajador } from '../trabajador/trabajador.entity';
 import { Teleoperador } from '../teleoperador/teleoperador.entity';
+import { Supervisor } from '../supervisor/supervisor.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Notificacion, Trabajador, Teleoperador])],
+  imports: [TypeOrmModule.forFeature([Notificacion, Trabajador, Teleoperador, Supervisor])],
   providers: [NotificacionService],
   controllers: [NotificacionController],
   exports: [NotificacionService],

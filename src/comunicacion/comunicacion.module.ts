@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ComunicacionService } from './comunicacion.service';
 import { ComunicacionController } from './comunicacion.controller';
+import { ComunicacionScheduler } from './comunicacion.scheduler';
 import { Comunicacion } from './comunicacion.entity';
 import { Grupo } from '../grupo/grupo.entity';
 import { Usuario } from '../usuario/usuario.entity';
@@ -10,7 +11,7 @@ import { NotificacionModule } from '../notificacion/notificacion.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Comunicacion, Grupo, Usuario, Teleoperador]), NotificacionModule],
-  providers: [ComunicacionService],
+  providers: [ComunicacionService, ComunicacionScheduler],
   controllers: [ComunicacionController],
 })
 export class ComunicacionModule {}

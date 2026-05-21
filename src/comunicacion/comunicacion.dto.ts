@@ -49,13 +49,14 @@ export class CreateComunicacionDTO {
   })
   estado: string;
 
+  @IsOptional()
   @IsString()
-  @Length(1, 500)
-  @ApiProperty({
+  @Length(0, 500)
+  @ApiPropertyOptional({
     description: 'Observaciones de la llamada',
     example: 'Conversación fluida. Anima a continuar paseos.',
   })
-  observaciones: string;
+  observaciones?: string;
 
   @IsOptional()
   @IsString()
@@ -214,11 +215,11 @@ export class ComunicacionResponseDTO {
   })
   estado: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Observaciones de la llamada',
     example: 'Conversación fluida. Anima a continuar paseos.',
   })
-  observaciones: string;
+  observaciones?: string;
 
   @ApiPropertyOptional({
     description: 'Grupo que realizó la comunicación',

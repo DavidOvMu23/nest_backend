@@ -78,27 +78,31 @@ export class ComunicacionService {
 
     const saved = await this.comunicacionRepository.save(comunicacion);
 
-    // Notificar a supervisores solo cuando el resultado es completada o no_contesto
+    // Notificar a supervisores siempre que se cree una llamada
     const grupo = saved.grupo as Grupo | undefined;
     const usuario = saved.usuario as Usuario | undefined;
     const grupoNombre = grupo?.nombre ?? 'desconocido';
     const usuarioNombre = usuario ? `${usuario.nombre} ${usuario.apellidos}` : 'desconocido';
     const estadoNorm = (saved.estado ?? '').toLowerCase();
 
-    if (['completada', 'no_contesto'].includes(estadoNorm)) {
-      const titulo = estadoNorm === 'completada' ? 'Llamada completada' : 'Llamada sin respuesta';
-      const contenidoSuper =
-        estadoNorm === 'completada'
-          ? `El grupo ${grupoNombre} ha realizado una llamada con el usuario ${usuarioNombre}`
-          : `El grupo ${grupoNombre} no ha podido contactar con el usuario ${usuarioNombre}`;
+    const tituloCreate =
+      estadoNorm === 'completada'   ? 'Llamada completada' :
+      estadoNorm === 'no_contesto'  ? 'Llamada sin respuesta' :
+                                      'Nueva llamada registrada';
 
-      await this.notificacionService.notifyAllSupervisors(
-        titulo,
-        contenidoSuper,
-        TipoNotificacion.CALL,
-        { eventType: 'LLAMADA_REGISTRADA', callId: saved.id_com, grupoNombre, usuarioNombre, estado: estadoNorm },
-      );
-    }
+    const contenidoCreate =
+      estadoNorm === 'completada'
+        ? `El grupo ${grupoNombre} ha realizado una llamada con el usuario ${usuarioNombre}`
+        : estadoNorm === 'no_contesto'
+        ? `El grupo ${grupoNombre} no ha podido contactar con el usuario ${usuarioNombre}`
+        : `El grupo ${grupoNombre} ha registrado una nueva llamada para el usuario ${usuarioNombre}`;
+
+    await this.notificacionService.notifyAllSupervisors(
+      tituloCreate,
+      contenidoCreate,
+      TipoNotificacion.CALL,
+      { eventType: 'LLAMADA_REGISTRADA', callId: saved.id_com, grupoNombre, usuarioNombre, estado: estadoNorm },
+    );
 
     // Solo notificar a los teleoperadores del grupo si la llamada es de hoy
     if (grupo) {

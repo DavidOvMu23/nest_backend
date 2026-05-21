@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 import { ContactoEmergenciaModule } from './contacto_emergencia/contacto_emergencia.module';
 import { UsuarioModule } from './usuario/usuario.module';
 import { ComunicacionModule } from './comunicacion/comunicacion.module';
@@ -21,6 +22,7 @@ import { AuthModule } from './auth/auth.module';
       isGlobal: true,
       envFilePath: ['.env', '../env', '../../env'],
     }),
+    ScheduleModule.forRoot(),
 
     // Configuración de la conexión a la base de datos PostgreSQL usando TypeORM
     TypeOrmModule.forRoot({

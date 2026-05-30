@@ -9,7 +9,10 @@ export class Comunicacion {
   @PrimaryGeneratedColumn()
   id_com: number;
 
-  @Column()
+  // Tipo 'date': almacena solo la fecha (sin hora ni zona horaria), evitando
+  // que PostgreSQL convierta a UTC y el día retroceda uno. La hora se guarda
+  // por separado en la columna 'hora'.
+  @Column({ type: 'date' })
   fecha: Date;
 
   @Column()

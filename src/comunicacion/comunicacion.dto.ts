@@ -26,9 +26,9 @@ export class CreateComunicacionDTO {
   })
   hora: string;
 
-  // Obligatorio salvo que la llamada esté pendiente (por hacer): en ese
-  // caso aún no se conoce la duración, así que se permite vacío.
-  @ValidateIf((o) => o.estado !== 'pendiente')
+  // Solo obligatorio cuando la llamada está completada. En pendiente o no
+  // contestada todavía no se conoce la duración, así que se permite vacío.
+  @ValidateIf((o) => o.estado === 'completada')
   @IsString()
   @Length(1, 500)
   @ApiProperty({
@@ -37,9 +37,9 @@ export class CreateComunicacionDTO {
   })
   duracion: string;
 
-  // Obligatorio salvo que la llamada esté pendiente (por hacer): en ese
-  // caso todavía no hay nada que resumir, así que se permite vacío.
-  @ValidateIf((o) => o.estado !== 'pendiente')
+  // Solo obligatorio cuando la llamada está completada. En pendiente o no
+  // contestada no hay nada que resumir, así que se permite vacío.
+  @ValidateIf((o) => o.estado === 'completada')
   @IsString()
   @Length(1, 500)
   @ApiProperty({
@@ -108,7 +108,11 @@ export class UpdateComunicacionDTO {
   })
   hora?: string;
 
+  // Solo obligatorio cuando la llamada está completada (mismo criterio que
+  // CreateComunicacionDTO). Así editar una llamada pendiente o no contestada
+  // no falla al enviar la duración vacía.
   @IsOptional()
+  @ValidateIf((o) => o.estado === 'completada')
   @IsString()
   @Length(1, 500)
   @ApiPropertyOptional({
@@ -117,7 +121,10 @@ export class UpdateComunicacionDTO {
   })
   duracion?: string;
 
+  // Solo obligatorio cuando la llamada está completada (mismo criterio que
+  // CreateComunicacionDTO). En pendiente o no contestada se permite vacío.
   @IsOptional()
+  @ValidateIf((o) => o.estado === 'completada')
   @IsString()
   @Length(1, 500)
   @ApiPropertyOptional({

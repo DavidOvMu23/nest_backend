@@ -67,6 +67,15 @@ export class CreateComunicacionDTO {
 
   @IsOptional()
   @IsString()
+  @Length(0, 500)
+  @ApiPropertyOptional({
+    description: 'Información que deja el supervisor para el teleoperador',
+    example: 'Recordar preguntar por la medicación nueva.',
+  })
+  informacion_supervisor?: string;
+
+  @IsOptional()
+  @IsString()
   @ApiPropertyOptional({
     description: 'DNI del usuario al que se le hizo la llamada',
     example: '10101010K',
@@ -153,6 +162,15 @@ export class UpdateComunicacionDTO {
 
   @IsOptional()
   @IsString()
+  @Length(0, 500)
+  @ApiPropertyOptional({
+    description: 'Información que deja el supervisor para el teleoperador',
+    example: 'Recordar preguntar por la medicación nueva.',
+  })
+  informacion_supervisor?: string;
+
+  @IsOptional()
+  @IsString()
   @ApiPropertyOptional({
     description: 'DNI del usuario al que se le hizo la llamada',
     example: '10101010K',
@@ -234,6 +252,12 @@ export class ComunicacionResponseDTO {
     example: 'Conversación fluida. Anima a continuar paseos.',
   })
   observaciones?: string;
+
+  @ApiPropertyOptional({
+    description: 'Información que deja el supervisor para el teleoperador',
+    example: 'Recordar preguntar por la medicación nueva.',
+  })
+  informacion_supervisor?: string;
 
   @ApiPropertyOptional({
     description: 'Grupo que realizó la comunicación',

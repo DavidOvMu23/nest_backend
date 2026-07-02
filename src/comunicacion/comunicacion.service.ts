@@ -38,6 +38,7 @@ export class ComunicacionService {
       resumen: dto.resumen,
       estado: dto.estado,
       observaciones: dto.observaciones,
+      informacion_supervisor: dto.informacion_supervisor,
     });
 
     // Asociar grupo si se proporciona
@@ -165,6 +166,8 @@ export class ComunicacionService {
     if (dto.estado !== undefined) comunicacion.estado = dto.estado;
     if (dto.observaciones !== undefined)
       comunicacion.observaciones = dto.observaciones;
+    if (dto.informacion_supervisor !== undefined)
+      comunicacion.informacion_supervisor = dto.informacion_supervisor;
 
     // Asociar/actualizar grupo y usuario si vienen en el DTO
     if ((dto as any).grupoId !== undefined) {

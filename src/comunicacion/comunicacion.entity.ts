@@ -30,6 +30,12 @@ export class Comunicacion {
   @Column({ nullable: true })
   observaciones?: string;
 
+  // Información que deja el supervisor para el teleoperador que hará la
+  // llamada (instrucciones, contexto...). La escribe el supervisor al crear
+  // la llamada; el teleoperador solo puede leerla.
+  @Column({ nullable: true })
+  informacion_supervisor?: string;
+
   // Relación Many-to-One con la entidad Grupo
   @ManyToOne(() => Grupo, (grupo) => grupo.comunicaciones, {
     nullable: true,

@@ -139,6 +139,7 @@ export class ComunicacionController {
       resumen,
       estado,
       observaciones,
+      informacion_supervisor,
       grupo,
       usuario,
       teleoperador,
@@ -152,6 +153,7 @@ export class ComunicacionController {
       resumen,
       estado,
       observaciones,
+      informacion_supervisor,
       grupo: grupo
         ? {
           id_grup: grupo.id_grup,

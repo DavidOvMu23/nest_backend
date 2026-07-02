@@ -2,16 +2,12 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import { runSeeders, SeederOptions } from 'typeorm-extension';
 //Comunicación
 import { Comunicacion } from './comunicacion/comunicacion.entity';
-import { ComunicacionSeed } from './database/seeds/comunicacion.seed';
 //Contacto de emergencia
 import { ContactoEmergencia } from './contacto_emergencia/contacto_emergencia.entity';
-import { ContactoEmergenciaSeeder } from './database/seeds/contacto_emergencia.seed';
 //Grupo
 import { Grupo } from './grupo/grupo.entity';
-import { GrupoSeed } from './database/seeds/grupo.seed';
 //Notificación
 import { Notificacion } from './notificacion/notificacion.entity';
-import { NotificacionSeed } from './database/seeds/notificacion.seed';
 //Supervisor
 import { Supervisor } from './supervisor/supervisor.entity';
 //Teleoperador
@@ -21,9 +17,6 @@ import { TrabajadorSeeder } from './database/seeds/trabajador.seed';
 import { Trabajador } from './trabajador/trabajador.entity';
 //Usuario
 import { Usuario } from './usuario/usuario.entity';
-import { UsuarioSeed } from './database/seeds/usuario.seed';
-//Usuario-Contacto relación
-import { UsuarioContactoSeed } from './database/seeds/usuario_contacto.seed';
 
 // Configuración de la fuente de datos para los seeders
 const options: DataSourceOptions & SeederOptions = {
@@ -44,15 +37,7 @@ const options: DataSourceOptions & SeederOptions = {
     Teleoperador,
     Usuario,
   ],
-  seeds: [
-    GrupoSeed,
-    TrabajadorSeeder,
-    ContactoEmergenciaSeeder,
-    UsuarioSeed,
-    UsuarioContactoSeed,
-    ComunicacionSeed,
-    NotificacionSeed,
-  ],
+  seeds: [TrabajadorSeeder],
 };
 
 // Creación de la fuente de datos
